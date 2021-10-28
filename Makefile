@@ -26,10 +26,7 @@ format:
 	$(VENV)/bin/autoflake --recursive --in-place --remove-all-unused-imports $(ALL)
 	$(VENV)/bin/unify --in-place --recursive $(ALL)
 
-#up:
-#	python3.8 -m web_scraper.handlers
-#
-#worker:
-#	python3 -m web_scraper.worker
+up:
+	$(VENV)/bin/python $(CODE)/run_server.py
 
 ci:	lint test

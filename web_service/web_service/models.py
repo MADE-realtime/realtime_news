@@ -15,3 +15,4 @@ class News(BaseModel):
 
 class ListNews(BaseModel):
     news_list: List[News]
+    statistics: None

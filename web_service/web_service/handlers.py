@@ -13,26 +13,26 @@ def get_all_handler(number: int):
     :return:
     """
     news_list = NEWS_CSV_EXTRACTOR.show_random_news(num_random_news=number)
-    return news_list
+    return news_list.dict()
 
 
-@app.get('/get_date/{date}')
-def get_date_handler(date: str):
+@app.get('/get_date/{start_date}_{end_date}')
+def get_date_handler(start_date: str, end_date: str):
     """
     Get news by day
     :param date:
     :return:
     """
-    news_list = NEWS_CSV_EXTRACTOR.show_news_by_day(date)
-    return news_list
+    news_list = NEWS_CSV_EXTRACTOR.show_news_by_days(start_date, end_date)
+    return news_list.dict()
 
 
-@app.get('/get_topic/{topic}_{date}')
-def get_topic_handler(topic: str):
+@app.get('/get_topic/{topic}_{start_date}_{end_date}')
+def get_topic_handler(topic: str, start_date: str, end_date: str):
     """
     Get news by day and topic
     :param topic:
     :return:
     """
-    news_list = NEWS_CSV_EXTRACTOR.show_news_by_topic(topic=topic)
-    return news_list
+    news_list = NEWS_CSV_EXTRACTOR.show_news_by_topic(topic, start_date, end_date)
+    return news_list.dict()
