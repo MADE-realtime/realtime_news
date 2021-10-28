@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from scrapy.spiders import SitemapSpider
-from scrapy.linkextractors import LinkExtractor
 
 
 class NewsSpider(SitemapSpider):
@@ -10,7 +9,7 @@ class NewsSpider(SitemapSpider):
     def __init__(self, sitemap_urls=None, date_depth=None, *args, **kwargs):
         self.sitemap_urls = sitemap_urls or []
         self.date_depth = date_depth or datetime.today()
-        super(NewsSpider, self).__init__()
+        super(NewsSpider, self).__init__(*args, **kwargs)
 
     def sitemap_filter(self, entries):
         for entry in entries:

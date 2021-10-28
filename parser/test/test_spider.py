@@ -1,7 +1,8 @@
-import os
-from data_collection.newsspider import NewsSpider
-from scrapy.http import Response, Request
 from datetime import datetime
+from scrapy.http import Response, Request
+
+from data_collection.newsspider import NewsSpider
+from test.util import get_abs_path
 
 
 def test_news_spider_find_news_ref():
@@ -34,17 +35,3 @@ def fake_response_from_file(file_path, url=None):
         body=file_content)
     response.encoding = 'utf-8'
     return response
-
-
-def get_abs_path(file_path):
-    if not file_path[0] == '/':
-        responses_dir = os.path.dirname(os.path.realpath(__file__))
-        file_path = os.path.join(responses_dir, file_path)
-    return file_path
-
-
-def make_short_str(obj, max_length=30):
-    str_obj = str(obj)
-    if len(str_obj) > max_length:
-        str_obj = f'{str_obj[:max_length]}...'
-    return str_obj
