@@ -31,7 +31,7 @@ def test_tass_parser(html_path, yaml_path):
     news_response = fake_response_from_file(html_path)
     expected_out = read_yaml(yaml_path)
     expected_out = prepare_expected_out(expected_out)
-    parser = PARSER_ZOO['tass']()
+    parser = PARSER_ZOO['tass']
     parsed_out = parser.parse(news_response)
     for key, expected_value in expected_out.items():
         assert expected_value == parsed_out[key], (f'{key} - field parsed wrong\n'

@@ -3,16 +3,16 @@ from scrapy.http import HtmlResponse
 PARSER_ZOO = {}
 
 
-def add_to_catalog(name):
+def add_to_zoo(name):
     def add_wrapper(parser_to_add):
-        PARSER_ZOO[name] = parser_to_add
+        PARSER_ZOO[name] = parser_to_add()
         return parser_to_add
     return add_wrapper
 
 
-@add_to_catalog('tass')
+@add_to_zoo('tass')
 class TassParser:
-    def parse(self, response:HtmlResponse):
+    def parse(self, response: HtmlResponse):
         title = self.join_css_parsed(response, '.news-header__title')
         title_post = self.join_css_parsed(response, '.news-header__lead')
         text = self.join_css_parsed(response, 'h2 , #news p')
