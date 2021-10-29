@@ -1,4 +1,27 @@
 import os
+from scrapy.http import HtmlResponse, Request
+
+
+def fake_response_from_file(file_path, url=None):
+    """
+    Create a Scrapy fake HTTP response from a HTML file
+    @param file_path: The relative filename from the responses directory,
+                      but absolute paths are also accepted.
+    @param url: The URL of the response.
+    returns: A scrapy HTTP response which can be used for unittesting.
+    """
+    if not url:
+        url = 'http://www.example.com'
+
+    request = Request(url=url)
+    file_path = get_abs_path(file_path)
+
+    file_content = open(file_path, 'rb').read()
+
+    response = HtmlResponse(url=url,
+        request=request,
+        body=file_content)
+    return response
 
 
 def get_abs_path(file_path):

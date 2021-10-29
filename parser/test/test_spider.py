@@ -1,8 +1,7 @@
 from datetime import datetime
-from scrapy.http import Response, Request
 
 from data_collection.newsspider import NewsSpider
-from test.util import get_abs_path
+from test.util import fake_response_from_file
 
 
 def test_news_spider_find_news_ref():
@@ -14,24 +13,3 @@ def test_news_spider_find_news_ref():
         assert e.url in expected_url, f"{e.url} not expected in url to crawl (date_depth = {date_depth})"
 
 
-def fake_response_from_file(file_path, url=None):
-    """
-    Create a Scrapy fake HTTP response from a HTML file
-    @param file_path: The relative filename from the responses directory,
-                      but absolute paths are also accepted.
-    @param url: The URL of the response.
-    returns: A scrapy HTTP response which can be used for unittesting.
-    """
-    if not url:
-        url = 'http://www.example.com'
-
-    request = Request(url=url)
-    file_path = get_abs_path(file_path)
-
-    file_content = open(file_path, 'rb').read()
-
-    response = Response(url=url,
-        request=request,
-        body=file_content)
-    response.encoding = 'utf-8'
-    return response
