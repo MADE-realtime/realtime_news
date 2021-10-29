@@ -1,6 +1,6 @@
 import pytest
 import yaml
-from data_collection.parser_zoo import PARSER_ZOO
+from newsspider.spiders.parser_zoo import PARSER_ZOO
 from test.util import get_abs_path, fake_response_from_file, make_short_str
 
 
