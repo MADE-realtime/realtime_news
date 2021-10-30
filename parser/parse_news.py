@@ -59,6 +59,7 @@ if __name__ == '__main__':
         "FEEDS": {
             news_args.destination: {"format": "json"},
         },
+        "FEED_EXPORT_ENCODING": 'utf-8',
         'USER_AGENT': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.10; rv:39.0) Gecko/20100101 Firefox/39.0',
     })
     crawl_proc.crawl(NewsSpider, sitemap_urls, domain_rules)
