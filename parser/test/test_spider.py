@@ -1,6 +1,6 @@
 import os.path
 import re
-from datetime import datetime
+import datetime
 from unittest.mock import MagicMock, patch
 from dicttoxml import dicttoxml
 
@@ -10,8 +10,8 @@ from test.util import fake_response_from_file
 
 
 def test_news_spider_find_news_ref():
-    response = fake_response_from_file('tass_data/sitemap_hot.xml')
-    date_depth = datetime(2021, 10, 26)
+    response = fake_response_from_file('tass_data/sitemap_hot.xml', url='http://www.example.com/sitemap.xml')
+    date_depth = datetime.datetime(2021, 10, 26, tzinfo=datetime.timezone(datetime.timedelta(seconds=10800)))
     news_spider = NewsSpider([], [], date_depth=date_depth)
     expected_url = ['https://tass.ru/ekonomika/12784183', 'https://tass.ru/sport/12784233']
     for news_response in news_spider._parse_sitemap(response):
@@ -32,7 +32,7 @@ def test_news_spider_use_parser_in_response(tmpdir):
         fout.write(xml)
 
     example_request = fake_response_from_file(os.path.join(tmpdir, 'example_sitemap.xml'))
-    date_depth = datetime(2021, 10, 26)
+    date_depth = datetime.datetime(2021, 10, 26, tzinfo=datetime.timezone(datetime.timedelta(seconds=10800)))
     news_spider = NewsSpider([], sitemap_rules, date_depth=date_depth)
     for news_response in news_spider._parse_sitemap(example_request):
         parser_name = re.findall('example.', news_response.url)[0]
