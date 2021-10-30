@@ -1,11 +1,11 @@
 import os.path
 import re
 from datetime import datetime
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 from dicttoxml import dicttoxml
 
-from newsspider.spiders.newsspider import NewsSpider
-from newsspider.spiders.parser_zoo import PARSER_ZOO
+from data_collection.newsspider import NewsSpider
+from data_collection.parser_zoo import PARSER_ZOO
 from test.util import fake_response_from_file
 
 

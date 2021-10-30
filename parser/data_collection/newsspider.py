@@ -2,7 +2,7 @@ from datetime import datetime
 
 from scrapy.spiders import SitemapSpider
 
-from newsspider.spiders.parser_zoo import PARSER_ZOO
+from data_collection.parser_zoo import PARSER_ZOO
 
 
 class NewsSpider(SitemapSpider):
