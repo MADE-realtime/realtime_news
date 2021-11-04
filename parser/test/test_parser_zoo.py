@@ -1,5 +1,7 @@
-import pytest
+import os
 import yaml
+import pytest
+
 from data_collection.parser_zoo import PARSER_ZOO
 from test.util import get_abs_path, fake_response_from_file, make_short_str
 
@@ -19,19 +21,27 @@ def read_yaml(yaml_path):
     return yaml_data
 
 
+def get_test_data(parser, folder):
+    for html_fname in os.listdir(folder):
+        if html_fname.endswith('html'):
+            yaml_fname = html_fname.replace('html', 'yaml')
+            html_path = os.path.join(folder, html_fname)
+            yaml_path = os.path.join(folder, yaml_fname)
+            yield parser, html_path, yaml_path
+
+
 @pytest.mark.parametrize(
-    ("html_path", "yaml_path"),
+    ("parser", "html_path", "yaml_path"),
     [
-        ('tass_data/tass_news1.html', 'tass_data/tass_news1.yaml'),
-        ('tass_data/tass_news2.html', 'tass_data/tass_news2.yaml'),
-        ('tass_data/tass_news3.html', 'tass_data/tass_news3.yaml'),
+        *get_test_data('tass', 'tass_data'),
+        *get_test_data('rbc', 'rbc_data')
     ]
 )
-def test_tass_parser(html_path, yaml_path):
+def test_tass_parser(parser, html_path, yaml_path):
     news_response = fake_response_from_file(html_path)
     expected_out = read_yaml(yaml_path)
     expected_out = prepare_expected_out(expected_out)
-    parser = PARSER_ZOO['tass']
+    parser = PARSER_ZOO[parser]
     parsed_out = parser.parse(news_response)
     for key, expected_value in expected_out.items():
         assert expected_value == parsed_out[key], (f'{key} - field parsed wrong\n'
