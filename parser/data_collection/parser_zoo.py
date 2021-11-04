@@ -20,8 +20,10 @@ class BaseParser(ABC):
     def join_css_parsed(response, pattern):
         text = [re.sub("<[^>]*>", '', part) for part in response.css(pattern).getall()]
         text = [part.strip() for part in text]
+        text = [part for part in text if part]
         text = ' '.join(text)
         text = text.replace('\n', '').strip()
+        text = text.replace('\xa0', ' ')
         return text
 
 
@@ -43,13 +45,16 @@ class TassParser(BaseParser):
 @add_to_zoo('rbc')
 class RBCParser(BaseParser):
     def parse(self, response: HtmlResponse):
-        title = self.join_css_parsed(response, '.js-rbcslider-article:nth-child(10) .js-slide-title')
-        title_post = self.join_css_parsed(response, '.article__text__overview span')
-        text = self.join_css_parsed(response, '.article__text__overview~ p')
+        for i in range(10, 12):
+            title = self.join_css_parsed(response, f'.js-rbcslider-article:nth-child({i}) .js-slide-title')
+            if not title:
+                continue
+            title_post = self.join_css_parsed(response, '.article__text__overview span')
+            text = self.join_css_parsed(response, f'.js-rbcslider-article:nth-child({i}) p')
 
-        parsed_item = {
-            'title': title,
-            'title_post': title_post,
-            'text': text,
-        }
-        return parsed_item
+            parsed_item = {
+                'title': title,
+                'title_post': title_post,
+                'text': text,
+            }
+            return parsed_item
