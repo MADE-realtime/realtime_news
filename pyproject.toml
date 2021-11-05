@@ -16,6 +16,7 @@ pylint = "^2.11.1"
 flake8 = "^4.0.1"
 black = "^21.9b0"
 unify = "^0.5"
+Jinja2 = "^3.0.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

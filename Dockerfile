@@ -6,7 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE=true
 ENV PYTHONFAULTHANDLER=true
 ENV PYTHONUNBUFFERED=true
 
-WORKDIR /code
+WORKDIR /code/
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
@@ -21,18 +21,19 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 
 # copy your project
-COPY pyproject.toml poetry.lock /code/
-COPY ./web_scraper /code/web_scraper
+COPY pyproject.toml /code/
+COPY poetry.lock /code/
+COPY web_service/web_service/ /code/web_service/web_service/
 
 RUN pip install --no-compile --upgrade pip \
  && pip install --no-compile poetry \
  && poetry config virtualenvs.create false \
  && poetry install --no-dev --no-interaction --no-ansi \
- && pip uninstall --yes poetry 
+ && pip uninstall --yes poetry
+
+COPY Makefile /code/
+RUN make venv
 
 # run it
-COPY Makefile /code/
-COPY run_the_app.py /code/
-
 ENTRYPOINT [""]
 CMD ["make", "up"]
