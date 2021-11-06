@@ -61,6 +61,11 @@ if __name__ == '__main__':
         },
         "FEED_EXPORT_ENCODING": 'utf-8',
         'USER_AGENT': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.10; rv:39.0) Gecko/20100101 Firefox/39.0',
+        'EXTENSIONS': {
+            'scrapy.extensions.corestats.CoreStats': 0,
+            'scrapy.extensions.memusage.MemoryUsage': 0,
+            'scrapy.extensions.logstats.LogStats': 0,
+        }
     })
     crawl_proc.crawl(NewsSpider, sitemap_urls, domain_rules)
     crawl_proc.start()

@@ -58,3 +58,18 @@ class RBCParser(BaseParser):
                 'text': text,
             }
             return parsed_item
+
+
+@add_to_zoo('ria')
+class RIAParser(BaseParser):
+    def parse(self, response: HtmlResponse):
+        title = self.join_css_parsed(response, '.m-active .article__title')
+        title_post = self.join_css_parsed(response, '.m-active .article__second-title')
+        text = self.join_css_parsed(response, '.layout-article:nth-child(1) .article__text')
+
+        parsed_item = {
+            'title': title,
+            'title_post': title_post,
+            'text': text,
+        }
+        return parsed_item

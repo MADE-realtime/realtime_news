@@ -34,7 +34,8 @@ def get_test_data(parser, folder):
     ("parser", "html_path", "yaml_path"),
     [
         *get_test_data('tass', 'tass_data'),
-        *get_test_data('rbc', 'rbc_data')
+        *get_test_data('rbc', 'rbc_data'),
+        *get_test_data('ria', 'ria_data')
     ]
 )
 def test_tass_parser(parser, html_path, yaml_path):
