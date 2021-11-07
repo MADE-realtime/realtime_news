@@ -1,9 +1,8 @@
 from datetime import date, datetime
 from typing import List
 
+from config import DEFAULT_LOGO_URL, DEFAULT_NEWS_IMAGE_URL
 from pydantic import BaseModel
-
-from config import DEFAULT_NEWS_IMAGE_URL, DEFAULT_LOGO_URL
 
 
 class News(BaseModel):

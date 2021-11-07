@@ -1,46 +1,52 @@
-from config import LENTA_DATASET_FILEPATH
-
-from fastapi import FastAPI
+from config import LENTA_MINI_DATASET_FILEPATH, TEMPLATE_NAME
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-
 from news_extractor_classes import PandasNewsExtractor
 
 app = FastAPI()
-NEWS_CSV_EXTRACTOR = PandasNewsExtractor(LENTA_DATASET_FILEPATH)
+NEWS_CSV_EXTRACTOR = PandasNewsExtractor(LENTA_MINI_DATASET_FILEPATH)
 
-# app.mount("/static", StaticFiles(directory="static"), name="static")
-# templates = Jinja2Templates(directory="templates")
+app.mount(
+    "/static", StaticFiles(directory="web_service/web_service/static"), name="static"
+)
+templates = Jinja2Templates(directory="web_service/web_service/templates")
 
 
-@app.get('/get_random_news/{number}')
-def get_all_handler(number: int):
+@app.get('/get_random_news/{number}', response_class=HTMLResponse)
+def get_all_handler(request: Request, number: int):
     """
     Get random number news from all the time
     :return:
     """
     news_list = NEWS_CSV_EXTRACTOR.show_random_news(num_random_news=number)
-    return news_list.dict()
-    # return templates.TemplateResponse("item.html", news_list.dict())
+    return templates.TemplateResponse(
+        TEMPLATE_NAME, {"request": request, 'news': news_list.dict()['news_list']}
+    )
 
 
-# @app.get('/get_date/{start_date}_{end_date}')
-# def get_date_handler(start_date: str, end_date: str):
-#     """
-#     Get news by day
-#     :param date:
-#     :return:
-#     """
-#     news_list = NEWS_CSV_EXTRACTOR.show_news_by_days(start_date, end_date)
-#     return templates.TemplateResponse("item.html", news_list.dict())
-#
-#
-# @app.get('/get_topic/{topic}_{start_date}_{end_date}')
-# def get_topic_handler(topic: str, start_date: str, end_date: str):
-#     """
-#     Get news by day and topic
-#     :param topic:
-#     :return:
-#     """
-#     news_list = NEWS_CSV_EXTRACTOR.show_news_by_topic(topic, start_date, end_date)
-#     return templates.TemplateResponse("item.html", news_list.dict())
+@app.get('/get_date/{start_date}/{end_date}', response_class=HTMLResponse)
+def get_date_handler(request: Request, start_date: str, end_date: str):
+    """
+    Get news by day
+    :param date:
+    :return:
+    """
+    news_list = NEWS_CSV_EXTRACTOR.show_news_by_days(start_date, end_date)
+    return templates.TemplateResponse(
+        TEMPLATE_NAME, {"request": request, 'news': news_list.dict()}
+    )
+
+
+@app.get('/get_topic/{topic}/{start_date}/{end_date}', response_class=HTMLResponse)
+def get_topic_handler(request: Request, topic: str, start_date: str, end_date: str):
+    """
+    Get news by day and topic
+    :param topic:
+    :return:
+    """
+    news_list = NEWS_CSV_EXTRACTOR.show_news_by_topic(topic, start_date, end_date)
+    return templates.TemplateResponse(
+        TEMPLATE_NAME, {"request": request, 'news': news_list.dict()}
+    )
