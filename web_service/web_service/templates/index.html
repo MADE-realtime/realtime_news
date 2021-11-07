@@ -8,7 +8,7 @@
     <title>Новости - в реальном времени и с аналитикой</title>
     <link rel="stylesheet" href="{{ url_for('static', path='/css/bulma.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='/css/custom.css') }}">
-    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script type="text/javascript" src="{{ url_for('static', path='/js/custom.js') }}"></script>
 
   </head>
 
@@ -19,7 +19,6 @@
       <div class="container">
         <div class="navbar-brand">
           <a class="navbar-item" href="#">
-            <img src="../static/img/logo-rtn-white.png" alt="Realtime news logo">
             <img src="{{ url_for('static', path='/img/logo-rtn-white.png') }}" alt="Realtime news logo">
           </a>
           <span class="navbar-burger burger" data-target="navbarMenu">
@@ -58,49 +57,59 @@
           </div>
         </div>
 
+        <div id="app" class="row columns is-multiline">
         <!-- News cards -->
         {% if news %}
         {% for card in news %}
 
-        <div id="app" class="row columns is-multiline">
           <div class="column is-4">
             <div class="card large">
 
               <div class="card-content">
-                <div class="media">
+                <div class="media mb-3">
                   <div class="media-content">
-                    <p class="title is-4 no-padding">{{card.title}}</p>
+                    <p class="title is-5 no-padding">{{ card.title }}</p>
                   </div>
                 </div>
-                <div class="content">
-                  {{card.content}}
+                <div class="content mb-3">
+                  <span class="short-text">{{ card.content[:250] }}</span>
+                  <span class="full-text">{{ card.content[250:] }}</span>
+                  <span class="text-dots">...</span>
+                  <b><span class="show-more-button" data-more="0">Читать полностью</span></b>
+                </div>
+                <div class="media-content mb-3">
+                  {% if card.topic != 'nan' %}
+                  <span class="tag is-primary">{{ card.topic }}</span>
+                  {% endif %}
+                  {% if card.tags != 'nan' %}
+                  <span class="tag">{{ card.tags }}</span>
+                  {% endif %}
                 </div>
                 <div class="card-image">
                 <figure class="image is-16by9">
-                  <img src="{{card.image_url}}" alt="Image">
+                  <img src="{{ card.image_url }}" alt="Image">
                 </figure>
               </div>
                 <div class="content">
-                  <time datetime="{{card.date}}">{{card.date}} - {{card.time}}</time>
+                  <time datetime="{{ card.date }}">{{ card.time }}</time>
                   <div class="media">
                     <div class="media-left">
                       <figure class="image is-16x16 m-0">
-                        <img src="{{card.logo_url}}" alt="Placeholder image">
+                        <img src="{{ card.logo_url }}" alt="Placeholder image">
                       </figure>
                     </div>
                     <div class="media-content">
-                      <p class="subtitle is-6">{{card.source_name}}</p>
+                      <p class="subtitle is-6">{{ card.source_name }}</p>
                     </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+
+        {% endfor %}
+        {% endif %}
         </div>
-
-      </div>
-
-      {% endfor %}
-      {% endif %}
 
       </div>
 

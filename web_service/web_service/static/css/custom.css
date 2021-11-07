@@ -11,3 +11,11 @@ body {
 .footer{
     background: var(--bg-dark);
 }
+
+.full-text {
+    display: none;
+}
+
+.show-more-button{
+    white-space: nowrap;
+}
