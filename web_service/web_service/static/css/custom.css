@@ -1,0 +1,13 @@
+:root {
+  --bg: #4c4c4c;
+  --bg-dark: #222;
+}
+
+body {
+  background: var(--bg);
+  background: linear-gradient(165deg, rgba(255,231,0,1) 0%, rgba(71,71,71,1) 10%, rgba(37,37,37,1) 100%);
+}
+
+.footer{
+    background: var(--bg-dark);
+}
