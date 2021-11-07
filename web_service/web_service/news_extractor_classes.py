@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
@@ -86,11 +87,12 @@ class PandasNewsExtractor(BaseNewsExtractor):
     @staticmethod
     def _convert_row_to_news(row) -> News:
         news_dict = {
-            'url': row['url'],
+            'source_url': row['url'],
             'title': row['title'],
-            'text': row['text'],
+            'content': row['text'],
             'topic': row['topic'],
             'tags': row['tags'],
             'date': row['date'],
+            'time': datetime.combine(row['date'], datetime.min.time()),
         }
         return News(**news_dict)
