@@ -14,7 +14,7 @@ app.mount(
 templates = Jinja2Templates(directory="web_service/web_service/templates")
 
 
-@app.get('/get_random_news/{number}', response_class=HTMLResponse)
+@app.get('/get_random_news/', response_class=HTMLResponse)
 def get_all_handler(request: Request, number: int):
     """
     Get random number news from all the time
@@ -26,7 +26,7 @@ def get_all_handler(request: Request, number: int):
     )
 
 
-@app.get('/get_date/{start_date}/{end_date}', response_class=HTMLResponse)
+@app.get('/get_date/', response_class=HTMLResponse)
 def get_date_handler(request: Request, start_date: str, end_date: str):
     """
     Get news by day
@@ -39,7 +39,7 @@ def get_date_handler(request: Request, start_date: str, end_date: str):
     )
 
 
-@app.get('/get_topic/{topic}/{start_date}/{end_date}', response_class=HTMLResponse)
+@app.get('/get_topic/', response_class=HTMLResponse)
 def get_topic_handler(request: Request, topic: str, start_date: str, end_date: str):
     """
     Get news by day and topic
