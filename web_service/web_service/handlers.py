@@ -14,6 +14,20 @@ app.mount(
 templates = Jinja2Templates(directory="web_service/web_service/templates")
 
 
+@app.get('/', response_class=HTMLResponse)
+def get_random_handler(request: Request):
+    """
+    Generate initial page with random news
+    # TODO: generate good news in first page
+    :param request:
+    :return:
+    """
+    news_list = NEWS_CSV_EXTRACTOR.show_random_news(num_random_news=10)
+    return templates.TemplateResponse(
+        TEMPLATE_NAME, {"request": request, 'news': news_list.dict()['news_list']}
+    )
+
+
 @app.get('/get_random_news/', response_class=HTMLResponse)
 def get_all_handler(request: Request, number: int):
     """
