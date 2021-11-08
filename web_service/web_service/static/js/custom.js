@@ -1,4 +1,7 @@
 window.onload = (event) => {
+    const newsNumber = document.getElementById("news-number");
+    const newsTopic = document.getElementById("news-topic");
+
     document.querySelectorAll('.show-more-button').forEach(item => {
         item.addEventListener('click', function() {
         // If text is shown less, then show complete
@@ -27,4 +30,50 @@ window.onload = (event) => {
             }
         });
     });
+
+    newsNumber.addEventListener("keyup", function(event) {
+        updateUrlParams("number", event.target.value)
+    });
+
+    newsTopic.addEventListener("change", function(event) {
+        updateUrlParams("topic", event.target.value)
+    });
+
 };
+
+function clearDefaultUrlParams(){
+    var newsTopic = document.getElementById("news-topic");
+    if (newsTopic.value == ''){
+        let searchParams = new URLSearchParams(window.location.search);
+        searchParams.delete("topic");
+        if (window.history.replaceState) {
+            const url = window.location.protocol
+                        + "//" + window.location.host
+                        + window.location.pathname
+                        + "?"
+                        + searchParams.toString();
+
+            window.history.replaceState({
+                path: url
+            }, "", url)
+        }
+    }
+}
+
+function updateUrlParams(param, target){
+    clearDefaultUrlParams();
+    let searchParams = new URLSearchParams(window.location.search);
+    searchParams.set(param, target);
+    if (window.history.replaceState) {
+        const url = window.location.protocol
+                    + "//" + window.location.host
+                    + window.location.pathname
+                    + "?"
+                    + searchParams.toString();
+
+        window.history.replaceState({
+            path: url
+        }, "", url)
+    }
+    location.reload();
+}

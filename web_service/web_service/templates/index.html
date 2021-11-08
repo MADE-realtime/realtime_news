@@ -57,6 +57,32 @@
           </div>
         </div>
 
+        <!-- Filters -->
+        <div class="row columns is-multiline">
+
+          <div class="column is-1 field">
+            <div class="control">
+              <input id="news-number" class="input" type="number" value="10">
+            </div>
+            <p class="help has-text-white">Новостей</p>
+          </div>
+
+          <div class="column is-4 field">
+            <div class="select">
+              <select id="news-topic">
+                <option value="" disabled selected>Выберите тему</option>
+                {% if topics %}
+                {% for topic in topics %}
+                <option>{{ topic }}</option>
+                {% endfor %}
+                {% endif %}
+              </select>
+            </div>
+          </div>
+
+        </div>
+        <!-- End filters -->
+
         <div id="app" class="row columns is-multiline">
         <!-- News cards -->
         {% if news %}
