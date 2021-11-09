@@ -1,6 +1,25 @@
 window.onload = (event) => {
     const newsNumber = document.getElementById("news-number");
     const newsTopic = document.getElementById("news-topic");
+    const dateStart = document.getElementById("date-start");
+    const dateEnd = document.getElementById("date-end");
+    const queryParams = new URLSearchParams(window.location.search);
+
+    var newsNumberParam = queryParams.get("number");
+    var topicParam = queryParams.get("topic");
+    var startDateParam = queryParams.get("start_date");
+    var endDateParam = queryParams.get("end_date");
+    newsNumber.value = newsNumberParam;
+    for (var i, j = 1; i = newsTopic.options[j]; j++) {
+        if (i.value == topicParam) {
+            newsTopic.selectedIndex = j;
+            break;
+        } else {
+            newsTopic.selectedIndex = 0;
+        }
+    };
+    dateStart.value = startDateParam;
+    dateEnd.value = endDateParam;
 
     document.querySelectorAll('.show-more-button').forEach(item => {
         item.addEventListener('click', function() {
@@ -39,6 +58,14 @@ window.onload = (event) => {
         updateUrlParams("topic", event.target.value)
     });
 
+    dateStart.addEventListener("change", function(event) {
+        updateUrlParams("start_date", event.target.value)
+    });
+
+    dateEnd.addEventListener("change", function(event) {
+        updateUrlParams("end_date", event.target.value)
+    });
+
 };
 
 function clearDefaultUrlParams(){
@@ -64,6 +91,30 @@ function updateUrlParams(param, target){
     clearDefaultUrlParams();
     let searchParams = new URLSearchParams(window.location.search);
     searchParams.set(param, target);
+    if (window.history.replaceState) {
+        const url = window.location.protocol
+                    + "//" + window.location.host
+                    + window.location.pathname
+                    + "?"
+                    + searchParams.toString();
+
+        window.history.replaceState({
+            path: url
+        }, "", url)
+    }
+    location.reload();
+}
+
+function clearFilters(){
+    document.getElementById("news-number").value = 10;
+    document.getElementById("news-topic").selectedIndex = 0;
+    document.getElementById("date-start").value = "";
+    document.getElementById("date-end").value = "";
+    let searchParams = new URLSearchParams(window.location.search);
+    searchParams.set("number", 10)
+    searchParams.delete("topic");
+    searchParams.delete("start_date");
+    searchParams.delete("end_date");
     if (window.history.replaceState) {
         const url = window.location.protocol
                     + "//" + window.location.host
