@@ -1,5 +1,7 @@
 import re
 from abc import ABC, abstractmethod
+from html.parser import HTMLParser
+
 from scrapy.http import HtmlResponse
 PARSER_ZOO = {}
 
@@ -9,6 +11,11 @@ def add_to_zoo(name):
         PARSER_ZOO[name] = parser_to_add()
         return parser_to_add
     return add_wrapper
+
+
+class AttrParser(HTMLParser):
+    def handle_starttag(self, tag, attrs):
+        self.attrs = attrs
 
 
 class BaseParser(ABC):
@@ -38,6 +45,7 @@ class TassParser(BaseParser):
             'title': title,
             'title_post': title_post,
             'text': text,
+            'source_url': response.url,
         }
         return parsed_item
 
@@ -45,6 +53,7 @@ class TassParser(BaseParser):
 @add_to_zoo('rbc')
 class RBCParser(BaseParser):
     def parse(self, response: HtmlResponse):
+        parsed_item = {}
         for i in range(10, 12):
             title = self.join_css_parsed(response, f'.js-rbcslider-article:nth-child({i}) .js-slide-title')
             if not title:
@@ -57,7 +66,9 @@ class RBCParser(BaseParser):
                 'title_post': title_post,
                 'text': text,
             }
-            return parsed_item
+            break
+        parsed_item['source_url'] = response.url
+        return parsed_item
 
 
 @add_to_zoo('ria')
@@ -66,10 +77,21 @@ class RIAParser(BaseParser):
         title = self.join_css_parsed(response, '.m-active .article__title')
         title_post = self.join_css_parsed(response, '.m-active .article__second-title')
         text = self.join_css_parsed(response, '.layout-article:nth-child(1) .article__text')
+        image_url = self.parse_image(response)
 
         parsed_item = {
             'title': title,
             'title_post': title_post,
             'text': text,
+            'source_url': response.url,
+            'image_url': image_url,
         }
         return parsed_item
+
+    def parse_image(self, response: HtmlResponse):
+        img_tag = response.css('.layout-article:nth-child(1) .photoview__open img').getall()[0]
+        attr_parser = AttrParser()
+        attr_parser.feed(img_tag)
+        img_url = dict(attr_parser.attrs)['srcset'].split(' ')[0]
+        return img_url
+

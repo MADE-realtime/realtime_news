@@ -8,8 +8,11 @@ from test.util import get_abs_path, fake_response_from_file, make_short_str
 
 def prepare_expected_out(expected_out):
     for key, value in expected_out.items():
-        value = [line.strip() for line in value.split('\n') if len(line.strip()) > 0]
-        value = ' '.join(value)
+        if isinstance(value, dict):
+            value = prepare_expected_out(value)
+        elif isinstance(value, str):
+            value = [line.strip() for line in value.split('\n') if len(line.strip()) > 0]
+            value = ' '.join(value)
         expected_out[key] = value
     return expected_out
 
@@ -44,7 +47,16 @@ def test_tass_parser(parser, html_path, yaml_path):
     expected_out = prepare_expected_out(expected_out)
     parser = PARSER_ZOO[parser]
     parsed_out = parser.parse(news_response)
+    assert news_response.url == parsed_out['source_url'], (f'{news_response.url} url expected but\n'
+                                                           f'{parsed_out["source_url"]} url parsed')
     for key, expected_value in expected_out.items():
-        assert expected_value == parsed_out[key], (f'{key} - field parsed wrong\n'
+        trunc = False
+        parsed_value = parsed_out[key]
+        if isinstance(expected_value, dict):
+            trunc = expected_value.get('trunc', False)
+            expected_value = expected_value['data']
+        if trunc:
+            parsed_value = parsed_value[:len(expected_value)]
+        assert expected_value == parsed_value, (f'{key} - field parsed wrong\n'
                                                    f'"{make_short_str(expected_value)}" - expected\n'
-                                                   f'"{make_short_str(parsed_out[key])}" - parsed')
+                                                   f'"{make_short_str(parsed_value)}" - parsed')
