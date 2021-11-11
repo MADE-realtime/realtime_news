@@ -58,5 +58,5 @@ def test_tass_parser(parser, html_path, yaml_path):
         if trunc:
             parsed_value = parsed_value[:len(expected_value)]
         assert expected_value == parsed_value, (f'{key} - field parsed wrong\n'
-                                                   f'"{make_short_str(expected_value)}" - expected\n'
-                                                   f'"{make_short_str(parsed_value)}" - parsed')
+                                                f'"{make_short_str(expected_value)}" - expected\n'
+                                                f'"{make_short_str(parsed_value)}" - parsed')

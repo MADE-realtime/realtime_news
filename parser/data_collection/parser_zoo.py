@@ -60,15 +60,29 @@ class RBCParser(BaseParser):
                 continue
             title_post = self.join_css_parsed(response, '.article__text__overview span')
             text = self.join_css_parsed(response, f'.js-rbcslider-article:nth-child({i}) p')
+            image_url = self.parse_image(response, i)
 
             parsed_item = {
                 'title': title,
                 'title_post': title_post,
                 'text': text,
+                'image_url': image_url
             }
             break
         parsed_item['source_url'] = response.url
         return parsed_item
+
+    @staticmethod
+    def parse_image(response: HtmlResponse, idx):
+        css_select = f'.js-rbcslider-article:nth-child({idx}) .article__main-image__image'
+        selected_tags = response.css(css_select).getall()
+        if len(selected_tags) == 0:
+            return ''
+        img_tag = selected_tags[0]
+        attr_parser = AttrParser()
+        attr_parser.feed(img_tag)
+        img_url = dict(attr_parser.attrs)['srcset'].split(' ')[0]
+        return img_url
 
 
 @add_to_zoo('ria')
@@ -88,8 +102,13 @@ class RIAParser(BaseParser):
         }
         return parsed_item
 
-    def parse_image(self, response: HtmlResponse):
-        img_tag = response.css('.layout-article:nth-child(1) .photoview__open img').getall()[0]
+    @staticmethod
+    def parse_image(response: HtmlResponse):
+        css_select = '.layout-article:nth-child(1) .photoview__open img'
+        selected_tags = response.css(css_select).getall()
+        if len(selected_tags) == 0:
+            return ''
+        img_tag = selected_tags[0]
         attr_parser = AttrParser()
         attr_parser.feed(img_tag)
         img_url = dict(attr_parser.attrs)['srcset'].split(' ')[0]
