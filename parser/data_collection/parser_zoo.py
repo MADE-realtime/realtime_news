@@ -31,6 +31,7 @@ class BaseParser(ABC):
         text = ' '.join(text)
         text = text.replace('\n', '').strip()
         text = text.replace('\xa0', ' ')
+        text = text.replace('\u200b', '')
         return text
 
 
@@ -39,15 +40,29 @@ class TassParser(BaseParser):
     def parse(self, response: HtmlResponse):
         title = self.join_css_parsed(response, '.news-header__title')
         title_post = self.join_css_parsed(response, '.news-header__lead')
-        text = self.join_css_parsed(response, 'h2 , #news p')
+        text = self.join_css_parsed(response, '#news li , #news p , h2')
+        image_url = self.parse_image(response)
 
         parsed_item = {
             'title': title,
             'title_post': title_post,
             'text': text,
             'source_url': response.url,
+            'image_url': image_url
         }
         return parsed_item
+
+    @staticmethod
+    def parse_image(response: HtmlResponse):
+        css_select = '.news-media_photo .text-include-photo__img'
+        selected_tags = response.css(css_select).getall()
+        if len(selected_tags) == 0:
+            return ''
+        img_tag = selected_tags[0]
+        attr_parser = AttrParser()
+        attr_parser.feed(img_tag)
+        img_url = dict(attr_parser.attrs)['data-originalurl'].split(' ')[0]
+        return img_url
 
 
 @add_to_zoo('rbc')

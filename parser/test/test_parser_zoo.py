@@ -1,6 +1,9 @@
 import os
+import re
+
 import yaml
 import pytest
+import difflib
 
 from data_collection.parser_zoo import PARSER_ZOO
 from test.util import get_abs_path, fake_response_from_file, make_short_str
@@ -50,13 +53,21 @@ def test_tass_parser(parser, html_path, yaml_path):
     assert news_response.url == parsed_out['source_url'], (f'{news_response.url} url expected but\n'
                                                            f'{parsed_out["source_url"]} url parsed')
     for key, expected_value in expected_out.items():
-        trunc = False
+        regexp = False
         parsed_value = parsed_out[key]
         if isinstance(expected_value, dict):
-            trunc = expected_value.get('trunc', False)
-            expected_value = expected_value['data']
-        if trunc:
-            parsed_value = parsed_value[:len(expected_value)]
-        assert expected_value == parsed_value, (f'{key} - field parsed wrong\n'
-                                                f'"{make_short_str(expected_value)}" - expected\n'
-                                                f'"{make_short_str(parsed_value)}" - parsed')
+            regexp = expected_value.get('regexp', False)
+            expected_value = expected_value['pattern']
+        if regexp:
+            assert_msg = (f'{key} - field parsed wrong\n'
+                          f'"{make_short_str(expected_value)}" - expected pattern\n'
+                          f'"{make_short_str(parsed_value)}" - parsed\n')
+            assert re.match(expected_value, parsed_value), assert_msg
+        else:
+            diff = [f'{li} at {i} position' for i, li
+                    in enumerate(difflib.ndiff(expected_value, parsed_value)) if li[0] != ' ']
+            assert_msg = (f'{key} - field parsed wrong\n'
+                          f'"{make_short_str(expected_value)}" - expected\n'
+                          f'"{make_short_str(parsed_value)}" - parsed\n'
+                          f'{diff[:10]} - first 10 difference')
+            assert expected_value == parsed_value, assert_msg
