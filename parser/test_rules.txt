@@ -1,0 +1,2 @@
+tass\.ru\/.+\/\d+$ tass
+rbc\.ru.+\/.{24}$ rbc

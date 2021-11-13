@@ -1,10 +1,8 @@
 from argparse import ArgumentParser
 
+from scrapy.crawler import CrawlerProcess
 
-def callback(news_args):
-    source_list = read_source_file(news_args.source_file)
-    agg_data = process_source_list(source_list)
-    store_data(agg_data, news_args.destination)
+from data_collection.newsspider import NewsSpider
 
 
 def init_arg_parser():
@@ -14,8 +12,13 @@ def init_arg_parser():
                      'sources and store them')
     )
     parser.add_argument(
-        '-source_file',
-        help='provide source file with urls to search news in',
+        '-urls_file',
+        help='provide source file with sitemap urls to search news in',
+        required=True,
+    )
+    parser.add_argument(
+        '-rules_file',
+        help='provide rules file with domain-parser mapping',
         required=True,
     )
     parser.add_argument(
@@ -26,24 +29,43 @@ def init_arg_parser():
     return parser
 
 
-def read_source_file(source_file):
-    return []
+def read_file(fpath):
+    with open(fpath, 'r') as fin:
+        fdata = fin.read()
+    return fdata
 
 
-def get_data_from(source):
-    pass
+def read_urls_file(url_fpath):
+    raw_data = read_file(url_fpath)
+    urls = [line.strip() for line in raw_data.split('\n')]
+    return urls
 
 
-def process_source_list(source_list):
-    agg_data = [get_data_from(source) for source in source_list]
-    return []
-
-
-def store_data(data, destination):
-    pass
+def read_rule_file(rules_fpath):
+    raw_data = read_file(rules_fpath)
+    rules = [line.strip().split() for line in raw_data.split('\n')]
+    return rules
 
 
 if __name__ == '__main__':
     arg_parser = init_arg_parser()
-    args = arg_parser.parse_args()
-    args.callback(args)
+    news_args = arg_parser.parse_args()
+
+    sitemap_urls = read_urls_file(news_args.urls_file)
+    domain_rules = read_rule_file(news_args.rules_file)
+
+    crawl_proc = CrawlerProcess(settings={
+        'DOWNLOAD_DELAY': 3,
+        "FEEDS": {
+            news_args.destination: {"format": "json"},
+        },
+        "FEED_EXPORT_ENCODING": 'utf-8',
+        'USER_AGENT': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.10; rv:39.0) Gecko/20100101 Firefox/39.0',
+        'EXTENSIONS': {
+            'scrapy.extensions.corestats.CoreStats': 0,
+            'scrapy.extensions.memusage.MemoryUsage': 0,
+            'scrapy.extensions.logstats.LogStats': 0,
+        }
+    })
+    crawl_proc.crawl(NewsSpider, sitemap_urls, domain_rules)
+    crawl_proc.start()
