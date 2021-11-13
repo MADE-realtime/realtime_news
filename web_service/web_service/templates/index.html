@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Новости - в реальном времени и с аналитикой</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/bulma.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/fontawesome/all.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/custom.css') }}">
+    <script type="text/javascript" src="{{ url_for('static', path='/js/custom.js') }}"></script>
+    <link rel="stylesheet" href="https://bulma.io/vendor/fontawesome-free-5.15.2-web/css/all.min.css">
+
+  </head>
+
+  <body>
+
+    <!-- START NAV -->
+    <nav class="navbar is-dark">
+      <div class="container">
+        <div class="navbar-brand">
+          <a class="navbar-item" href="#">
+            <img src="{{ url_for('static', path='/img/logo-rtn-white.png') }}" alt="Realtime news logo">
+          </a>
+          <span class="navbar-burger burger" data-target="navbarMenu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+        </div>
+        <div id="navbarMenu" class="navbar-menu">
+          <div class="navbar-end">
+            <a class="navbar-item">
+              Категории
+            </a>
+            <a class="navbar-item">
+              В тренде
+            </a>
+            <a class="navbar-item">
+              О нас
+            </a>
+            <a class="navbar-item">
+              Личный кабинет
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <!-- END NAV -->
+
+    <div class="container">
+
+      <div class="section">
+
+        <div class="columns mb-6">
+          <div class="column has-text-centered">
+            <h1 class="title is-1" style="color: ghostwhite;">Новости</h1>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="row columns is-multiline">
+
+          <div class="column is-1 field">
+            <div class="control">
+              <input id="news-number" class="input" type="number" value="10">
+            </div>
+            <p class="help has-text-white">новостей</p>
+          </div>
+
+          <div class="column is-4 field is-horizontal">
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <input id="date-start" class="input" type="date">
+                </div>
+                <p class="help has-text-white">от</p>
+              </div>
+              <div class="field">
+                <div class="control">
+                  <input id="date-end" class="input" type="date">
+                </div>
+                <p class="help has-text-white">до</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="column is-6 field">
+            <div class="select">
+              <select id="news-topic">
+                <option value="" disabled selected>Выберите тему</option>
+                {% if topics %}
+                {% for topic in topics %}
+                <option>{{ topic }}</option>
+                {% endfor %}
+                {% endif %}
+              </select>
+            </div>
+          </div>
+
+          <div class="column is-1 field">
+            <button id="clear" class="button is-danger is-outlined is-pulled-right" onclick="clearFilters()">
+              <span class="icon">
+                <i class="fas fa-times"></i>
+              </span>
+            </button>
+          </div>
+
+        </div>
+        <!-- End filters -->
+
+        <div id="app" class="row columns is-multiline">
+        <!-- News cards -->
+        {% if news %}
+        {% for card in news %}
+
+          <div class="column is-4">
+            <div class="card large">
+
+              <div class="card-content">
+                <div class="media mb-3">
+                  <div class="media-content">
+                    <p class="title is-5 no-padding">{{ card.title }}</p>
+                  </div>
+                </div>
+                <div class="content mb-3">
+                  <span class="short-text">{{ card.content[:250] }}</span>
+                  <span class="full-text">{{ card.content[250:] }}</span>
+                  <span class="text-dots">...</span>
+                  <b><span class="show-more-button" data-more="0">Читать полностью</span></b>
+                </div>
+                <div class="media-content mb-3">
+                  {% if card.topic != 'nan' %}
+                  <span class="tag is-primary">{{ card.topic }}</span>
+                  {% endif %}
+                  {% if card.tags != 'nan' %}
+                  <span class="tag">{{ card.tags }}</span>
+                  {% endif %}
+                </div>
+                <div class="card-image">
+                <figure class="image is-16by9">
+                  <img src="{{ card.image_url }}" alt="Image">
+                </figure>
+              </div>
+                <div class="content">
+                  <time datetime="{{ card.date }}">{{ card.time }}</time>
+                  <div class="media">
+                    <div class="media-left">
+                      <figure class="image is-16x16 m-0">
+                        <img src="{{ card.logo_url }}" alt="Placeholder image">
+                      </figure>
+                    </div>
+                    <div class="media-content">
+                      <p class="subtitle is-6">{{ card.source_name }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        {% endfor %}
+        {% endif %}
+        </div>
+
+      </div>
+
+    </div>
+
+    <footer class="footer is-dark">
+      <div class="container">
+        <div class="content has-text-centered">
+          <div class="soc">
+            <a href="#"><i class="fa fa-github-alt fa-lg" aria-hidden="true"></i></a>
+            <a href="#"><i class="fa fa-youtube fa-lg" aria-hidden="true"></i></a>
+            <a href="#"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a>
+            <a href="#"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a>
+          </div>
+          <p>
+            <strong>Realtime news</strong> by 5 nice guys.
+          </p>
+        </div>
+      </div>
+    </footer>
+
+  </body>
+
+</html>
