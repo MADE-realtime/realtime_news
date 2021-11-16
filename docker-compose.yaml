@@ -12,10 +12,10 @@ services:
       retries: 5
 
   realtime_parser:
-    image: "terysy/realtime_parser:v1"
-    build:
-      context: .
-      dockerfile: parser/Dockerfile
+    image: "terysy/realtime_parser:v2"
+#    build:
+#      context: .
+#      dockerfile: parser/Dockerfile
     depends_on:
       db:
         condition: service_healthy
@@ -23,10 +23,10 @@ services:
       - db
 
   realtime_web:
-#    image: "terysy/realtime_web:latest"
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: "terysy/realtime_web:v6"
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
     ports:
       - "80:8000"
     volumes:
