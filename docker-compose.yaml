@@ -1,11 +1,38 @@
+version: "2.1"
 services:
-  code:
-    image: "web_service:latest"
+  db:
+    ports:
+      - "5432:5432"
+    image: postgres:11
+    env_file: .env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  realtime_web:
+    image: "terysy/realtime_web:latest"
     build:
       context: .
       dockerfile: Dockerfile
-#    network_mode: host
     ports:
-      - "8000:8000"
+      - "80:8000"
     volumes:
       - ./data:/code/data
+      - ./migrations:/code/db_lib/alembic/versions
+    depends_on:
+      db:
+        condition: service_healthy
+    links:
+      - db
+
+  pgadmin:
+    container_name: pgadmin
+    ports:
+      - "5050:80"
+    image: dpage/pgadmin4
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy

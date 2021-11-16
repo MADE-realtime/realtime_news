@@ -20,24 +20,24 @@ RUN apt-get update \
         make \
  && rm -rf /var/lib/apt/lists/*
 
-COPY Makefile /code/
-
-# copy libs
-COPY db_lib /code/db_lib
-
 # copy poetry
 COPY pyproject.toml /code/
 COPY poetry.lock /code/
+# copy project
+COPY db_lib /code/db_lib
 
 # install dependencies
-RUN make venv
-
-# drop poetry
-RUN pip uninstall --yes poetry
+RUN python -m venv .venv \
+ && pip install --no-compile --upgrade pip \
+ && pip install --no-compile poetry \
+ && poetry config virtualenvs.create false \
+ && poetry install --no-dev --no-interaction --no-ansi \
+ && pip uninstall --yes poetry
 
 # copy src
 COPY web_service/src/ /code/web_service/src/
-COPY .env /code/.env
+COPY data /code/data
+COPY Makefile /code/
 
 # run it
 ENTRYPOINT [""]

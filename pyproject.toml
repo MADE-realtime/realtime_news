@@ -17,6 +17,11 @@ flake8 = "^4.0.1"
 black = "^21.9b0"
 unify = "^0.5"
 Jinja2 = "^3.0.2"
+alembic = "^1.7.4"
+fastapi-sqlalchemy = "^0.2.1"
+psycopg2-binary = "2.9.1"
+db-lib = {path = "db_lib"}
+python-dotenv = "^0.19.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

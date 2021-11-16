@@ -1,15 +1,18 @@
-CODE = web_service/web_service
+CODE = web_service/src
 TESTS = web_service/tests
 
 ALL = $(CODE) $(TESTS)
 
 VENV ?= .venv
 
+all: migrate up
+
 venv:
 	python3.8 -m venv $(VENV)
 	$(VENV)/bin/python -m pip install --upgrade pip
-	$(VENV)/bin/python -m pip install poetry
-	$(VENV)/bin/poetry install
+	$(VENV)/bin/python -m pip install --no-compile poetry
+	$(VENV)/bin/poetry config virtualenvs.create false
+	$(VENV)/bin/poetry install --no-dev --no-interaction --no-ansi
 
 test:
 	$(VENV)/bin/pytest -v tests
@@ -25,6 +28,10 @@ format:
 	$(VENV)/bin/black --skip-string-normalization $(ALL)
 	$(VENV)/bin/autoflake --recursive --in-place --remove-all-unused-imports $(ALL)
 	$(VENV)/bin/unify --in-place --recursive $(ALL)
+
+migrate:
+	$(VENV)/bin/alembic -c db_lib/alembic.ini revision --autogenerate -m 'Added required tables'
+	$(VENV)/bin/alembic -c db_lib/alembic.ini upgrade head
 
 up:
 	$(VENV)/bin/python $(CODE)/run_server.py
