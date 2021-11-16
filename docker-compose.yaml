@@ -11,8 +11,19 @@ services:
       timeout: 5s
       retries: 5
 
+  realtime_parser:
+    image: "terysy/realtime_parser:v1"
+    build:
+      context: .
+      dockerfile: parser/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    links:
+      - db
+
   realtime_web:
-    image: "terysy/realtime_web:latest"
+#    image: "terysy/realtime_web:latest"
     build:
       context: .
       dockerfile: Dockerfile

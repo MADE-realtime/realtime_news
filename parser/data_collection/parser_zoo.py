@@ -53,14 +53,14 @@ class TassParser(BaseParser):
         text = self.join_css_parsed(response, '#news li , #news p , h2')
         image_url = self.parse_image(response)
 
-        parsed_item = {
+        parsed_dict = {
             'title': title,
             'title_post': title_post,
-            'text': text,
+            'content': text,
             'source_url': response.url,
             'image_url': image_url
         }
-        return parsed_item
+        return News(**parsed_dict)
 
     @staticmethod
     def parse_image(response: HtmlResponse):
@@ -78,7 +78,7 @@ class TassParser(BaseParser):
 @add_to_zoo('rbc')
 class RBCParser(BaseParser):
     def _parse(self, response: HtmlResponse):
-        parsed_item = {}
+        parsed_dict = {}
         for i in range(10, 12):
             title = self.join_css_parsed(response, f'.js-rbcslider-article:nth-child({i}) .js-slide-title')
             if not title:
@@ -87,15 +87,15 @@ class RBCParser(BaseParser):
             text = self.join_css_parsed(response, f'.js-rbcslider-article:nth-child({i}) p')
             image_url = self.parse_image(response, i)
 
-            parsed_item = {
+            parsed_dict = {
                 'title': title,
                 'title_post': title_post,
-                'text': text,
+                'content': text,
                 'image_url': image_url
             }
             break
-        parsed_item['source_url'] = response.url
-        return parsed_item
+        parsed_dict['source_url'] = response.url
+        return News(**parsed_dict)
 
     @staticmethod
     def parse_image(response: HtmlResponse, idx):
@@ -118,14 +118,14 @@ class RIAParser(BaseParser):
         text = self.join_css_parsed(response, '.layout-article:nth-child(1) .article__text')
         image_url = self.parse_image(response)
 
-        parsed_item = {
+        parsed_dict = {
             'title': title,
             'title_post': title_post,
-            'text': text,
+            'content': text,
             'source_url': response.url,
             'image_url': image_url,
         }
-        return parsed_item
+        return News(**parsed_dict)
 
     @staticmethod
     def parse_image(response: HtmlResponse):

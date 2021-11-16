@@ -37,6 +37,7 @@ RUN pip uninstall --yes poetry
 
 # copy src
 COPY web_service/src/ /code/web_service/src/
+COPY parser /code/parser/
 COPY .env /code/.env
 
 # run it
