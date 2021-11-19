@@ -1,11 +1,11 @@
-CODE = web_service/src
-TESTS = web_service/tests
+CODE =
+TESTS = test
 
 ALL = $(CODE) $(TESTS)
 
 VENV ?= .venv
 
-all: migrate up
+all:up
 
 venv:
 	python3.8 -m venv $(VENV)
@@ -29,11 +29,7 @@ format:
 	$(VENV)/bin/autoflake --recursive --in-place --remove-all-unused-imports $(ALL)
 	$(VENV)/bin/unify --in-place --recursive $(ALL)
 
-migrate:
-	$(VENV)/bin/alembic -c db_lib/alembic.ini revision --autogenerate -m 'Added required tables'
-	$(VENV)/bin/alembic -c db_lib/alembic.ini upgrade head
-
 up:
-	$(VENV)/bin/python $(CODE)/run_server.py
+	$(VENV)/bin/python parse_news.py -urls_file test_sources.txt -rules_file test_rules.txt -destination test_dest.json
 
 ci:	lint test

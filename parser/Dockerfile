@@ -20,7 +20,7 @@ RUN apt-get update \
         make \
  && rm -rf /var/lib/apt/lists/*
 
-COPY Makefile /code/
+COPY parser/Makefile /code/
 
 # copy libs
 COPY db_lib /code/db_lib
@@ -36,8 +36,7 @@ RUN make venv
 RUN pip uninstall --yes poetry
 
 # copy src
-COPY web_service/src/ /code/web_service/src/
-COPY parser /code/parser/
+COPY parser/ /code/
 COPY .env /code/.env
 
 # run it

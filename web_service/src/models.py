@@ -8,7 +8,7 @@ from pydantic import BaseModel
 class News(BaseModel):
     source_url: str
     title: str
-    content: str
+    content: str = 'Содержание'
     topic: str = 'Новость'
     tags: str = 'Новость'
     date: date
