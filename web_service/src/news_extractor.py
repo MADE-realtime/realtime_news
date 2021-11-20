@@ -41,6 +41,13 @@ class BaseNewsExtractor(ABC):
         """
         pass
 
+    @abstractmethod
+    def show_news_by_filters(self, db: Session, topic: str, end_date: str, start_date: str, num_random_news: int):
+        """
+        Метод для показа новостей по заданным фильтрам
+        """
+        pass
+
 
 class PandasNewsExtractor(BaseNewsExtractor):
     def __init__(self, path_to_df: Path):
@@ -133,4 +140,14 @@ class DBNewsExtractor(BaseNewsExtractor):
         return {'news_list': crud.get_news_by_topic_and_date(db, topic,
                                                              convert_str_to_date(start_date),
                                                              convert_str_to_date(end_date)),
+                'statistics': None}
+
+    def show_news_by_filters(self,
+                             db: Session,
+                             topic: str,
+                             end_date: str,
+                             start_date: str = '1991-05-12',
+                             num_random_news: int = 10,
+                             ) -> Dict:
+        return {'news_list': random.choices(crud.get_news_with_filters(db, topic, start_date, end_date), k=num_random_news),
                 'statistics': None}
