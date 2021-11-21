@@ -149,5 +149,9 @@ class DBNewsExtractor(BaseNewsExtractor):
                              start_date: str = '1991-05-12',
                              num_random_news: int = 10,
                              ) -> Dict:
-        return {'news_list': random.choices(crud.get_news_with_filters(db, topic, start_date, end_date), k=num_random_news),
+        news_list = crud.get_news_with_filters(db, topic, start_date, end_date)
+        news_list_len = len(news_list)
+        if num_random_news > news_list_len:
+            num_random_news = news_list_len
+        return {'news_list': random.choices(news_list, k=num_random_news),
                 'statistics': None}

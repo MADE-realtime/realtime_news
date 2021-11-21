@@ -30,10 +30,10 @@ def get_db():
 
 
 @app.get('/', response_class=HTMLResponse)
-def get_random_handler(request: Request,
-                       topic: Optional[str],
-                       start_date: Optional[str],
-                       end_date: Optional[str],
+async def main_handler(request: Request,
+                       topic: Optional[str] = None,
+                       start_date: Optional[str] = '1991-05-12',
+                       end_date: Optional[str] = None,
                        number: Optional[int] = 10,
                        db: Session = Depends(get_db)
                        ):

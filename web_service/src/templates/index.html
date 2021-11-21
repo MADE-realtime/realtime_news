@@ -97,12 +97,12 @@
                 {% endfor %}
                 {% endif %}
               </select>
-              <button id="clear" class="button is-danger is-outlined is-pulled-right" onclick="clearFilters()">
+            </div>
+            <button id="clear" class="button is-danger is-outlined is-pulled-right" onclick="clearFilters()">
               <span class="icon">
                 <i class="fas fa-times"></i>
               </span>
             </button>
-            </div>
           </div>
 
         </div>
@@ -113,6 +113,7 @@
         {% if news %}
         {% for card in news %}
 
+          {% if card.title %}
           <div class="column is-4">
             <div class="card large">
 
@@ -173,6 +174,7 @@
               </div>
             </div>
           </div>
+          {% endif %}
 
         {% endfor %}
         {% endif %}

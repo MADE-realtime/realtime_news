@@ -16,11 +16,15 @@ def get_news_with_filters(db: Session,
                           end_date: date,
                           skip: int = 0,
                           limit: int = 100) -> List[News]:
-    return db.query(News)\
-        .filter(News.topic == topic)\
-        .filter(News.date >= start_date)\
-        .filter(News.date <= end_date)\
-        .offset(skip).limit(limit).all()
+    # TODO: допилить фильтрацию
+    if topic and start_date and end_date:
+        return db.query(News)\
+            .filter(News.topic == topic)\
+            .filter(News.date >= start_date)\
+            .filter(News.date <= end_date)\
+            .offset(skip).limit(limit).all()
+    else:
+        return db.query(News).offset(skip).limit(limit).all()
 
 
 def get_all_news(db: Session,
