@@ -2,7 +2,7 @@ version: "2.1"
 services:
   db:
     ports:
-      - "5434:5432"
+      - "5432:5432"
     image: postgres:11
     env_file: .env
     healthcheck:
