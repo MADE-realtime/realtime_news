@@ -1,4 +1,5 @@
 import re
+import urllib.parse
 
 from scrapy.spiders import Spider
 from scrapy.linkextractors.lxmlhtml import LxmlLinkExtractor
@@ -29,10 +30,11 @@ class SpiderRSS(Spider):
             yield Request(link.url, callback=self.parse_rss_xml)
 
     def parse_rss_xml(self, response: XmlResponse):
+        domain = get_domain(response.url)
         for rss_item in response.xpath('//item'):
             parser_name, parser = self.find_parser(response.url)
             self.log(f'parse {response.url} with {parser_name} parser')
-            yield self.parse_rss_item(rss_item, parser)
+            yield {'domain': domain, **self.parse_rss_item(rss_item, parser)}
 
     @staticmethod
     def parse_rss_item(rss_item, parser):
@@ -62,3 +64,8 @@ def regex(x):
     if isinstance(x, str):
         return re.compile(x)
     return x
+
+
+def get_domain(url):
+    parsed_url = urllib.parse.urlparse(url)
+    return parsed_url.netloc
