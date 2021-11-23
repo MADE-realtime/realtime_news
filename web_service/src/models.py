@@ -1,5 +1,5 @@
 from datetime import date, datetime
-from typing import List
+from typing import List, Tuple
 
 from config import DEFAULT_LOGO_URL, DEFAULT_NEWS_IMAGE_URL
 from pydantic import BaseModel
@@ -18,6 +18,11 @@ class News(BaseModel):
     logo_url: str = DEFAULT_LOGO_URL
 
 
+class StatisticsModels(BaseModel):
+    type: str
+    stats: List[Tuple[str, int]]
+
+
 class ListNews(BaseModel):
     news_list: List[News]
-    statistics: None
+    statistics: List

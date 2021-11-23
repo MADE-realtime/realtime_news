@@ -1,22 +1,21 @@
+from typing import List
+
 from config import TEMPLATE_NAME
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from news_extractor import DBNewsExtractor, BaseNewsExtractor
-from db_lib.database import SessionLocal
-from fastapi import Depends
-from sqlalchemy.orm import Session
 from models import News
-from typing import List
+from news_extractor import BaseNewsExtractor, DBNewsExtractor
+from sqlalchemy.orm import Session
+
+from db_lib.database import SessionLocal
 
 app = FastAPI()
 # NEWS_EXTRACTOR = PandasNewsExtractor(LENTA_MINI_DATASET_FILEPATH)
 NEWS_EXTRACTOR: BaseNewsExtractor = DBNewsExtractor()
 
-app.mount(
-    "/static", StaticFiles(directory="web_service/src/static"), name="static"
-)
+app.mount("/static", StaticFiles(directory="web_service/src/static"), name="static")
 templates = Jinja2Templates(directory="web_service/src/templates")
 
 
@@ -28,8 +27,14 @@ def get_db():
         db.close()
 
 
-@app.get('/get_random_news/{num_random_news}', response_class=HTMLResponse, response_model=List[News])
-def get_all_handler(request: Request, num_random_news: int, db: Session = Depends(get_db)):
+@app.get(
+    '/get_random_news/{num_random_news}',
+    response_class=HTMLResponse,
+    response_model=List[News],
+)
+def get_all_handler(
+    request: Request, num_random_news: int, db: Session = Depends(get_db)
+):
     """
     Get random number news from all the time
     :return:
@@ -40,8 +45,14 @@ def get_all_handler(request: Request, num_random_news: int, db: Session = Depend
     )
 
 
-@app.get('/get_date/{start_date}/{end_date}', response_class=HTMLResponse, response_model=List[News])
-def get_date_handler(request: Request, start_date: str, end_date: str, db: Session = Depends(get_db)):
+@app.get(
+    '/get_date/{start_date}/{end_date}',
+    response_class=HTMLResponse,
+    response_model=List[News],
+)
+def get_date_handler(
+    request: Request, start_date: str, end_date: str, db: Session = Depends(get_db)
+):
     """
     Get news by day
     :param date:
@@ -53,8 +64,18 @@ def get_date_handler(request: Request, start_date: str, end_date: str, db: Sessi
     )
 
 
-@app.get('/get_topic/{topic}/{start_date}/{end_date}', response_class=HTMLResponse, response_model=List[News])
-def get_topic_handler(request: Request, topic: str, start_date: str, end_date: str, db: Session = Depends(get_db)):
+@app.get(
+    '/get_topic/{topic}/{start_date}/{end_date}',
+    response_class=HTMLResponse,
+    response_model=List[News],
+)
+def get_topic_handler(
+    request: Request,
+    topic: str,
+    start_date: str,
+    end_date: str,
+    db: Session = Depends(get_db),
+):
     """
     Get news by day and topic
     :param topic:

@@ -1,17 +1,17 @@
+import random
 from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
+from typing import Dict
 
 import pandas as pd
-import random
 from models import ListNews, News
-from typing import Dict
-from utils import convert_str_to_date
-
 from sqlalchemy.orm import Session
+from utils import convert_str_to_date
 
 from db_lib import crud
 from db_lib.database import SessionLocal
+from web_service.src.statistics import NgramsBuilder
 
 
 class BaseNewsExtractor(ABC):
@@ -35,7 +35,9 @@ class BaseNewsExtractor(ABC):
         pass
 
     @abstractmethod
-    def show_news_by_topic(self, db: Session, topic: str, start_date: str, end_date: str):
+    def show_news_by_topic(
+        self, db: Session, topic: str, start_date: str, end_date: str
+    ):
         """
         Метод для показа новостей по определённой теме
         """
@@ -47,30 +49,32 @@ class PandasNewsExtractor(BaseNewsExtractor):
         self.source_df = pd.read_csv(path_to_df, parse_dates=['date'])
         self.source_df['date'] = self.source_df['date'].map(lambda x: x.date())
 
-    def show_random_news(self, num_random_news: int = 10) -> ListNews:
+    def show_random_news(self, num_random_news: int = 10, **kwargs) -> ListNews:
         df_random = self.source_df.sample(n=num_random_news)
         news_list = self._convert_df_to_list_news(df_random)
         return news_list
 
     def show_news_by_days(
-            self,
-            start_date: str = '1991-05-12',
-            end_date: str = '1991-05-12',
+        self,
+        start_date: str = '1991-05-12',
+        end_date: str = '1991-05-12',
+        **kwargs,
     ) -> ListNews:
         start_date = convert_str_to_date(start_date)
         end_date = convert_str_to_date(end_date)
         df_date = self.source_df[
             (self.source_df['date'] >= start_date)
             & (self.source_df['date'] <= end_date)
-            ]
+        ]
         news_list = self._convert_df_to_list_news(df_date)
         return news_list
 
     def show_news_by_topic(
-            self,
-            topic: str = 'Футбол',
-            start_date: str = '1991-05-12',
-            end_date: str = '1991-05-12',
+        self,
+        topic: str = 'Футбол',
+        start_date: str = '1991-05-12',
+        end_date: str = '1991-05-12',
+        **kwargs,
     ) -> ListNews:
         start_date = convert_str_to_date(start_date)
         end_date = convert_str_to_date(end_date)
@@ -78,7 +82,7 @@ class PandasNewsExtractor(BaseNewsExtractor):
             (self.source_df['topic'] == topic)
             & (self.source_df['date'] >= start_date)
             & (self.source_df['date'] <= end_date)
-            ]
+        ]
         news_list = self._convert_df_to_list_news(df_topic)
         return news_list
 
@@ -106,7 +110,6 @@ class PandasNewsExtractor(BaseNewsExtractor):
 
 
 class DBNewsExtractor(BaseNewsExtractor):
-
     def get_db(self):
         db = SessionLocal()
         try:
@@ -115,22 +118,31 @@ class DBNewsExtractor(BaseNewsExtractor):
             db.close()
 
     def show_random_news(self, db: Session, num_random_news: int = 10) -> Dict:
-        return {'news_list': random.choices(crud.get_all_news(db), k=num_random_news),
-                'statistics': None}
+        news_list = random.choices(crud.get_all_news(db), k=num_random_news)
+        return ListNews(
+            **{'news_list': news_list, 'statistics': NgramsBuilder().predict(news_list)}
+        )
 
-    def show_news_by_days(self,
-                          db,
-                          start_date: str = '1991-05-12',
-                          end_date: str = '1991-05-12') -> Dict:
-        return {'news_list': crud.get_news_by_date(db, convert_str_to_date(start_date), convert_str_to_date(end_date)),
-                'statistics': None}
+    def show_news_by_days(
+        self, db, start_date: str = '1991-05-12', end_date: str = '1991-05-12'
+    ) -> Dict:
+        news_list = crud.get_news_by_date(
+            db, convert_str_to_date(start_date), convert_str_to_date(end_date)
+        )
+        return ListNews(
+            **{'news_list': news_list, 'statistics': NgramsBuilder().predict(news_list)}
+        )
 
-    def show_news_by_topic(self,
-                           db,
-                           topic: str = 'Футбол',
-                           start_date: str = '1991-05-12',
-                           end_date: str = '1991-05-12') -> Dict:
-        return {'news_list': crud.get_news_by_topic_and_date(db, topic,
-                                                             convert_str_to_date(start_date),
-                                                             convert_str_to_date(end_date)),
-                'statistics': None}
+    def show_news_by_topic(
+        self,
+        db,
+        topic: str = 'Футбол',
+        start_date: str = '1991-05-12',
+        end_date: str = '1991-05-12',
+    ) -> Dict:
+        news_list = crud.get_news_by_topic_and_date(
+            db, topic, convert_str_to_date(start_date), convert_str_to_date(end_date)
+        )
+        return ListNews(
+            **{'news_list': news_list, 'statistics': NgramsBuilder().predict(news_list)}
+        )
