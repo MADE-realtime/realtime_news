@@ -3,6 +3,7 @@ from argparse import ArgumentParser
 from scrapy.crawler import CrawlerProcess
 
 from data_collection.news_spider import NewsSpider
+from data_collection.rss_spider import SpiderRSS
 
 
 def init_arg_parser():
@@ -56,5 +57,5 @@ if __name__ == '__main__':
             'scrapy.extensions.logstats.LogStats': 0,
         }
     })
-    crawl_proc.crawl(NewsSpider, **spider_kwargs)
+    crawl_proc.crawl(spider_class, **spider_kwargs)
     crawl_proc.start()
