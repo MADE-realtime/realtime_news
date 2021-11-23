@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 
 from scrapy.crawler import CrawlerProcess
 
-from data_collection.newsspider import NewsSpider
+from data_collection.news_spider import NewsSpider
 
 
 def init_arg_parser():
@@ -12,14 +12,9 @@ def init_arg_parser():
                      'sources and store them')
     )
     parser.add_argument(
-        '-urls_file',
-        help='provide source file with sitemap urls to search news in',
-        required=True,
-    )
-    parser.add_argument(
-        '-rules_file',
-        help='provide rules file with domain-parser mapping',
-        required=True,
+        '-spider_class',
+        help='choose Spider',
+        required=True
     )
     parser.add_argument(
         '-destination',
@@ -29,35 +24,29 @@ def init_arg_parser():
     return parser
 
 
-def read_file(fpath):
-    with open(fpath, 'r') as fin:
-        fdata = fin.read()
-    return fdata
-
-
-def read_urls_file(url_fpath):
-    raw_data = read_file(url_fpath)
-    urls = [line.strip() for line in raw_data.split('\n')]
-    return urls
-
-
-def read_rule_file(rules_fpath):
-    raw_data = read_file(rules_fpath)
-    rules = [line.strip().split() for line in raw_data.split('\n')]
-    return rules
+def prepare_kwargs(raw_kwargs):
+    kwargs = dict()
+    key = None
+    for element in raw_kwargs:
+        if element.startswith('-'):
+            key = element.replace('-', '')
+        elif key is not None:
+            kwargs[key] = element
+    return kwargs
 
 
 if __name__ == '__main__':
     arg_parser = init_arg_parser()
-    news_args = arg_parser.parse_args()
+    cli_args, raw_spider_kwargs = arg_parser.parse_known_args()
 
-    sitemap_urls = read_urls_file(news_args.urls_file)
-    domain_rules = read_rule_file(news_args.rules_file)
+    # TODO: replace prepare_kwargs with spider_parser
+    spider_kwargs = prepare_kwargs(raw_spider_kwargs)
+    spider_class = locals()[cli_args.spider_class]
 
     crawl_proc = CrawlerProcess(settings={
         'DOWNLOAD_DELAY': 3,
         "FEEDS": {
-            news_args.destination: {"format": "json"},
+            cli_args.destination: {"format": "json"},
         },
         "FEED_EXPORT_ENCODING": 'utf-8',
         'USER_AGENT': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.10; rv:39.0) Gecko/20100101 Firefox/39.0',
@@ -67,5 +56,5 @@ if __name__ == '__main__':
             'scrapy.extensions.logstats.LogStats': 0,
         }
     })
-    crawl_proc.crawl(NewsSpider, sitemap_urls, domain_rules)
+    crawl_proc.crawl(NewsSpider, **spider_kwargs)
     crawl_proc.start()
