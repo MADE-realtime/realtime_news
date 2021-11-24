@@ -49,6 +49,7 @@ if __name__ == '__main__':
         "FEEDS": {
             cli_args.destination: {"format": "json"},
         },
+        'LOG_FILE': f'{cli_args.spider_class}.log',
         "FEED_EXPORT_ENCODING": 'utf-8',
         'USER_AGENT': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.10; rv:39.0) Gecko/20100101 Firefox/39.0',
         'EXTENSIONS': {

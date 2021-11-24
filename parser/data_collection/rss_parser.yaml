@@ -4,5 +4,10 @@
   title: ./title/text()
   description: ./description/text()
   pubDate: ./pubDate/text()
-  image: ./enclosure/@url
+  image:
+    - ./enclosure/@url
+    - ./*["content"=local-name()]/@url
   category: ./category/text()
+  content:
+    - ./*["encoded"=local-name()]/text()
+    - ./*["full-text"=local-name()]/text()
