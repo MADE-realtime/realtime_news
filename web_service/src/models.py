@@ -25,4 +25,4 @@ class StatisticsModels(BaseModel):
 
 class ListNews(BaseModel):
     news_list: List[News]
-    statistics: List
+    statistics: List[StatisticsModels]

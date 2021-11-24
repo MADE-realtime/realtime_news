@@ -120,7 +120,9 @@ class DBNewsExtractor(BaseNewsExtractor):
     def show_random_news(self, db: Session, num_random_news: int = 10) -> Dict:
         news_list = random.choices(crud.get_all_news(db), k=num_random_news)
         return ListNews(
-            **{'news_list': news_list, 'statistics': NgramsBuilder().predict(news_list)}
+            **{'news_list': news_list, 'statistics': [
+                NgramsBuilder().predict(news_list),
+            ]}
         )
 
     def show_news_by_days(
@@ -130,7 +132,9 @@ class DBNewsExtractor(BaseNewsExtractor):
             db, convert_str_to_date(start_date), convert_str_to_date(end_date)
         )
         return ListNews(
-            **{'news_list': news_list, 'statistics': NgramsBuilder().predict(news_list)}
+            **{'news_list': news_list, 'statistics': [
+                NgramsBuilder().predict(news_list),
+            ]}
         )
 
     def show_news_by_topic(
@@ -144,5 +148,7 @@ class DBNewsExtractor(BaseNewsExtractor):
             db, topic, convert_str_to_date(start_date), convert_str_to_date(end_date)
         )
         return ListNews(
-            **{'news_list': news_list, 'statistics': NgramsBuilder().predict(news_list)}
+            **{'news_list': news_list, 'statistics': [
+                NgramsBuilder().predict(news_list),
+            ]}
         )
