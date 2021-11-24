@@ -52,7 +52,11 @@ if __name__ == '__main__':
         },
         'LOG_FILE': f'{cli_args.spider_class}.log',
         "FEED_EXPORT_ENCODING": 'utf-8',
-        'USER_AGENT': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.10; rv:39.0) Gecko/20100101 Firefox/39.0',
+        # TODO: pip install scrapy-user-agents
+        'DOWNLOADER_MIDDLEWARES': {
+            'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+            'scrapy_user_agents.middlewares.RandomUserAgentMiddleware': 400,
+        },
         'EXTENSIONS': {
             'scrapy.extensions.corestats.CoreStats': 0,
             'scrapy.extensions.memusage.MemoryUsage': 0,
