@@ -4,6 +4,7 @@ from scrapy.crawler import CrawlerProcess
 
 from data_collection.news_spider import NewsSpider
 from data_collection.rss_spider import SpiderRSS
+from data_collection.yandex_spider import YandexNewsSpider
 
 
 def init_arg_parser():
