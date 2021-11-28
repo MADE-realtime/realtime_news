@@ -2,9 +2,7 @@ from argparse import ArgumentParser
 
 from scrapy.crawler import CrawlerProcess
 
-from data_collection.news_spider import NewsSpider
-from data_collection.rss_spider import SpiderRSS
-from data_collection.yandex_spider import YandexNewsSpider
+from data_collection import SPIDER_PARSERS
 
 
 def init_arg_parser():
@@ -14,43 +12,33 @@ def init_arg_parser():
                      'sources and store them')
     )
     parser.add_argument(
-        '-spider_class',
-        help='choose Spider',
-        required=True
-    )
-    parser.add_argument(
         '-destination',
-        help='provide path to store news data',
+        help='Path to store news data',
         required=True,
     )
+    subparsers = parser.add_subparsers()
+    for parser_name, (help_str, setup_parser) in SPIDER_PARSERS.items():
+        spider_parser = subparsers.add_parser(parser_name, help=help_str)
+        spider_parser = setup_parser(spider_parser)
+        spider_parser.add_argument(
+            '-logfile',
+            help='Path to write logs',
+            default=f'{parser_name}.log'
+        )
     return parser
-
-
-def prepare_kwargs(raw_kwargs):
-    kwargs = dict()
-    key = None
-    for element in raw_kwargs:
-        if element.startswith('-'):
-            key = element.replace('-', '')
-        elif key is not None:
-            kwargs[key] = element
-    return kwargs
 
 
 if __name__ == '__main__':
     arg_parser = init_arg_parser()
-    cli_args, raw_spider_kwargs = arg_parser.parse_known_args()
-
-    # TODO: replace prepare_kwargs with spider_parser
-    spider_kwargs = prepare_kwargs(raw_spider_kwargs)
-    spider_class = locals()[cli_args.spider_class]
+    cli_args = arg_parser.parse_args()
+    cli_args = vars(cli_args)
 
     crawl_proc = CrawlerProcess(settings={
         'DOWNLOAD_DELAY': 3,
         "FEEDS": {
-            cli_args.destination: {"format": "json"},
+            cli_args.pop('destination'): {"format": "json"},
         },
-        'LOG_FILE': f'{cli_args.spider_class}.log',
+        'LOG_FILE': f'{cli_args.pop("logfile")}.log',
         "FEED_EXPORT_ENCODING": 'utf-8',
         # TODO: pip install scrapy-user-agents
         'DOWNLOADER_MIDDLEWARES': {
@@ -63,5 +51,9 @@ if __name__ == '__main__':
             'scrapy.extensions.logstats.LogStats': 0,
         }
     })
+
+    spider_class = cli_args.pop('spider')
+    setup_kwargs = cli_args.pop('setup_kwargs')
+    spider_kwargs = setup_kwargs(**cli_args)
     crawl_proc.crawl(spider_class, **spider_kwargs)
     crawl_proc.start()

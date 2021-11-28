@@ -1,5 +1,6 @@
 import re
 import urllib.parse
+from argparse import ArgumentParser
 
 from bs4 import BeautifulSoup
 from scrapy.spiders import Spider
@@ -10,12 +11,40 @@ from scrapy.http import Response, Request, XmlResponse
 from data_collection.util import read_urls_file, read_yaml_file
 
 
+def setup_rs_parser(parser: ArgumentParser):
+    parser.add_argument(
+        '-start_urls',
+        help='Path to file with urls',
+        dest='start_urls_fpath',
+        type=str,
+        required=True,
+    )
+    parser.add_argument(
+        '-rss_parser',
+        help='Path to yaml file with parser',
+        dest='rss_parser_fpath',
+        type=str,
+        required=True,
+    )
+    parser.set_defaults(setup_kwargs=setup_rs_kwargs, spider=SpiderRSS)
+    return parser
+
+
+def setup_rs_kwargs(start_urls_fpath, rss_parser_fpath):
+    start_urls = read_urls_file(start_urls_fpath)
+    rss_parser = read_yaml_file(rss_parser_fpath)
+    kwargs = {
+        'start_urls': start_urls,
+        'rss_parser': rss_parser,
+    }
+    return kwargs
+
+
 class SpiderRSS(Spider):
     name = 'parser_rss'
 
-    def __init__(self, start_urls_fpath, rss_parser_fpath, *args, **kwargs):
-        self.start_urls = read_urls_file(start_urls_fpath)
-        raw_parser_zoo = read_yaml_file(rss_parser_fpath)
+    def __init__(self, start_urls, raw_parser_zoo, *args, **kwargs):
+        self.start_urls = start_urls
         self.rss_parser_zoo = self.create_zoo_rules(raw_parser_zoo)
         ignore_extensions = IGNORED_EXTENSIONS.copy()
         ignore_extensions.remove('rss')
