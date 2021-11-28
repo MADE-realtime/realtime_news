@@ -1,10 +1,13 @@
 version: "2.1"
 services:
   db:
+    container_name: db
     ports:
       - "5432:5432"
     image: postgres:11
     env_file: .env
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s
@@ -12,7 +15,8 @@ services:
       retries: 5
 
   realtime_parser:
-    image: "terysy/realtime_parser:v2"
+    container_name: realtime_parser
+    image: "terysy/realtime_parser:latest"
 #    build:
 #      context: .
 #      dockerfile: parser/Dockerfile
@@ -23,7 +27,8 @@ services:
       - db
 
   realtime_web:
-    image: "terysy/realtime_web:v6"
+    container_name: realtime_web
+    image: "terysy/realtime_web:latest"
 #    build:
 #      context: .
 #      dockerfile: Dockerfile

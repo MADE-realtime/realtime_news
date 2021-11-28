@@ -1,0 +1,14 @@
+[
+  {
+    "id": "redeploy-realtime_web",
+    "execute-command": "/home/ubuntu/scripts/redeploy-realtime_web.sh",
+    "command-working-directory": "/home/ubuntu/scripts",
+    "response-message": "Redeploying API server."
+  },
+  {
+    "id": "redeploy-realtime_parser",
+    "execute-command": "/home/ubuntu/scripts/redeploy-realtime_parser.sh",
+    "command-working-directory": "/home/ubuntu/scripts",
+    "response-message": "Redeploying parser."
+  }
+]
