@@ -10,14 +10,14 @@ jobs:
     name: Publish - Docker Hub
     runs-on: ubuntu-18.04
     env:
-      REPO: ${{ secrets.DOCKER_REPO }}
+      REPO: ${{ secrets.DOCKER_REPO_WEB }}
     steps:
       - uses: actions/checkout@v1
       - name: Login to Docker Hub
         run: docker login -u ${{ secrets.DOCKER_USER }}
              -p ${{ secrets.DOCKER_PASS }}
       - name: Build web_service Docker image
-        run: docker build -t $DOCKER_REPO_WEB:latest -t $DOCKER_REPO_WEB:${GITHUB_SHA::8} .
+        run: docker build -t $REPO:latest -t $REPO:${GITHUB_SHA::8} .
       - name: Publish web_service Docker image
         run: docker push $DOCKER_REPO_WEB
 
@@ -36,14 +36,14 @@ jobs:
     name: Publish - Docker Hub
     runs-on: ubuntu-18.04
     env:
-      REPO: ${{ secrets.DOCKER_REPO }}
+      REPO: ${{ secrets.DOCKER_REPO_PARSER }}
     steps:
       - uses: actions/checkout@v1
       - name: Login to Docker Hub
         run: docker login -u ${{ secrets.DOCKER_USER }}
           -p ${{ secrets.DOCKER_PASS }}
       - name: Build parser Docker image
-        run: docker build -t $DOCKER_REPO_PARSER:latest -t $DOCKER_REPO_PARSER:${GITHUB_SHA::8} .
+        run: docker build -t $REPO:latest -t $REPO:${GITHUB_SHA::8} parser/Dockerfile .
       - name: Publish parser Docker image
         run: docker push $DOCKER_REPO_PARSER
 
