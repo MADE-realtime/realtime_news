@@ -24,7 +24,7 @@ jobs:
   redeploy-web:
     name: Redeploy web webhook call
     runs-on: ubuntu-18.04
-    needs: [docker]
+    needs: [docker-web]
     steps:
       - name: Deploy docker container webhook for web_service
         uses: joelwmale/webhook-action@master
@@ -50,7 +50,7 @@ jobs:
   redeploy-parser:
     name: Redeploy parser webhook call
     runs-on: ubuntu-18.04
-    needs: [ docker ]
+    needs: [ docker-parser]
     steps:
       - name: Deploy docker container webhook for parser
         uses: joelwmale/webhook-action@master
