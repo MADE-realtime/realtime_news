@@ -1,8 +1,9 @@
-from typing import List
+from typing import List, Optional
 
-from config import TEMPLATE_NAME
+from config import FAVICON_PATH, TEMPLATE_NAME
+from datetime import datetime
 from fastapi import Depends, FastAPI, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from models import News
@@ -25,6 +26,29 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+@app.get(
+    '/',
+    response_class=HTMLResponse
+)
+async def main_handler(request: Request,
+                       topic: Optional[str] = None,
+                       start_date: Optional[str] = '1991-05-12',
+                       end_date: Optional[str] = None,
+                       number: Optional[int] = 10,
+                       db: Session = Depends(get_db)
+                       ):
+    """
+    Get random number news by filters
+    :return:
+    """
+    if not end_date:
+        end_date = datetime.date(datetime.now())
+    news_list = NEWS_EXTRACTOR.show_news_by_filters(db, topic, end_date, start_date, number)
+    return templates.TemplateResponse(
+        TEMPLATE_NAME, {"request": request, 'news': news_list['news_list']}
+    )
 
 
 @app.get(
@@ -85,3 +109,8 @@ def get_topic_handler(
     return templates.TemplateResponse(
         TEMPLATE_NAME, {"request": request, 'news': news_list['news_list']}
     )
+
+
+@app.get('/favicon.ico', response_class=FileResponse, include_in_schema=False)
+async def favicon():
+    return FAVICON_PATH

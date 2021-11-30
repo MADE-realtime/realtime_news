@@ -10,6 +10,23 @@ def get_news(db: Session,
     return db.query(News).filter(News.id == news_id).first()
 
 
+def get_news_with_filters(db: Session,
+                          topic: str,
+                          start_date: date,
+                          end_date: date,
+                          skip: int = 0,
+                          limit: int = 100) -> List[News]:
+    # TODO: допилить фильтрацию
+    if topic and start_date and end_date:
+        return db.query(News)\
+            .filter(News.topic == topic)\
+            .filter(News.date >= start_date)\
+            .filter(News.date <= end_date)\
+            .offset(skip).limit(limit).all()
+    else:
+        return db.query(News).offset(skip).limit(limit).all()
+
+
 def get_all_news(db: Session,
                  skip: int = 0,
                  limit: int = 100) -> List[News]:

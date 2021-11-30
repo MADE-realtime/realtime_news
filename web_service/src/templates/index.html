@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Новости - в реальном времени и с аналитикой</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="stylesheet" href="{{ url_for('static', path='/css/bulma.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='/css/fontawesome/all.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='/css/custom.css') }}">
@@ -62,7 +63,7 @@
         <!-- Filters -->
         <div class="row columns is-multiline">
 
-          <div class="column is-1 field">
+          <div class="column is-2 field">
             <div class="control">
               <input id="news-number" class="input" type="number" value="10">
             </div>
@@ -97,9 +98,6 @@
                 {% endif %}
               </select>
             </div>
-          </div>
-
-          <div class="column is-1 field">
             <button id="clear" class="button is-danger is-outlined is-pulled-right" onclick="clearFilters()">
               <span class="icon">
                 <i class="fas fa-times"></i>
@@ -115,6 +113,7 @@
         {% if news %}
         {% for card in news %}
 
+          {% if card.title %}
           <div class="column is-4">
             <div class="card large">
 
@@ -125,40 +124,57 @@
                   </div>
                 </div>
                 <div class="content mb-3">
-                  <span class="short-text">{{ card.content }}</span>
-                  <span class="full-text">{{ card.content }}</span>
+                  <span class="short-text">{{ card.content[:200] }}</span>
+                  <span class="full-text">{{ card.content[200:] }}</span>
                   <span class="text-dots">...</span>
                   <b><span class="show-more-button" data-more="0">Читать полностью</span></b>
                 </div>
                 <div class="media-content mb-3">
-                  {% if card.topic != 'nan' %}
+                  {% if card.topic %}
                   <span class="tag is-primary">{{ card.topic }}</span>
                   {% endif %}
-                  {% if card.tags != 'nan' %}
+                  {% if card.tags %}
                   <span class="tag">{{ card.tags }}</span>
                   {% endif %}
                 </div>
                 <div class="card-image">
                 <figure class="image is-16by9">
-                  <img src="{{ card.image_url }}" alt="Image">
+                  {% if card.image_url %}
+                  <img src="{{ card.image_url }}" alt="{{ card.title }}">
+                  {% else %}
+                  <img src="{{ url_for('static', path='/img/news-placeholder.jpg') }}" alt="{{ card.title }}">
+                  {% endif %}
                 </figure>
               </div>
                 <div class="content">
+                  {% if card.time %}
                   <time datetime="{{ card.date }}">{{ card.time }}</time>
+                  {% else %}
+                  <span>Сегодня</span>
+                  {% endif %}
                   <div class="media">
                     <div class="media-left">
                       <figure class="image is-16x16 m-0">
-                        <img src="{{ card.logo_url }}" alt="Placeholder image">
+                        {% if card.time %}
+                        <img src="{{ card.logo_url }}" alt="{{ card.source_name }}">
+                        {% else %}
+                        <img src="{{ url_for('static', path='/img/rtn-small-logo.png') }}" alt="{{ card.source_name }}">
+                        {% endif %}
                       </figure>
                     </div>
                     <div class="media-content">
+                      {% if card.source_name %}
                       <p class="subtitle is-6">{{ card.source_name }}</p>
+                      {% else %}
+                      <p>Неизвестная газета</p>
+                      {% endif %}
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+          {% endif %}
 
         {% endfor %}
         {% endif %}
