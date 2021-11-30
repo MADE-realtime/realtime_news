@@ -4,8 +4,8 @@ import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
 from stop_words import get_stop_words
 
-from web_service.src.config import LANGUAGE
-from web_service.src.models import ListNews, StatisticsModels
+from config import LANGUAGE
+from models import ListNews, StatisticsModels
 
 
 class Statistics(ABC):

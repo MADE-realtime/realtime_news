@@ -19,7 +19,7 @@ jobs:
       - name: Build web_service Docker image
         run: docker build -t $REPO:latest -t $REPO:${GITHUB_SHA::8} .
       - name: Publish web_service Docker image
-        run: docker push $REPO
+        run: docker push --all-tags $REPO:latest
 
   redeploy-web:
     name: Redeploy web webhook call
@@ -45,7 +45,7 @@ jobs:
       - name: Build parser Docker image
         run: docker build -t $REPO:latest -t $REPO:${GITHUB_SHA::8} -f parser/Dockerfile .
       - name: Publish parser Docker image
-        run: docker push $REPO
+        run: docker push --all-tags $REPO
 
   redeploy-parser:
     name: Redeploy parser webhook call
