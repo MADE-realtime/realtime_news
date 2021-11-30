@@ -11,7 +11,7 @@ from utils import convert_str_to_date
 
 from db_lib import crud
 from db_lib.database import SessionLocal
-from web_service.src.statistics import NgramsBuilder
+from statistics import NgramsBuilder
 
 
 class BaseNewsExtractor(ABC):

@@ -17,9 +17,9 @@ services:
   realtime_parser:
     container_name: realtime_parser
     image: "terysy/realtime_parser:latest"
-#    build:
-#      context: .
-#      dockerfile: parser/Dockerfile
+    build:
+      context: .
+      dockerfile: parser/Dockerfile
     depends_on:
       db:
         condition: service_healthy
@@ -29,9 +29,9 @@ services:
   realtime_web:
     container_name: realtime_web
     image: "terysy/realtime_web:latest"
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "80:8000"
     volumes:
