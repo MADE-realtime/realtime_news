@@ -47,7 +47,7 @@ async def main_handler(request: Request,
         end_date = datetime.date(datetime.now())
     news_list = NEWS_EXTRACTOR.show_news_by_filters(db, topic, end_date, start_date, number)
     return templates.TemplateResponse(
-        TEMPLATE_NAME, {"request": request, 'news': news_list['news_list']}
+        TEMPLATE_NAME, {"request": request, 'news': news_list['news_list'], 'stats': news_list['statistics']}
     )
 
 
@@ -65,7 +65,7 @@ def get_all_handler(
     """
     news_list = NEWS_EXTRACTOR.show_random_news(db, num_random_news)
     return templates.TemplateResponse(
-        TEMPLATE_NAME, {"request": request, 'news': news_list['news_list']}
+        TEMPLATE_NAME, {"request": request, 'news': news_list['news_list'], 'stats': news_list['statistics']}
     )
 
 
@@ -84,7 +84,7 @@ def get_date_handler(
     """
     news_list = NEWS_EXTRACTOR.show_news_by_days(db, start_date, end_date)
     return templates.TemplateResponse(
-        TEMPLATE_NAME, {"request": request, 'news': news_list['news_list']}
+        TEMPLATE_NAME, {"request": request, 'news': news_list['news_list'], 'stats': news_list['statistics']}
     )
 
 
@@ -107,7 +107,7 @@ def get_topic_handler(
     """
     news_list = NEWS_EXTRACTOR.show_news_by_topic(db, topic, start_date, end_date)
     return templates.TemplateResponse(
-        TEMPLATE_NAME, {"request": request, 'news': news_list['news_list']}
+        TEMPLATE_NAME, {"request": request, 'news': news_list['news_list'], 'stats': news_list['statistics']}
     )
 
 
