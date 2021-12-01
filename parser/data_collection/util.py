@@ -1,4 +1,8 @@
+import re
+import urllib.parse
+
 import yaml
+from bs4 import BeautifulSoup
 
 
 def read_file(fpath):
@@ -23,3 +27,19 @@ def read_yaml_file(yaml_fpath):
     with open(yaml_fpath, 'r') as fin:
         yaml_data = yaml.safe_load(fin)
     return yaml_data
+
+
+def regex(x):
+    if isinstance(x, str):
+        return re.compile(x)
+    return x
+
+
+def get_domain(url):
+    parsed_url = urllib.parse.urlparse(url)
+    return parsed_url.netloc
+
+
+def extract_all_tags(xml_tag):
+    soup = BeautifulSoup(xml_tag, 'xml')
+    return [t.name for t in soup.descendants if t.name]

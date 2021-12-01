@@ -1,13 +1,14 @@
 .*:
-  url: ./link/text()
+  source_url: ./link/text()
   author: ./author/text()
   title: ./title/text()
-  description: ./description/text()
-  pubDate: ./pubDate/text()
-  image:
+  title_post: ./description/text()
+  date: ./pubDate/text()
+  time: ./pubDate/text()
+  image_url:
     - ./enclosure/@url
     - ./*["content"=local-name()]/@url
-  category: ./category/text()
+  topic: ./category/text()
   content:
     - ./*["encoded"=local-name()]/text()
     - ./*["full-text"=local-name()]/text()

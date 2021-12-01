@@ -1,14 +1,15 @@
 import re
-import urllib.parse
 from argparse import ArgumentParser
 
-from bs4 import BeautifulSoup
 from scrapy.spiders import Spider
 from scrapy.linkextractors.lxmlhtml import LxmlLinkExtractor
 from scrapy.linkextractors import IGNORED_EXTENSIONS
 from scrapy.http import Response, Request, XmlResponse
 
-from data_collection.util import read_urls_file, read_yaml_file
+from data_collection.util import read_urls_file, read_yaml_file, regex, get_domain, extract_all_tags
+from db_lib.db_lib.models import News
+from db_lib.db_lib.database import SessionLocal
+from db_lib.db_lib import crud
 
 
 def setup_rs_parser(parser: ArgumentParser):
@@ -49,10 +50,10 @@ class SpiderRSS(Spider):
         ignore_extensions = IGNORED_EXTENSIONS.copy()
         ignore_extensions.remove('rss')
         self.rss_filter = (
-                '.*\/rss.*',
-                '.*\/feed.*',
-                '.*\.rss'
-            )
+            '.*\/rss.*',
+            '.*\/feed.*',
+            '.*\.rss'
+        )
         self.link_extractor = LxmlLinkExtractor(
             allow=self.rss_filter,
             deny_extensions=ignore_extensions,
@@ -124,17 +125,43 @@ class SpiderRSS(Spider):
         return False
 
 
-def extract_all_tags(xml_tag):
-    soup = BeautifulSoup(xml_tag, 'xml')
-    return [t.name for t in soup.descendants if t.name]
+class DatabaseAdapter(SpiderRSS):
+    def __init__(self, *args, **kwargs):
+        super(DatabaseAdapter, self).__init__(*args, **kwargs)
+        self.legal_keys = [
+            ('title', dummy_func),
+            ('title_post', dummy_func),
+            ('content', dummy_func),
+            ('source_url', dummy_func),
+            ('image_url', dummy_func),
+            ('date', self.get_date),
+            ('topic', self.get_time),
+        ]
+
+    def parse_rss_xml(self, response: XmlResponse):
+        for item in super(DatabaseAdapter, self).parse_rss_xml(response):
+            db_item = self.prepare_item(item)
+            db_item = crud.create_news(SessionLocal(), db_item)
+            return db_item
+
+    def prepare_item(self, item):
+        preproc_item = {}
+        for key, preproc in self.legal_keys:
+            value = item.get(key, None)
+            if value is not None:
+                value = preproc(value)
+            preproc_item[key] = value
+        db_item = News(**preproc_item)
+        return db_item
+
+    @staticmethod
+    def get_date(rss_date):
+        return rss_date
+
+    @staticmethod
+    def get_time(rss_time):
+        return rss_time
 
 
-def regex(x):
-    if isinstance(x, str):
-        return re.compile(x)
+def dummy_func(x):
     return x
-
-
-def get_domain(url):
-    parsed_url = urllib.parse.urlparse(url)
-    return parsed_url.netloc
