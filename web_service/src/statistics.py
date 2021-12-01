@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
 
 import numpy as np
+from typing import Dict, List
 from sklearn.feature_extraction.text import CountVectorizer
 from stop_words import get_stop_words
 
 from config import LANGUAGE
-from models import ListNews, StatisticsModels
+from models import ListNews, News, StatisticsModels
 
 
 class Statistics(ABC):
@@ -25,8 +26,8 @@ class NgramsBuilder(Statistics):
         )
         self.name = 'Ngrams'
 
-    def predict(self, news: ListNews) -> StatisticsModels:
-        news_texts = [one_news['contents'] for one_news in news]
+    def predict(self, news: ListNews) -> StatisticsModels:  # по сути на вход придет List[News]
+        news_texts = [one_news['content'] for one_news in news]  # изменил на 'content'
         frequencies = np.array(
             np.sum(self.builder.fit_transform(news_texts).todense(), axis=0)
         )[0]

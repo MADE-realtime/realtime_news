@@ -6,7 +6,7 @@ from fastapi import Depends, FastAPI, Request
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from models import News
+from models import ListNews, News
 from news_extractor import BaseNewsExtractor, DBNewsExtractor
 from sqlalchemy.orm import Session
 
@@ -30,7 +30,8 @@ def get_db():
 
 @app.get(
     '/',
-    response_class=HTMLResponse
+    response_class=HTMLResponse,
+    # response_model=ListNews,
 )
 async def main_handler(request: Request,
                        topic: Optional[str] = None,
@@ -54,7 +55,7 @@ async def main_handler(request: Request,
 @app.get(
     '/get_random_news/{num_random_news}',
     response_class=HTMLResponse,
-    response_model=List[News],
+    # response_model=List[News],
 )
 def get_all_handler(
     request: Request, num_random_news: int, db: Session = Depends(get_db)
