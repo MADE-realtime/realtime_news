@@ -3,6 +3,10 @@ from abc import ABC, abstractmethod
 from html.parser import HTMLParser
 
 from scrapy.http import HtmlResponse
+from db_lib.models import News
+from db_lib.database import SessionLocal
+from db_lib import crud
+
 PARSER_ZOO = {}
 
 
@@ -19,8 +23,14 @@ class AttrParser(HTMLParser):
 
 
 class BaseParser(ABC):
+
+    def parse(self, response: HtmlResponse) -> News:
+        item = self._parse(response)
+        item = crud.create_news(SessionLocal(), item)
+        return item
+
     @abstractmethod
-    def parse(self, response: HtmlResponse):
+    def _parse(self, response: HtmlResponse) -> News:
         pass
 
     @staticmethod
@@ -37,20 +47,20 @@ class BaseParser(ABC):
 
 @add_to_zoo('tass')
 class TassParser(BaseParser):
-    def parse(self, response: HtmlResponse):
+    def _parse(self, response: HtmlResponse) -> News:
         title = self.join_css_parsed(response, '.news-header__title')
         title_post = self.join_css_parsed(response, '.news-header__lead')
         text = self.join_css_parsed(response, '#news li , #news p , h2')
         image_url = self.parse_image(response)
 
-        parsed_item = {
+        parsed_dict = {
             'title': title,
             'title_post': title_post,
-            'text': text,
+            'content': text,
             'source_url': response.url,
             'image_url': image_url
         }
-        return parsed_item
+        return News(**parsed_dict)
 
     @staticmethod
     def parse_image(response: HtmlResponse):
@@ -67,8 +77,8 @@ class TassParser(BaseParser):
 
 @add_to_zoo('rbc')
 class RBCParser(BaseParser):
-    def parse(self, response: HtmlResponse):
-        parsed_item = {}
+    def _parse(self, response: HtmlResponse):
+        parsed_dict = {}
         for i in range(10, 12):
             title = self.join_css_parsed(response, f'.js-rbcslider-article:nth-child({i}) .js-slide-title')
             if not title:
@@ -77,15 +87,15 @@ class RBCParser(BaseParser):
             text = self.join_css_parsed(response, f'.js-rbcslider-article:nth-child({i}) p')
             image_url = self.parse_image(response, i)
 
-            parsed_item = {
+            parsed_dict = {
                 'title': title,
                 'title_post': title_post,
-                'text': text,
+                'content': text,
                 'image_url': image_url
             }
             break
-        parsed_item['source_url'] = response.url
-        return parsed_item
+        parsed_dict['source_url'] = response.url
+        return News(**parsed_dict)
 
     @staticmethod
     def parse_image(response: HtmlResponse, idx):
@@ -102,20 +112,20 @@ class RBCParser(BaseParser):
 
 @add_to_zoo('ria')
 class RIAParser(BaseParser):
-    def parse(self, response: HtmlResponse):
+    def _parse(self, response: HtmlResponse):
         title = self.join_css_parsed(response, '.m-active .article__title')
         title_post = self.join_css_parsed(response, '.m-active .article__second-title')
         text = self.join_css_parsed(response, '.layout-article:nth-child(1) .article__text')
         image_url = self.parse_image(response)
 
-        parsed_item = {
+        parsed_dict = {
             'title': title,
             'title_post': title_post,
-            'text': text,
+            'content': text,
             'source_url': response.url,
             'image_url': image_url,
         }
-        return parsed_item
+        return News(**parsed_dict)
 
     @staticmethod
     def parse_image(response: HtmlResponse):
