@@ -73,7 +73,7 @@ def setup_rs_kwargs(start_urls_fpath, rss_parser_fpath):
 
 
 class SpiderRSS(Spider):
-    name = 'parser_rss'
+    name = 'rss_spider'
 
     def __init__(self, start_urls, raw_parser_zoo, *args, **kwargs):
         self.start_urls = start_urls
