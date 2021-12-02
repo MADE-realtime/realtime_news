@@ -27,7 +27,7 @@ def setup_ns_parser(parser: ArgumentParser):
         help='Date depth as kwargs for timedelta',
         dest='date_depth_raw',
         type=str,
-        required=True,
+        default=None,
     )
     parser.set_defaults(setup_kwargs=setup_ns_kwargs, spider=NewsSpider)
     return parser
@@ -74,5 +74,6 @@ class NewsSpider(SitemapSpider):
 
 
 def str_to_timedelta(date_depth_raw):
-    date_depth = timedelta(**eval(f'dict({date_depth_raw})'))
-    return date_depth
+    if date_depth_raw is not None:
+        date_depth = timedelta(**eval(f'dict({date_depth_raw})'))
+        return date_depth
