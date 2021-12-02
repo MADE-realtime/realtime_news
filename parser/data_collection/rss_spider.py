@@ -1,15 +1,27 @@
 import re
 from argparse import ArgumentParser
 
+from dateutil import parser as date_parser
 from scrapy.spiders import Spider
 from scrapy.linkextractors.lxmlhtml import LxmlLinkExtractor
 from scrapy.linkextractors import IGNORED_EXTENSIONS
 from scrapy.http import Response, Request, XmlResponse
 
-from data_collection.util import read_urls_file, read_yaml_file, regex, get_domain, extract_all_tags
-from db_lib.db_lib.models import News
-from db_lib.db_lib.database import SessionLocal
-from db_lib.db_lib import crud
+from data_collection.util import (
+    read_urls_file,
+    read_yaml_file,
+    regex,
+    get_domain,
+    extract_all_tags,
+    clean_url_queries,
+    is_comment_url
+)
+from db_lib.models import News
+from db_lib.database import SessionLocal
+from db_lib import crud
+
+BAD_QUERIES = ['from', 'utm_source', 'utm_medium', 'utm_campaign',
+               'at_medium', 'at_campaign', 'utm_term']
 
 
 def setup_rs_parser(parser: ArgumentParser):
@@ -31,12 +43,31 @@ def setup_rs_parser(parser: ArgumentParser):
     return parser
 
 
+def setup_rs_db_parser(parser: ArgumentParser):
+    parser.add_argument(
+        '-start_urls',
+        help='Path to file with urls',
+        dest='start_urls_fpath',
+        type=str,
+        required=True,
+    )
+    parser.add_argument(
+        '-rss_parser',
+        help='Path to yaml file with parser',
+        dest='rss_parser_fpath',
+        type=str,
+        required=True,
+    )
+    parser.set_defaults(setup_kwargs=setup_rs_kwargs, spider=DatabaseAdapter)
+    return parser
+
+
 def setup_rs_kwargs(start_urls_fpath, rss_parser_fpath):
     start_urls = read_urls_file(start_urls_fpath)
     rss_parser = read_yaml_file(rss_parser_fpath)
     kwargs = {
         'start_urls': start_urls,
-        'rss_parser': rss_parser,
+        'raw_parser_zoo': rss_parser,
     }
     return kwargs
 
@@ -80,11 +111,16 @@ class SpiderRSS(Spider):
         for rss_item in response.xpath('//item'):
             parser_name, parser = self.find_parser(response.url)
             self.log(f'parse {response.url} with {parser_name} parser')
-            yield {
-                'domain': domain,
-                **self.parse_rss_item(rss_item, parser),
-                'tags': extract_all_tags(rss_item.get())
-            }
+            parsed_item = self.parse_rss_item(rss_item, parser)
+            if self.filter_item(parsed_item):
+                parsed_item['source_url'] = clean_url_queries(parsed_item['source_url'], BAD_QUERIES)
+                yield {
+                    'domain': domain,
+                    **parsed_item,
+                    'tags': extract_all_tags(rss_item.get())
+                }
+            else:
+                self.log(f'Filtered: {parsed_item}')
 
     @staticmethod
     def parse_rss_item(rss_item, parser):
@@ -124,18 +160,22 @@ class SpiderRSS(Spider):
                 return True
         return False
 
+    def filter_item(self, parsed_item):
+        if parsed_item.get('source_url', None) is None:
+            return False
+        return not is_comment_url(parsed_item['source_url'])
+
 
 class DatabaseAdapter(SpiderRSS):
     def __init__(self, *args, **kwargs):
         super(DatabaseAdapter, self).__init__(*args, **kwargs)
         self.legal_keys = [
-            ('title', dummy_func),
-            ('title_post', dummy_func),
-            ('content', dummy_func),
-            ('source_url', dummy_func),
-            ('image_url', dummy_func),
-            ('date', self.get_date),
-            ('topic', self.get_time),
+            'title',
+            'title_post',
+            'content',
+            'source_url',
+            'image_url',
+            'topic',
         ]
 
     def parse_rss_xml(self, response: XmlResponse):
@@ -145,23 +185,15 @@ class DatabaseAdapter(SpiderRSS):
             return db_item
 
     def prepare_item(self, item):
-        preproc_item = {}
-        for key, preproc in self.legal_keys:
-            value = item.get(key, None)
-            if value is not None:
-                value = preproc(value)
-            preproc_item[key] = value
+        preproc_item = {key: item.get(key, None) for key in self.legal_keys}
+        preproc_item.update(**self.split_datetime(item.get('datetime', None)))
         db_item = News(**preproc_item)
         return db_item
 
-    @staticmethod
-    def get_date(rss_date):
-        return rss_date
+    def split_datetime(self, news_datetime):
+        split = {}
+        news_datetime = date_parser.parse(news_datetime)
+        split['date'] = news_datetime.date()
+        split['time'] = news_datetime.time()
+        return split
 
-    @staticmethod
-    def get_time(rss_time):
-        return rss_time
-
-
-def dummy_func(x):
-    return x

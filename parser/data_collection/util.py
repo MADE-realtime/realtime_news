@@ -1,5 +1,5 @@
 import re
-import urllib.parse
+from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 
 import yaml
 from bs4 import BeautifulSoup
@@ -36,8 +36,22 @@ def regex(x):
 
 
 def get_domain(url):
-    parsed_url = urllib.parse.urlparse(url)
+    parsed_url = urlparse(url)
     return parsed_url.netloc
+
+
+def clean_url_queries(url, bad_query):
+    u = urlparse(url)
+    query = parse_qs(u.query, keep_blank_values=True)
+    for b in bad_query:
+        query.pop(b, None)
+    clean = u._replace(query=urlencode(query, True))
+    return urlunparse(clean)
+
+
+def is_comment_url(url):
+    u = urlparse(url)
+    return 'comment' in u.fragment
 
 
 def extract_all_tags(xml_tag):

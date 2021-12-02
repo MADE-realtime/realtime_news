@@ -3,8 +3,7 @@
   author: ./author/text()
   title: ./title/text()
   title_post: ./description/text()
-  date: ./pubDate/text()
-  time: ./pubDate/text()
+  datetime: ./pubDate/text()
   image_url:
     - ./enclosure/@url
     - ./*["content"=local-name()]/@url

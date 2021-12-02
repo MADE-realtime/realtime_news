@@ -38,7 +38,7 @@ if __name__ == '__main__':
         "FEEDS": {
             cli_args.pop('destination'): {"format": "json"},
         },
-        'LOG_FILE': f'{cli_args.pop("logfile")}.log',
+        'LOG_FILE': f'{cli_args.pop("logfile")}',
         "FEED_EXPORT_ENCODING": 'utf-8',
         # TODO: pip install scrapy-user-agents
         'DOWNLOADER_MIDDLEWARES': {
