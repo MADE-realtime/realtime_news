@@ -5,7 +5,6 @@ from urllib.parse import urlparse
 from scrapy.spiders import Spider
 from scrapy.linkextractors.lxmlhtml import LxmlLinkExtractor
 from scrapy.http import Response, Request, TextResponse
-from scrapy.shell import inspect_response
 
 from data_collection.util import read_urls_file
 
@@ -74,9 +73,9 @@ class SpiderVK(Spider):
                 'likes': post['likes']['count'],
                 'reposts': post['reposts']['count'],
                 'views': post['views']['count'],
+                'link': re.findall(r'(https?://\S+)', post['text'])
             }
             yield item
-        inspect_response(response, self)
 
     def check_vk_url(self, url):
         for filter in self.vk_filter:
@@ -94,7 +93,9 @@ class SpiderVK(Spider):
         return get_url
 
     def is_bad(self, post):
-        return False
+        is_pinned = post.get('is_pinned', False)
+        is_add = post['marked_as_ads']
+        return is_pinned or is_add
 
 
 # filter pinned
