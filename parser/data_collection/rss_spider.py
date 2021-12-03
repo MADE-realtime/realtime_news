@@ -14,14 +14,11 @@ from data_collection.util import (
     get_domain,
     extract_all_tags,
     clean_url_queries,
-    is_comment_url
+    is_comment_url, BAD_QUERIES
 )
 from db_lib.models import News
 from db_lib.database import SessionLocal
 from db_lib import crud
-
-BAD_QUERIES = ['from', 'utm_source', 'utm_medium', 'utm_campaign',
-               'at_medium', 'at_campaign', 'utm_term']
 
 
 def setup_rs_parser(parser: ArgumentParser):

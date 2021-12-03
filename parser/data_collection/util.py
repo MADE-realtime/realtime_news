@@ -4,6 +4,9 @@ from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 import yaml
 from bs4 import BeautifulSoup
 
+BAD_QUERIES = ['from', 'utm_source', 'utm_medium', 'utm_campaign',
+               'at_medium', 'at_campaign', 'utm_term']
+
 
 def read_file(fpath):
     with open(fpath, 'r') as fin:

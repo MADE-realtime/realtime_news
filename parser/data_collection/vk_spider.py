@@ -4,14 +4,30 @@ from urllib.parse import urlparse
 
 from scrapy.spiders import Spider
 from scrapy.linkextractors.lxmlhtml import LxmlLinkExtractor
-from scrapy.http import Response, Request
+from scrapy.http import Response, Request, TextResponse
+from scrapy.shell import inspect_response
 
-BAD_QUERIES = ['from', 'utm_source', 'utm_medium', 'utm_campaign',
-               'at_medium', 'at_campaign', 'utm_term']
+from data_collection.util import read_urls_file
 
 
 def setup_vk_parser(parser: ArgumentParser):
+    parser.add_argument(
+        '-start_urls',
+        help='Path to file with urls',
+        dest='start_urls_fpath',
+        type=str,
+        required=True,
+    )
+    parser.set_defaults(setup_kwargs=setup_vk_kwargs, spider=SpiderVK)
     return parser
+
+
+def setup_vk_kwargs(start_urls_fpath):
+    start_urls = read_urls_file(start_urls_fpath)
+    kwargs = {
+        'start_urls': start_urls,
+    }
+    return kwargs
 
 
 class SpiderVK(Spider):
@@ -21,7 +37,7 @@ class SpiderVK(Spider):
     def __init__(self, start_urls, *args, **kwargs):
         self.start_urls = start_urls
         self.vk_filter = (
-            '.*vk\.com*',
+            '/.*\/vk\.com\/[^\/]+$',
         )
         self.link_extractor = LxmlLinkExtractor(
             allow=self.vk_filter,
@@ -43,10 +59,24 @@ class SpiderVK(Spider):
             found_rss += 1
             get_url = self.vk_get(link.url)
             yield Request(get_url, callback=self.parse_feed)
-        self.log(f'Found {found_rss} rss_links in {response.url}')
+        self.log(f'Found {found_rss} vk link in {response.url}')
 
-    def parse_feed(self, response: Response):
-        pass
+    def parse_feed(self, response: TextResponse):
+        wall = response.json()['response']['items']
+        for post in wall:
+            if self.is_bad(post):
+                continue
+            item = {
+                'post_id': post['id'],
+                'text': post['text'],
+                'date': post['date'],  # timestamp
+                'comments_count': post['comments']['count'],
+                'likes': post['likes']['count'],
+                'reposts': post['reposts']['count'],
+                'views': post['views']['count'],
+            }
+            yield item
+        inspect_response(response, self)
 
     def check_vk_url(self, url):
         for filter in self.vk_filter:
@@ -59,6 +89,17 @@ class SpiderVK(Spider):
         get_url = 'https://api.vk.com/method/wall.get'
         get_url += f'?domain={domain}'
         get_url += '&count=100'
-        get_url += '&access_token={self.api_key}'
+        get_url += f'&access_token={self.api_key}'
         get_url += '&v=5.131'
         return get_url
+
+    def is_bad(self, post):
+        return False
+
+
+# filter pinned
+# id
+# text
+# comments['count']
+# likes['can_like', 'count']
+# reposts['count']
