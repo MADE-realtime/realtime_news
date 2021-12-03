@@ -6,7 +6,7 @@ from scrapy.spiders import Spider
 from scrapy.linkextractors.lxmlhtml import LxmlLinkExtractor
 from scrapy.http import Response, Request, TextResponse
 
-from data_collection.util import read_urls_file
+from data_collection.util import read_urls_file, clean_url_queries, BAD_QUERIES
 
 
 def setup_vk_parser(parser: ArgumentParser):
@@ -65,6 +65,9 @@ class SpiderVK(Spider):
         for post in wall:
             if self.is_bad(post):
                 continue
+
+            links = re.findall(r'(https?://\S+)', post['text'])
+            links = [clean_url_queries(l, BAD_QUERIES) for l in links]
             item = {
                 'post_id': post['id'],
                 'text': post['text'],
@@ -73,7 +76,7 @@ class SpiderVK(Spider):
                 'likes': post['likes']['count'],
                 'reposts': post['reposts']['count'],
                 'views': post['views']['count'],
-                'link': re.findall(r'(https?://\S+)', post['text'])
+                'link': links
             }
             yield item
 
