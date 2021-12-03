@@ -194,6 +194,6 @@ class DatabaseAdapter(SpiderRSS):
         split = {}
         news_datetime = date_parser.parse(news_datetime)
         split['date'] = news_datetime.date()
-        split['time'] = news_datetime.time()
+        split['time'] = news_datetime
         return split
 
