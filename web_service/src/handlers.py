@@ -31,7 +31,7 @@ def get_db():
 @app.get(
     '/',
     response_class=HTMLResponse,
-    # response_model=ListNews,
+    response_model=ListNews,
 )
 async def main_handler(request: Request,
                        topic: Optional[str] = None,
@@ -48,14 +48,14 @@ async def main_handler(request: Request,
         end_date = datetime.date(datetime.now())
     news_list = NEWS_EXTRACTOR.show_news_by_filters(db, topic, end_date, start_date, number)
     return templates.TemplateResponse(
-        TEMPLATE_NAME, {"request": request, 'news': news_list['news_list'], 'stats': news_list['statistics']}
+        TEMPLATE_NAME, {"request": request, 'news': news_list.news_list, 'stats': news_list.statistics}
     )
 
 
 @app.get(
     '/get_random_news/{num_random_news}',
     response_class=HTMLResponse,
-    # response_model=List[News],
+    response_model=ListNews,
 )
 def get_all_handler(
     request: Request, num_random_news: int, db: Session = Depends(get_db)
@@ -66,14 +66,14 @@ def get_all_handler(
     """
     news_list = NEWS_EXTRACTOR.show_random_news(db, num_random_news)
     return templates.TemplateResponse(
-        TEMPLATE_NAME, {"request": request, 'news': news_list['news_list'], 'stats': news_list['statistics']}
+        TEMPLATE_NAME, {"request": request, 'news': news_list.news_list, 'stats': news_list.statistics}
     )
 
 
 @app.get(
     '/get_date/{start_date}/{end_date}',
     response_class=HTMLResponse,
-    response_model=List[News],
+    response_model=ListNews,
 )
 def get_date_handler(
     request: Request, start_date: str, end_date: str, db: Session = Depends(get_db)
@@ -85,14 +85,14 @@ def get_date_handler(
     """
     news_list = NEWS_EXTRACTOR.show_news_by_days(db, start_date, end_date)
     return templates.TemplateResponse(
-        TEMPLATE_NAME, {"request": request, 'news': news_list['news_list'], 'stats': news_list['statistics']}
+        TEMPLATE_NAME, {"request": request, 'news': news_list.news_list, 'stats': news_list.statistics}
     )
 
 
 @app.get(
     '/get_topic/{topic}/{start_date}/{end_date}',
     response_class=HTMLResponse,
-    response_model=List[News],
+    response_model=ListNews,
 )
 def get_topic_handler(
     request: Request,
@@ -108,7 +108,7 @@ def get_topic_handler(
     """
     news_list = NEWS_EXTRACTOR.show_news_by_topic(db, topic, start_date, end_date)
     return templates.TemplateResponse(
-        TEMPLATE_NAME, {"request": request, 'news': news_list['news_list'], 'stats': news_list['statistics']}
+        TEMPLATE_NAME, {"request": request, 'news': news_list.news_list, 'stats': news_list.statistics}
     )
 
 

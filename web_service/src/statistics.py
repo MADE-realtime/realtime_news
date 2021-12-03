@@ -5,7 +5,7 @@ from typing import Dict, List
 from sklearn.feature_extraction.text import CountVectorizer
 from stop_words import get_stop_words
 
-from config import LANGUAGE
+from config import LANGUAGE, MIN_NGRAM_FREQ
 from models import ListNews, News, StatisticsModels
 
 
@@ -27,7 +27,9 @@ class NgramsBuilder(Statistics):
         self.name = 'Ngrams'
 
     def predict(self, news: List[News]) -> StatisticsModels:
-        news_texts = [one_news.content for one_news in news]
+        news_texts = [one_news.content for one_news in news if one_news.content]
+        if not news_texts:
+            return StatisticsModels(type=self.name, stats=[('none', 0)])
         frequencies = np.array(
             np.sum(self.builder.fit_transform(news_texts).todense(), axis=0)
         )[0]

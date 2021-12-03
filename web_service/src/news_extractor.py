@@ -124,7 +124,7 @@ class DBNewsExtractor(BaseNewsExtractor):
         finally:
             db.close()
 
-    def show_random_news(self, db: Session, num_random_news: int = 10) -> Dict:
+    def show_random_news(self, db: Session, num_random_news: int = 10) -> ListNews:
         news_list = random.choices(crud.get_all_news(db), k=num_random_news)
         return ListNews(
             **{'news_list': news_list, 'statistics': [
@@ -134,7 +134,7 @@ class DBNewsExtractor(BaseNewsExtractor):
 
     def show_news_by_days(
             self, db, start_date: str = '1991-05-12', end_date: str = '1991-05-12'
-    ) -> Dict:
+    ) -> ListNews:
         news_list = crud.get_news_by_date(
             db, convert_str_to_date(start_date), convert_str_to_date(end_date)
         )
@@ -150,7 +150,7 @@ class DBNewsExtractor(BaseNewsExtractor):
             topic: str = 'Футбол',
             start_date: str = '1991-05-12',
             end_date: str = '1991-05-12',
-    ) -> Dict:
+    ) -> ListNews:
         news_list = crud.get_news_by_topic_and_date(
             db, topic, convert_str_to_date(start_date), convert_str_to_date(end_date)
         )
@@ -167,7 +167,7 @@ class DBNewsExtractor(BaseNewsExtractor):
             end_date: str,
             start_date: str = '1991-05-12',
             num_random_news: int = 10,
-    ) -> Dict:
+    ) -> ListNews:
         news_list = crud.get_news_by_filters(db,
                                              topic,
                                              convert_str_to_date(start_date),
@@ -176,8 +176,10 @@ class DBNewsExtractor(BaseNewsExtractor):
         if num_random_news > news_list_len:
             num_random_news = news_list_len
         news_list = random.choices(news_list, k=num_random_news)
-        return ListNews(
-            **{'news_list': news_list, 'statistics': [
-                NgramsBuilder().predict(news_list),
-            ]}
+
+        return ListNews.parse_obj(
+            {
+                'news_list': news_list,
+                'statistics': NgramsBuilder().predict(news_list),
+            }
         )
