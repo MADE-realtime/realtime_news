@@ -46,21 +46,18 @@ class SpiderVK(Spider):
 
     def start_requests(self):
         for url in self.start_urls:
-            if self.check_vk_url(url):
-                get_url = self.vk_get(url)
-                yield Request(get_url, callback=self.parse_feed)
-            else:
-                yield Request(url, callback=self.parse_main)
+            yield Request(url, callback=self.parse_main)
 
     def parse_main(self, response: Response):
         found_rss = 0
+        domain = urlparse(response.url).netloc
         for link in self.link_extractor.extract_links(response):
             found_rss += 1
             get_url = self.vk_get(link.url)
-            yield Request(get_url, callback=self.parse_feed)
+            yield Request(get_url, callback=self.parse_vk_feed, cb_kwargs={'domain': domain})
         self.log(f'Found {found_rss} vk link in {response.url}')
 
-    def parse_feed(self, response: TextResponse):
+    def parse_vk_feed(self, response: TextResponse, domain):
         wall = response.json()['response']['items']
         for post in wall:
             if self.is_bad(post):
@@ -76,7 +73,8 @@ class SpiderVK(Spider):
                 'likes': post['likes']['count'],
                 'reposts': post['reposts']['count'],
                 'views': post['views']['count'],
-                'link': links
+                'link': links,
+                'domain': domain
             }
             yield item
 
@@ -86,8 +84,8 @@ class SpiderVK(Spider):
                 return True
         return False
 
-    def vk_get(self, url):
-        domain = urlparse(url).path[1:]
+    def vk_get(self, vk_url):
+        domain = urlparse(vk_url).path[1:]
         get_url = 'https://api.vk.com/method/wall.get'
         get_url += f'?domain={domain}'
         get_url += '&count=100'
@@ -99,11 +97,3 @@ class SpiderVK(Spider):
         is_pinned = post.get('is_pinned', False)
         is_add = post['marked_as_ads']
         return is_pinned or is_add
-
-
-# filter pinned
-# id
-# text
-# comments['count']
-# likes['can_like', 'count']
-# reposts['count']
