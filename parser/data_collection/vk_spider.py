@@ -52,7 +52,7 @@ class SpiderVK(Spider):
     def __init__(self, start_urls, *args, **kwargs):
         self.start_urls = start_urls
         self.vk_filter = (
-            '/.*\/vk\.com\/[^\/]+$',
+            '.*\/vk\.com\/[^\/]+$',
         )
         self.link_extractor = LxmlLinkExtractor(
             allow=self.vk_filter,
