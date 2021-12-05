@@ -9,9 +9,10 @@ from models import ListNews, News
 from sqlalchemy.orm import Session
 from utils import convert_str_to_date
 
+from config import LIMIT_NEWS
 from db_lib import crud
 from db_lib.database import SessionLocal
-from statistics import NgramsBuilder
+from statistics import NgramsBuilder, StatisticsByDay, ByDayCounter
 
 
 class BaseNewsExtractor(ABC):
@@ -47,6 +48,13 @@ class BaseNewsExtractor(ABC):
     def show_news_by_filters(self, db: Session, topic: str, end_date: str, start_date: str, num_random_news: int):
         """
         Метод для показа новостей по заданным фильтрам
+        """
+        pass
+
+    @abstractmethod
+    def show_news_by_regex(self, db: Session, word: str):
+        """
+        Метод для поиска новостей по регулярному выражению
         """
         pass
 
@@ -128,7 +136,7 @@ class DBNewsExtractor(BaseNewsExtractor):
         news_list = random.choices(crud.get_all_news(db), k=num_random_news)
         return ListNews(
             **{'news_list': news_list, 'statistics': [
-                NgramsBuilder().predict(news_list),
+                NgramsBuilder().predict(news_list,)
             ]}
         )
 
@@ -140,7 +148,7 @@ class DBNewsExtractor(BaseNewsExtractor):
         )
         return ListNews(
             **{'news_list': news_list, 'statistics': [
-                NgramsBuilder().predict(news_list),
+                NgramsBuilder().predict(news_list)
             ]}
         )
 
@@ -156,7 +164,7 @@ class DBNewsExtractor(BaseNewsExtractor):
         )
         return ListNews(
             **{'news_list': news_list, 'statistics': [
-                NgramsBuilder().predict(news_list),
+                NgramsBuilder().predict(news_list,)
             ]}
         )
 
@@ -180,6 +188,20 @@ class DBNewsExtractor(BaseNewsExtractor):
         return ListNews.parse_obj(
             {
                 'news_list': news_list,
-                'statistics': NgramsBuilder().predict(news_list),
+                'statistics': [NgramsBuilder().predict(news_list,)]
+            }
+        )
+
+    def show_news_by_regex(self, db: Session, word: str) -> ListNews:
+        news_list = crud.get_all_news(db, limit=LIMIT_NEWS)
+        selected_news = [one_news for one_news in news_list if word.lower() in one_news.content.lower()]
+        return ListNews.parse_obj(
+            {
+                'news_list': selected_news,
+                'statistics': [
+                    NgramsBuilder().predict(selected_news, ),
+                    StatisticsByDay().predict(selected_news, ),
+                    ByDayCounter().predict(selected_news, ),
+                ]
             }
         )

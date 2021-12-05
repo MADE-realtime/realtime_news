@@ -53,6 +53,29 @@ async def main_handler(request: Request,
 
 
 @app.get(
+    '/search',
+    response_class=HTMLResponse,
+    response_model=ListNews,
+)
+async def main_handler(request: Request,
+                       word_1: str,
+                       word_2: str,
+                       db: Session = Depends(get_db)
+                       ):
+    """
+    Get random number news by filters
+    :return:
+    """
+    news_infos = []
+    for word in (word_1, word_2):
+        news_infos.append(NEWS_EXTRACTOR.show_news_by_regex(db, word))
+    return ...
+    # return templates.TemplateResponse(
+    #     TEMPLATE_NAME, {"request": request, 'news': news_list.news_list, 'stats': news_list.statistics}
+    # )
+
+
+@app.get(
     '/get_random_news/{num_random_news}',
     response_class=HTMLResponse,
     response_model=ListNews,

@@ -15,7 +15,7 @@ class Statistics(ABC):
     """
 
     @abstractmethod
-    def predict(self, news: ListNews) -> StatisticsModels:
+    def predict(self, news: List[News], *args, **kwargs) -> StatisticsModels:
         pass
 
 
@@ -26,7 +26,7 @@ class NgramsBuilder(Statistics):
         )
         self.name = 'Ngrams'
 
-    def predict(self, news: List[News]) -> StatisticsModels:
+    def predict(self, news: List[News], *args, **kwargs) -> StatisticsModels:
         news_texts = [one_news.content for one_news in news if one_news.content]
         if not news_texts:
             return StatisticsModels(type=self.name, stats=[('none', 0)])
@@ -41,3 +41,23 @@ class NgramsBuilder(Statistics):
                 ans_list.append((vocab[i_word], frequencies[i_word]))
         return StatisticsModels(type=self.name, stats=ans_list)
 
+
+class StatisticsByDay(Statistics):
+    def __init_(self):
+        self.name = 'stats_by_day'
+
+    def predict(self, news: List[News], *args, **kwargs) -> StatisticsModels:
+
+        return [
+            ...
+        ]
+
+
+class ByDayCounter(Statistics):
+    def __init_(self):
+        self.name = 'count_by_day'
+
+    def predict(self, news: List[News], *args, **kwargs) -> StatisticsModels:
+        return [
+            ...
+        ]
