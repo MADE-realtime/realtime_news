@@ -69,11 +69,10 @@ async def main_handler(request: Request,
     news_infos = []
     for word in (word_1, word_2):
         news_infos.append(NEWS_EXTRACTOR.show_news_by_regex(db, word))
-    return news_infos[0]
-    # return templates.TemplateResponse(
-    #     TEMPLATE_NAME, {"request": request, 'news': news_list.news_list, 'stats': news_list.statistics}
-    # )
-
+    return templates.TemplateResponse(
+        TEMPLATE_NAME, {"request": request, 'news': news_infos[0].news_list, 'stats': news_infos[0].statistics}
+    )
+    # TODO: Роберт, нужно тут добавить возвращение статистик по обоим словам
 
 @app.get(
     '/get_random_news/{num_random_news}',
