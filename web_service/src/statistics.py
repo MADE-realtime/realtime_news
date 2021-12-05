@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from collections import defaultdict
 
 import numpy as np
 from typing import Dict, List
@@ -42,22 +43,31 @@ class NgramsBuilder(Statistics):
         return StatisticsModels(type=self.name, stats=ans_list)
 
 
-class StatisticsByDay(Statistics):
+class StatisticsByResource(Statistics):
+    """Класс для подсчёта количества ресурсов, которые встретились в выборке новостей"""
     def __init_(self):
         self.name = 'stats_by_day'
 
     def predict(self, news: List[News], *args, **kwargs) -> StatisticsModels:
-
-        return [
-            ...
-        ]
+        news_counter = defaultdict(int)
+        for one_news in news:
+            news_counter[one_news.source_name] += 1
+        news_counter_list = []
+        for source_name, count in news_counter.items():
+            news_counter_list.append((source_name, count))
+        return StatisticsModels(type=self.name, stats=news_counter)
 
 
 class ByDayCounter(Statistics):
+    """Класс для подсчёта количества упоминаний по дням"""
     def __init_(self):
         self.name = 'count_by_day'
 
     def predict(self, news: List[News], *args, **kwargs) -> StatisticsModels:
-        return [
-            ...
-        ]
+        news_counter = defaultdict(int)
+        for one_news in news:
+            news_counter[one_news.date] += 1
+        news_counter_list = []
+        for date, count in news_counter.items():
+            news_counter_list.append((date, count))
+        return StatisticsModels(type=self.name, stats=news_counter)

@@ -63,13 +63,13 @@ async def main_handler(request: Request,
                        db: Session = Depends(get_db)
                        ):
     """
-    Get random number news by filters
+    Get statistics of some word in news
     :return:
     """
     news_infos = []
     for word in (word_1, word_2):
         news_infos.append(NEWS_EXTRACTOR.show_news_by_regex(db, word))
-    return ...
+    return news_infos[0]
     # return templates.TemplateResponse(
     #     TEMPLATE_NAME, {"request": request, 'news': news_list.news_list, 'stats': news_list.statistics}
     # )
