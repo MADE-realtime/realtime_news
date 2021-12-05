@@ -1,0 +1,13 @@
+.*:
+  source_url: ./link/text()
+  author: ./author/text()
+  title: ./title/text()
+  title_post: ./description/text()
+  datetime: ./pubDate/text()
+  image_url:
+    - ./enclosure/@url
+    - ./*["content"=local-name()]/@url
+  topic: ./category/text()
+  content:
+    - ./*["encoded"=local-name()]/text()
+    - ./*["full-text"=local-name()]/text()
