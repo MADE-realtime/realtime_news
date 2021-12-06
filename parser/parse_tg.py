@@ -26,7 +26,7 @@ def read_last_callback(client, source_path, destination_path):
 
 def read_last(client, chat_id, domain):
     news = []
-    for msg in client.get_messages(chat_id, limit=10):
+    for msg in client.get_messages(chat_id, limit=100):
         datetime = msg.date
         text = msg.message
         if msg.media and hasattr(msg.media, 'webpage') and hasattr(msg.media.webpage, 'url'):
