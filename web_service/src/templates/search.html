@@ -184,10 +184,8 @@
           <div class="box">
             <h2 class="title is-3">Топ-30 n-грамм</h2>
             <div class="tags are-large">
-              {% if stats and stats.stats and (stats.type == "Ngrams") %}
-              {% for ngram in stats.stats[:30] %}
-              <span class="tag">{{ngram[0]}}: {{ngram[1]}}</span>
-              {% endfor %}
+              {% if stats %}
+              {{ stats }}
               {% endif %}
             </div>
           </div>

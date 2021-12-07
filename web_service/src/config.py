@@ -8,4 +8,5 @@ DEFAULT_LOGO_URL = 'https://image.flaticon.com/icons/png/512/21/21601.png'
 MIN_NGRAM_FREQ = 2
 LIMIT_NEWS = 10_000
 TEMPLATE_NAME = 'index.html'
+SEARCH_TEMPLATE_NAME = 'search.html'
 FAVICON_PATH = Path('web_service/src/static/img/favicon.ico')

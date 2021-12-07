@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from config import FAVICON_PATH, TEMPLATE_NAME
+from config import FAVICON_PATH, TEMPLATE_NAME, SEARCH_TEMPLATE_NAME
 from datetime import datetime
 from fastapi import Depends, FastAPI, Request
 from fastapi.responses import FileResponse, HTMLResponse
@@ -70,7 +70,7 @@ async def main_handler(request: Request,
     for word in (word_1, word_2):
         news_infos.append(NEWS_EXTRACTOR.show_news_by_regex(db, word))
     return templates.TemplateResponse(
-        TEMPLATE_NAME, {"request": request, 'news': news_infos[0].news_list, 'stats': news_infos[0].statistics}
+        SEARCH_TEMPLATE_NAME, {"request": request, 'news': news_infos[0].news_list, 'stats': news_infos[0].statistics}
     )
     # TODO: Роберт, нужно тут добавить возвращение статистик по обоим словам
 

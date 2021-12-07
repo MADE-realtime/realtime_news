@@ -3,6 +3,7 @@ from typing import List, Tuple
 
 from config import DEFAULT_LOGO_URL, DEFAULT_NEWS_IMAGE_URL
 from pydantic import BaseModel
+from typing import Optional
 
 
 class News(BaseModel):
@@ -11,8 +12,8 @@ class News(BaseModel):
     content: str = None
     topic: str = None
     tags: str = None
-    date: date = None
-    time: datetime = None
+    date: Optional[date]
+    time: Optional[datetime]
     source_name: str = None
     image_url: str = None
     logo_url: str = None

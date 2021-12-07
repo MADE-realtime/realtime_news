@@ -188,20 +188,24 @@ class DBNewsExtractor(BaseNewsExtractor):
         return ListNews.parse_obj(
             {
                 'news_list': news_list,
-                'statistics': [NgramsBuilder().predict(news_list,)]
+                'statistics': [NgramsBuilder().predict(news_list)]
             }
         )
 
     def show_news_by_regex(self, db: Session, word: str) -> ListNews:
         news_list = crud.get_all_news(db, limit=LIMIT_NEWS)
+        print(news_list)
+        news_list = [one_news for one_news in news_list if one_news.content]
+        print(news_list)
         selected_news = [one_news for one_news in news_list if word.lower() in one_news.content.lower()]
+        print(selected_news)
         return ListNews.parse_obj(
             {
                 'news_list': selected_news,
                 'statistics': [
-                    NgramsBuilder().predict(selected_news, ),
-                    StatisticsByResource().predict(selected_news, ),
-                    ByDayCounter().predict(selected_news, ),
+                    NgramsBuilder().predict(selected_news),
+                    StatisticsByResource().predict(selected_news),
+                    ByDayCounter().predict(selected_news),
                 ]
             }
         )
