@@ -6,7 +6,7 @@ class News(Base):
     __tablename__ = "news"
 
     id = Column(Integer, primary_key=True, index=True)
-    source_url = Column(String)
+    source_url = Column(String, unique=True, index=True)
     title = Column(String)
     content = Column(String)
     topic = Column(String)
@@ -17,3 +17,20 @@ class News(Base):
     image_url = Column(String)
     logo_url = Column(String)
     title_post = Column(String)
+
+
+class SocialNetworkNews(Base):
+    __tablename__ = "social_network_news"
+
+    id = Column(Integer, primary_key=True, index=True)
+    post_id = Column(Integer)
+    text = Column(String)
+    date = Column(Date)
+    time = Column(DateTime)
+    comments = Column(Integer)
+    likes = Column(Integer)
+    reposts = Column(Integer)
+    views = Column(Integer)
+    link = Column(String)
+    source_name = Column(String)
+    social_network = Column(String)
