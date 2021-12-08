@@ -52,12 +52,10 @@ class StatisticsByResource(Statistics):
         news_counter = defaultdict(int)
         for one_news in news:
             news_counter[one_news.source_name] += 1
-        print(news_counter)
         news_counter_list = []
         for source_name, count in news_counter.items():
             if source_name:
                 news_counter_list.append((source_name, count))
-        print(news_counter_list)
         return StatisticsModels(type=self.name, stats=news_counter_list)
 
 
