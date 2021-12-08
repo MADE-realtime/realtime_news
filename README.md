@@ -2,7 +2,17 @@
 
 
 Чтобы настроить окружение, необходимо набрать в терминале
+`virtualenv .venv venv`
+`source activate .venv/bin/activate`
 `make venv`
+
+Чтобы настроиться на локальную базу данных заменить переменную
+`DATABASE_URL=postgresql+psycopg2://realtime:realtime@localhost:5432/realtime_news`
+
+Чтобы наполнить локальную базу тестовыми значениями:
+* настройтесть на локальную базу
+* выполните `make populate`
+
 
 Чтоб отформатировать код `make pretty`
 
