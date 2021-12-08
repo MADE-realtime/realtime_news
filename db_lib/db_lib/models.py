@@ -6,7 +6,7 @@ class News(Base):
     __tablename__ = "news"
 
     id = Column(Integer, primary_key=True, index=True)
-    source_url = Column(String)
+    source_url = Column(String, unique=True, index=True)
     title = Column(String)
     content = Column(String)
     topic = Column(String)
