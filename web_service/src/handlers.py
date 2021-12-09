@@ -48,7 +48,7 @@ async def main_handler(request: Request,
         end_date = datetime.date(datetime.now())
     news_list = NEWS_EXTRACTOR.show_news_by_filters(db, topic, end_date, start_date, number)
     return templates.TemplateResponse(
-        TEMPLATE_NAME, {"request": request, 'news': news_list.news_list, 'stats': news_list.statistics}
+        TEMPLATE_NAME, {"request": request, 'news': news_list.news_list, 'stats': news_list.statistics[0]}
     )
 
 
@@ -57,22 +57,27 @@ async def main_handler(request: Request,
     response_class=HTMLResponse,
     response_model=ListNews,
 )
-async def main_handler(request: Request,
-                       word_1: str,
-                       word_2: str,
-                       db: Session = Depends(get_db)
-                       ):
+async def vs_search_handler(request: Request,
+                            word_1: Optional[str] = '',
+                            word_2: Optional[str] = '',
+                            db: Session = Depends(get_db)
+                            ):
     """
     Get statistics of some word in news
     :return:
     """
-    news_infos = []
-    for word in (word_1, word_2):
-        news_infos.append(NEWS_EXTRACTOR.show_news_by_regex(db, word))
+    words = {'words': [word_1, word_2]}
+    news_info = []
+    for word in words['words']:
+        news_info.append(NEWS_EXTRACTOR.show_news_by_regex(db, word))
     return templates.TemplateResponse(
-        SEARCH_TEMPLATE_NAME, {"request": request, 'news': news_infos[0].news_list, 'stats': news_infos[0].statistics}
+        SEARCH_TEMPLATE_NAME, {'request': request,
+                               'words': words['words'],
+                               'news_1': news_info[0].news_list, 'stats_1': news_info[0].statistics,
+                               'news_2': news_info[1].news_list, 'stats_2': news_info[1].statistics,
+                               }
     )
-    # TODO: Роберт, нужно тут добавить возвращение статистик по обоим словам
+
 
 @app.get(
     '/get_random_news/{num_random_news}',
@@ -80,7 +85,7 @@ async def main_handler(request: Request,
     response_model=ListNews,
 )
 def get_all_handler(
-    request: Request, num_random_news: int, db: Session = Depends(get_db)
+        request: Request, num_random_news: int, db: Session = Depends(get_db)
 ):
     """
     Get random number news from all the time
@@ -98,7 +103,7 @@ def get_all_handler(
     response_model=ListNews,
 )
 def get_date_handler(
-    request: Request, start_date: str, end_date: str, db: Session = Depends(get_db)
+        request: Request, start_date: str, end_date: str, db: Session = Depends(get_db)
 ):
     """
     Get news by day
@@ -117,11 +122,11 @@ def get_date_handler(
     response_model=ListNews,
 )
 def get_topic_handler(
-    request: Request,
-    topic: str,
-    start_date: str,
-    end_date: str,
-    db: Session = Depends(get_db),
+        request: Request,
+        topic: str,
+        start_date: str,
+        end_date: str,
+        db: Session = Depends(get_db),
 ):
     """
     Get news by day and topic

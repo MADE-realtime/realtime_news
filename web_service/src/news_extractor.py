@@ -196,6 +196,7 @@ class DBNewsExtractor(BaseNewsExtractor):
         news_list = crud.get_all_news(db, limit=LIMIT_NEWS)
         news_list = [one_news for one_news in news_list if one_news.content]
         selected_news = [one_news for one_news in news_list if word.lower() in one_news.content.lower()]
+        # Не менять порядок в statistics
         return ListNews.parse_obj(
             {
                 'news_list': selected_news,

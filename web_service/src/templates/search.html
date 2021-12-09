@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Новости - в реальном времени и с аналитикой</title>
+    <title>Сравнение слов - в реальном времени и с аналитикой / RTN</title>
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="stylesheet" href="{{ url_for('static', path='/css/bulma.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='/css/fontawesome/all.min.css') }}">
@@ -56,106 +56,176 @@
 
         <div class="columns mb-6">
           <div class="column has-text-centered">
-            <h1 class="title is-1" style="color: ghostwhite;">Новости</h1>
+            {% if words[0] and words[1] %}
+            <h1 class="title is-1" style="color: ghostwhite;">{{ words[0].capitalize() }} vs {{ words[1].capitalize() }}</h1>
+            {% else %}
+            <h1 class="title is-1" style="color: ghostwhite;">Сравнение</h1>
+            {% endif %}
           </div>
         </div>
 
         <!-- Filters -->
-        <div class="row columns is-multiline">
+        <div id="filters" class="row columns is-multiline">
 
-          <div class="column is-2 field">
-            <div class="control">
-              <input id="news-number" class="input" type="number" value="10">
-            </div>
-            <p class="help has-text-white">новостей</p>
-          </div>
-
-          <div class="column is-4 field is-horizontal">
-            <div class="field-body">
-              <div class="field">
-                <div class="control">
-                  <input id="date-start" class="input" type="date">
+          <div class="column">
+            <div class="field is-horizontal">
+              <div class="field-body">
+                <div class="field">
+                  <p class="control is-expanded">
+                    <input id="first-word" class="input" type="text" placeholder="Первое слово">
+                  </p>
                 </div>
-                <p class="help has-text-white">от</p>
-              </div>
-              <div class="field">
-                <div class="control">
-                  <input id="date-end" class="input" type="date">
+                <div class="field">
+                  <p class="control is-expanded">
+                    <input id="second-word" class="input" type="text" placeholder="Дороже второго">
+                  </p>
                 </div>
-                <p class="help has-text-white">до</p>
+                <div class="field">
+                  <div class="control">
+                    <button id="update" class="button is-primary" onclick="updateVsSearchFilters()">
+                      Сравнить
+                    </button>
+                  </div>
+                </div>
+                <div class="field">
+                  <div class="control">
+                    <button id="clear" class="button is-danger is-outlined is-pulled-right" onclick="clearVsSearchFilters()">
+                      <span class="icon">
+                        <i class="fas fa-times"></i>
+                      </span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-
-          <div class="column is-6 field">
-            <div class="select">
-              <select id="news-topic">
-                <option value="" disabled selected>Выберите тему</option>
-                {% if topics %}
-                {% for topic in topics %}
-                <option>{{ topic }}</option>
-                {% endfor %}
-                {% endif %}
-              </select>
-            </div>
-            <button id="clear" class="button is-danger is-outlined is-pulled-right" onclick="clearFilters()">
-              <span class="icon">
-                <i class="fas fa-times"></i>
-              </span>
-            </button>
           </div>
 
         </div>
         <!-- End filters -->
 
-        <div id="app" class="row columns is-multiline">
-        <!-- News cards -->
-        {% if news %}
-        {% for card in news %}
+        <!-- Start stats -->
+        <div id="stats" class="row">
 
-          {% if card.title and card.content %}
-          <div class="column is-4">
-            <div class="card large">
+          <div class="columns is-mobile">
+
+            <div class="column">
+              <div class="box content">
+
+                {% if words[0] %}
+                <h2 class="title is-4">{{ words[0].capitalize() }}</h2>
+                {% else %}
+                <h2 class="title is-4">Введите первое слово</h2>
+                {% endif %}
+
+                {% if stats_1 %}
+                {% if stats_1[1] %}
+                <p>
+                  Упоминается в разных новостях: {{ news_1|length }} раз.<br>
+                  В разных источниках: {{ stats_1[1].stats|length }} раз.
+                </p>
+                <p>Топ-10 источников:</p>
+                <ul>
+                  {% for source, count in stats_1[1].stats[:10] %}
+                  <li>{{ source }}: {{ count }}</li>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+                {% if stats_1[2] %}
+                <p>Упоминания за последние 7 дней:</p>
+                <ul>
+                  {% for date, count in stats_1[2].stats[:7] %}
+                  <li>{{ date }}: {{ count }}</li>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+                {% if stats_1[0] %}
+                <p>30 самых частых n-грамм:</p>
+                <div class="tags">
+                  {% for ngram, count in stats_1[0].stats[:30] %}
+                  <span class="tag">{{ ngram }}: {{ count }}</span>
+                  {% endfor %}
+                </div>
+                {% endif %}
+                <!-- Количество топиков -->
+                {% endif %}
+
+              </div>
+            </div>
+
+            <div class="column">
+              <div class="box content">
+                {% if words[1] %}
+                <h2 class="title is-4">{{ words[1].capitalize() }}</h2>
+                {% else %}
+                <h2 class="title is-4">Введите второе слово</h2>
+                {% endif %}
+
+                {% if stats_2 %}
+                {% if stats_2[1] %}
+                <p>
+                  Упоминается в разных новостях: {{ news_2|length }} раз.<br>
+                  В разных источниках: {{ stats_2[1].stats|length }} раз.
+                </p>
+                <p>Топ-10 источников:</p>
+                <ul>
+                  {% for source, count in stats_2[1].stats[:10] %}
+                  <li>{{ source }}: {{ count }}</li>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+                {% if stats_2[2] %}
+                <p>Упоминания за последние 7 дней:</p>
+                <ul>
+                  {% for date, count in stats_2[2].stats[:7] %}
+                  <li>{{ date }}: {{ count }}</li>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+                {% if stats_2[0] %}
+                <p>30 самых частых n-грамм:</p>
+                <div class="tags">
+                  {% for ngram, count in stats_2[0].stats[:30] %}
+                  <span class="tag">{{ ngram }}: {{ count }}</span>
+                  {% endfor %}
+                </div>
+                {% endif %}
+                <!-- Количество топиков -->
+                {% endif %}
+
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+        <!-- End stats -->
+
+        <!-- Start news -->
+        <div id="news" class="row columns">
+
+          <div class="column">
+          {% if news_1 %}
+
+            {% if words[0] %}
+            <h3 class="title is-5 mt-5" style="color: ghostwhite;">Новости по слову {{ words[0].capitalize() }}</h3>
+            <h4 class="subtitle" style="color: ghostwhite;">до 15 штук</h4>
+            {% endif %}
+
+            {% for card in news_1[:15] %}
+            {% if card.title %}
+            <div class="card large mb-1">
 
               <div class="card-content">
                 <div class="media mb-3">
                   <div class="media-content">
-                    <p class="title is-5 no-padding">{{ card.title }}</p>
+                    <p class="title is-6 no-padding">{{ card.title }}</p>
                   </div>
                 </div>
-                <div class="content mb-3">
-                  <span class="short-text">{{ card.content[:200] }}</span>
-                  <span class="full-text">{{ card.content[200:] }}</span>
-                  <span class="text-dots">...</span>
-                  <b><span class="show-more-button" data-more="0">Читать полностью</span></b>
-                </div>
-                <div class="media-content mb-3">
-                  {% if card.topic %}
-                  <span class="tag is-primary">{{ card.topic }}</span>
-                  {% endif %}
-                  {% if card.tags %}
-                  <span class="tag">{{ card.tags }}</span>
-                  {% endif %}
-                </div>
-                <div class="card-image">
-                <figure class="image is-16by9">
-                  {% if card.image_url %}
-                  <img src="{{ card.image_url }}" alt="{{ card.title }}">
-                  {% else %}
-                  <img src="{{ url_for('static', path='/img/news-placeholder.jpg') }}" alt="{{ card.title }}">
-                  {% endif %}
-                </figure>
-              </div>
                 <div class="content">
-                  {% if card.time %}
-                  <time datetime="{{ card.date }}">{{ card.time }}</time>
-                  {% else %}
-                  <span>Сегодня</span>
-                  {% endif %}
                   <div class="media">
                     <div class="media-left">
                       <figure class="image is-16x16 m-0">
-                        {% if card.time %}
+                        {% if card.logo_url %}
                         <img src="{{ card.logo_url }}" alt="{{ card.source_name }}">
                         {% else %}
                         <img src="{{ url_for('static', path='/img/rtn-small-logo.png') }}" alt="{{ card.source_name }}">
@@ -169,31 +239,83 @@
                       <p>Неизвестная газета</p>
                       {% endif %}
                     </div>
+                    <div class="media-right">
+                      {% if card.time %}
+                      <time datetime="{{ card.date }}">{{ card.time }}</time>
+                      {% else %}
+                      <span>Сегодня</span>
+                      {% endif %}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+            {% endif %}
+            {% endfor %}
+
           {% endif %}
-
-        {% endfor %}
-        {% endif %}
-        </div>
-
-        <div class="row">
-          <div class="box">
-            <h2 class="title is-3">Топ-30 n-грамм</h2>
-            <div class="tags are-large">
-              {% if stats %}
-              {{ stats }}
-              {% endif %}
-            </div>
           </div>
+
+          <div class="column">
+          {% if news_2 %}
+
+            {% if words[1] %}
+            <h3 class="title is-5 mt-5" style="color: ghostwhite;">Новости по слову {{ words[1].capitalize() }}</h3>
+            <h4 class="subtitle" style="color: ghostwhite;">до 15 штук</h4>
+            {% endif %}
+
+            {% for card in news_2[:15] %}
+            {% if card.title %}
+            <div class="card large mb-1">
+
+              <div class="card-content">
+                <div class="media mb-3">
+                  <div class="media-content">
+                    <p class="title is-6 no-padding">{{ card.title }}</p>
+                  </div>
+                </div>
+                <div class="content">
+                  <div class="media">
+                    <div class="media-left">
+                      <figure class="image is-16x16 m-0">
+                        {% if card.logo_url %}
+                        <img src="{{ card.logo_url }}" alt="{{ card.source_name }}">
+                        {% else %}
+                        <img src="{{ url_for('static', path='/img/rtn-small-logo.png') }}" alt="{{ card.source_name }}">
+                        {% endif %}
+                      </figure>
+                    </div>
+                    <div class="media-content">
+                      {% if card.source_name %}
+                      <p class="subtitle is-6">{{ card.source_name }}</p>
+                      {% else %}
+                      <p>Неизвестная газета</p>
+                      {% endif %}
+                    </div>
+                    <div class="media-right">
+                      {% if card.time %}
+                      <time datetime="{{ card.date }}">{{ card.time }}</time>
+                      {% else %}
+                      <span>Сегодня</span>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+
+          {% endif %}
+          </div>
+
         </div>
+        <!-- End news -->
 
       </div>
 
     </div>
+
 
     <footer class="footer is-dark">
       <div class="container">

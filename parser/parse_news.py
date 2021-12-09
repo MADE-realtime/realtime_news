@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 
 from scrapy.crawler import CrawlerProcess
 
-from data_collection.newsspider import NewsSpider
+from data_collection import SPIDER_PARSERS
 
 
 def init_arg_parser():
@@ -12,60 +12,48 @@ def init_arg_parser():
                      'sources and store them')
     )
     parser.add_argument(
-        '-urls_file',
-        help='provide source file with sitemap urls to search news in',
-        required=True,
-    )
-    parser.add_argument(
-        '-rules_file',
-        help='provide rules file with domain-parser mapping',
-        required=True,
-    )
-    parser.add_argument(
         '-destination',
-        help='provide path to store news data',
+        help='Path to store news data',
         required=True,
     )
+    subparsers = parser.add_subparsers()
+    for parser_name, (help_str, setup_parser) in SPIDER_PARSERS.items():
+        spider_parser = subparsers.add_parser(parser_name, help=help_str)
+        spider_parser = setup_parser(spider_parser)
+        spider_parser.add_argument(
+            '-logfile',
+            help='Path to write logs',
+            default=f'{parser_name}.log'
+        )
     return parser
-
-
-def read_file(fpath):
-    with open(fpath, 'r') as fin:
-        fdata = fin.read()
-    return fdata
-
-
-def read_urls_file(url_fpath):
-    raw_data = read_file(url_fpath)
-    urls = [line.strip() for line in raw_data.split('\n')]
-    return urls
-
-
-def read_rule_file(rules_fpath):
-    raw_data = read_file(rules_fpath)
-    rules = [line.strip().split() for line in raw_data.split('\n')]
-    return rules
 
 
 if __name__ == '__main__':
     arg_parser = init_arg_parser()
-    news_args = arg_parser.parse_args()
-
-    sitemap_urls = read_urls_file(news_args.urls_file)
-    domain_rules = read_rule_file(news_args.rules_file)
+    cli_args = arg_parser.parse_args()
+    cli_args = vars(cli_args)
 
     crawl_proc = CrawlerProcess(settings={
         'DOWNLOAD_DELAY': 3,
         "FEEDS": {
-            news_args.destination: {"format": "json"},
+            cli_args.pop('destination'): {"format": "json"},
         },
+        'LOG_FILE': f'{cli_args.pop("logfile")}',
         "FEED_EXPORT_ENCODING": 'utf-8',
-        'USER_AGENT': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.10; rv:39.0) Gecko/20100101 Firefox/39.0',
+        # TODO: pip install scrapy-user-agents
+        'DOWNLOADER_MIDDLEWARES': {
+            'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+            'scrapy_user_agents.middlewares.RandomUserAgentMiddleware': 400,
+        },
         'EXTENSIONS': {
             'scrapy.extensions.corestats.CoreStats': 0,
             'scrapy.extensions.memusage.MemoryUsage': 0,
             'scrapy.extensions.logstats.LogStats': 0,
         }
     })
-    crawl_proc.crawl(NewsSpider, sitemap_urls, domain_rules)
+
+    spider_class = cli_args.pop('spider')
+    setup_kwargs = cli_args.pop('setup_kwargs')
+    spider_kwargs = setup_kwargs(**cli_args)
+    crawl_proc.crawl(spider_class, **spider_kwargs)
     crawl_proc.start()
