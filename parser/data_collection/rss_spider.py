@@ -14,14 +14,11 @@ from data_collection.util import (
     get_domain,
     extract_all_tags,
     clean_url_queries,
-    is_comment_url
+    is_comment_url, BAD_QUERIES
 )
 from db_lib.models import News
 from db_lib.database import SessionLocal
 from db_lib import crud
-
-BAD_QUERIES = ['from', 'utm_source', 'utm_medium', 'utm_campaign',
-               'at_medium', 'at_campaign', 'utm_term']
 
 
 def setup_rs_parser(parser: ArgumentParser):
@@ -73,7 +70,7 @@ def setup_rs_kwargs(start_urls_fpath, rss_parser_fpath):
 
 
 class SpiderRSS(Spider):
-    name = 'parser_rss'
+    name = 'rss_spider'
 
     def __init__(self, start_urls, raw_parser_zoo, *args, **kwargs):
         self.start_urls = start_urls
