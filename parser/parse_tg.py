@@ -76,16 +76,21 @@ def setup_parser(parser: ArgumentParser):
         help='Json path to write output',
         default='tg.json'
     )
-    parser.add_argument(
+    subparsers = parser.add_subparsers()
+    get_channel_id_parser = subparsers.add_parser('get_channel_id', help='Get tg channel ids')
+    get_channel_id_parser.add_argument(
         '-source',
         help='Json path to input',
         default='source_files/social_media.json'
     )
-    subparsers = parser.add_subparsers()
-    get_channel_id_parser = subparsers.add_parser('get_channel_id', help='Get tg channel ids')
     get_channel_id_parser.set_defaults(callback=get_channel_id)
 
     read_last_parser = subparsers.add_parser('get_last', help='Get last 100 msg')
+    read_last_parser.add_argument(
+        '-source',
+        help='Json path to input',
+        default='source_files/tg_channels.json'
+    )
     read_last_parser.set_defaults(callback=read_last_callback)
     return parser
 
