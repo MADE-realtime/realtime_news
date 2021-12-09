@@ -30,6 +30,7 @@ format:
 	$(VENV)/bin/unify --in-place --recursive $(ALL)
 
 up:
+	$(VENV)/bin/python parse_news.py -d vk.json vk_db -start_urls url_files/smi.url
 	$(VENV)/bin/python parse_news.py -d rss_news.json rss_db -s url_files/smi.url -r data_collection/rss_parser.yaml
 
 ci:	lint test

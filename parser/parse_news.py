@@ -23,7 +23,7 @@ def init_arg_parser():
         spider_parser.add_argument(
             '-logfile',
             help='Path to write logs',
-            default=f'{parser_name}.log'
+            default=None
         )
     return parser
 

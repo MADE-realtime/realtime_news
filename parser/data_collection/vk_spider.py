@@ -7,6 +7,9 @@ from scrapy.linkextractors.lxmlhtml import LxmlLinkExtractor
 from scrapy.http import Response, Request, TextResponse
 
 from data_collection.util import read_urls_file, clean_url_queries, BAD_QUERIES
+from db_lib.models import SocialNetworkNews
+from db_lib.database import SessionLocal
+from db_lib import crud
 
 
 def setup_vk_parser(parser: ArgumentParser):
@@ -18,6 +21,18 @@ def setup_vk_parser(parser: ArgumentParser):
         required=True,
     )
     parser.set_defaults(setup_kwargs=setup_vk_kwargs, spider=SpiderVK)
+    return parser
+
+
+def setup_vk_db_parser(parser: ArgumentParser):
+    parser.add_argument(
+        '-start_urls',
+        help='Path to file with urls',
+        dest='start_urls_fpath',
+        type=str,
+        required=True,
+    )
+    parser.set_defaults(setup_kwargs=setup_vk_kwargs, spider=DatabaseAdapter)
     return parser
 
 
@@ -69,12 +84,12 @@ class SpiderVK(Spider):
                 'post_id': post['id'],
                 'text': post['text'],
                 'date': post['date'],  # timestamp
-                'comments_count': post['comments']['count'],
+                'comments': post['comments']['count'],
                 'likes': post['likes']['count'],
                 'reposts': post['reposts']['count'],
                 'views': post['views']['count'],
                 'link': links,
-                'domain': domain
+                'source_name': domain
             }
             yield item
 
@@ -97,3 +112,20 @@ class SpiderVK(Spider):
         is_pinned = post.get('is_pinned', False)
         is_add = post['marked_as_ads']
         return is_pinned or is_add
+
+
+class DatabaseAdapter(SpiderVK):
+    def parse_vk_feed(self, response: TextResponse, domain):
+        for item in super(DatabaseAdapter, self).parse_vk_feed(response, domain):
+            db_item = self.prepare_item(item)
+            db_item = crud.create_news(SessionLocal(), db_item)
+            return db_item
+
+    def prepare_item(self, item):
+        item.update(**self.split_datetime(item['date']))
+        db_item = SocialNetworkNews(**item, social_network='vk')
+        return db_item
+
+    def split_datetime(self, news_datetime):
+        split = {'date': news_datetime.date(), 'time': news_datetime.time()}
+        return split
