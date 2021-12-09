@@ -1,5 +1,6 @@
 import re
 from argparse import ArgumentParser
+from datetime import datetime, timedelta, timezone
 from urllib.parse import urlparse
 
 from scrapy.spiders import Spider
@@ -84,10 +85,7 @@ class SpiderVK(Spider):
                 'post_id': post['id'],
                 'text': post['text'],
                 'date': post['date'],  # timestamp
-                'comments': post['comments']['count'],
-                'likes': post['likes']['count'],
-                'reposts': post['reposts']['count'],
-                'views': post['views']['count'],
+                **self.get_stat(post),
                 'link': links,
                 'source_name': domain
             }
@@ -110,8 +108,18 @@ class SpiderVK(Spider):
 
     def is_bad(self, post):
         is_pinned = post.get('is_pinned', False)
-        is_add = post['marked_as_ads']
+        is_add = post.get('marked_as_ads', False)
         return is_pinned or is_add
+
+    def get_stat(self, post):
+        stat_keys = ['comments', 'likes', 'reposts', 'views']
+        stat = {}
+        for key in stat_keys:
+            if key in post:
+                stat[key] = post[key].get('count', 0)
+            else:
+                stat[key] = 0
+        return stat
 
 
 class DatabaseAdapter(SpiderVK):
@@ -126,6 +134,9 @@ class DatabaseAdapter(SpiderVK):
         db_item = SocialNetworkNews(**item, social_network='vk')
         return db_item
 
-    def split_datetime(self, news_datetime):
-        split = {'date': news_datetime.date(), 'time': news_datetime.time()}
+    @staticmethod
+    def split_datetime(news_datetime):
+        msc_tz = timezone(timedelta(seconds=10800))
+        news_datetime = datetime.fromtimestamp(news_datetime, tz=msc_tz)
+        split = {'date': news_datetime.date(), 'time': news_datetime}
         return split
