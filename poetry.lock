@@ -1422,6 +1422,17 @@ w3lib = ">=1.17.0"
 "zope.interface" = ">=4.1.3"
 
 [[package]]
+name = "scrapy-user-agents"
+version = "0.1.1"
+description = "Automatically pick an User-Agent for every request"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+user-agents = "*"
+
+[[package]]
 name = "send2trash"
 version = "1.8.0"
 description = "Send file to trash natively under Mac OS X, Windows and Linux."
@@ -1666,6 +1677,14 @@ optional = false
 python-versions = ">=3.6"
 
 [[package]]
+name = "ua-parser"
+version = "0.10.0"
+description = "Python port of Browserscope's user agent parser"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "unify"
 version = "0.5"
 description = "Modifies strings to all use the same (single/double) quote where possible."
@@ -1683,6 +1702,17 @@ description = "Transforms tokens into original source code (while preserving whi
 category = "main"
 optional = false
 python-versions = "*"
+
+[[package]]
+name = "user-agents"
+version = "2.2.0"
+description = "A library to identify devices (phones, tablets) and their capabilities by parsing browser user agent strings."
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+ua-parser = ">=0.10.0"
 
 [[package]]
 name = "uvicorn"
@@ -1774,7 +1804,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "d6aa69fb6b016e5580436c564e4218498ed351816496c209327b8bbed509af0c"
+content-hash = "bc047b032a2ccea473d34b7452ae473d87d501bd1af20fd929c08ca5f9467ad7"
 
 [metadata.files]
 alembic = [
@@ -2866,6 +2896,10 @@ scrapy = [
     {file = "Scrapy-2.5.1-py2.py3-none-any.whl", hash = "sha256:1a9a36970004950ee3c519a14c4db945f9d9a63fecb3d593dddcda477331dde9"},
     {file = "Scrapy-2.5.1.tar.gz", hash = "sha256:13af6032476ab4256158220e530411290b3b934dd602bb6dacacbf6d16141f49"},
 ]
+scrapy-user-agents = [
+    {file = "scrapy_user_agents-0.1.1-py2.py3-none-any.whl", hash = "sha256:284c9af555f3128697a2953ab3cdb987b160b091a12896562d969cf9e81d1350"},
+    {file = "scrapy_user_agents-0.1.1.win-amd64.zip", hash = "sha256:aa1f78c8cbae42f1a7159c5ea16c2638ac17e78d7d44111d164ed099ec48705f"},
+]
 send2trash = [
     {file = "Send2Trash-1.8.0-py3-none-any.whl", hash = "sha256:f20eaadfdb517eaca5ce077640cb261c7d2698385a6a0f072a4a5447fd49fa08"},
     {file = "Send2Trash-1.8.0.tar.gz", hash = "sha256:d2c24762fd3759860a0aff155e45871447ea58d2be6bdd39b5c8f966a0c99c2d"},
@@ -3023,11 +3057,19 @@ typing-extensions = [
     {file = "typing_extensions-4.0.0-py3-none-any.whl", hash = "sha256:829704698b22e13ec9eaf959122315eabb370b0884400e9818334d8b677023d9"},
     {file = "typing_extensions-4.0.0.tar.gz", hash = "sha256:2cdf80e4e04866a9b3689a51869016d36db0814d84b8d8a568d22781d45d27ed"},
 ]
+ua-parser = [
+    {file = "ua-parser-0.10.0.tar.gz", hash = "sha256:47b1782ed130d890018d983fac37c2a80799d9e0b9c532e734c67cf70f185033"},
+    {file = "ua_parser-0.10.0-py2.py3-none-any.whl", hash = "sha256:46ab2e383c01dbd2ab284991b87d624a26a08f72da4d7d413f5bfab8b9036f8a"},
+]
 unify = [
     {file = "unify-0.5.tar.gz", hash = "sha256:8ddce812b2457212b7598fe574c9e6eb3ad69710f445391338270c7f8a71723c"},
 ]
 untokenize = [
     {file = "untokenize-0.1.1.tar.gz", hash = "sha256:3865dbbbb8efb4bb5eaa72f1be7f3e0be00ea8b7f125c69cbd1f5fda926f37a2"},
+]
+user-agents = [
+    {file = "user-agents-2.2.0.tar.gz", hash = "sha256:d36d25178db65308d1458c5fa4ab39c9b2619377010130329f3955e7626ead26"},
+    {file = "user_agents-2.2.0-py3-none-any.whl", hash = "sha256:a98c4dc72ecbc64812c4534108806fb0a0b3a11ec3fd1eafe807cee5b0a942e7"},
 ]
 uvicorn = [
     {file = "uvicorn-0.15.0-py3-none-any.whl", hash = "sha256:17f898c64c71a2640514d4089da2689e5db1ce5d4086c2d53699bf99513421c1"},

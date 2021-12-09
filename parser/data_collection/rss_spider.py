@@ -112,7 +112,7 @@ class SpiderRSS(Spider):
             if self.filter_item(parsed_item):
                 parsed_item['source_url'] = clean_url_queries(parsed_item['source_url'], BAD_QUERIES)
                 yield {
-                    'domain': domain,
+                    'source_name': domain,
                     **parsed_item,
                     'tags': extract_all_tags(rss_item.get())
                 }
@@ -168,6 +168,7 @@ class DatabaseAdapter(SpiderRSS):
         super(DatabaseAdapter, self).__init__(*args, **kwargs)
         self.legal_keys = [
             'title',
+            'source_name',
             'title_post',
             'content',
             'source_url',
@@ -191,6 +192,6 @@ class DatabaseAdapter(SpiderRSS):
         split = {}
         news_datetime = date_parser.parse(news_datetime)
         split['date'] = news_datetime.date()
-        split['time'] = news_datetime.time()
+        split['time'] = news_datetime
         return split
 

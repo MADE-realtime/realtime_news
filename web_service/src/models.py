@@ -6,16 +6,19 @@ from pydantic import BaseModel
 
 
 class News(BaseModel):
-    source_url: str
-    title: str
-    content: str = 'Содержание'
-    topic: str = 'Новость'
-    tags: str = 'Новость'
-    date: date
-    time: datetime
-    source_name: str = 'Наша газета'
-    image_url: str = DEFAULT_NEWS_IMAGE_URL
-    logo_url: str = DEFAULT_LOGO_URL
+    source_url: str = None
+    title: str = None
+    content: str = None
+    topic: str = None
+    tags: str = None
+    date: date = None
+    time: datetime = None
+    source_name: str = None
+    image_url: str = None
+    logo_url: str = None
+
+    class Config:
+        orm_mode = True
 
 
 class StatisticsModels(BaseModel):
@@ -25,4 +28,4 @@ class StatisticsModels(BaseModel):
 
 class ListNews(BaseModel):
     news_list: List[News]
-    statistics: List[StatisticsModels]
+    statistics: StatisticsModels

@@ -36,4 +36,8 @@ migrate:
 up:
 	$(VENV)/bin/python $(CODE)/run_server.py
 
+service:
+	docker compose build
+	docker compose up
+
 ci:	lint test
