@@ -27,6 +27,7 @@ stop-words = "^2018.7.23"
 PyYAML = "^6.0"
 beautifulsoup4 = "^4.10.0"
 scrapy-user-agents = "^0.1.1"
+plotly = "^5.4.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
