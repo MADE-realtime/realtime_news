@@ -125,14 +125,16 @@ class SpiderVK(Spider):
 class DatabaseAdapter(SpiderVK):
     def parse_vk_feed(self, response: TextResponse, domain):
         for item in super(DatabaseAdapter, self).parse_vk_feed(response, domain):
-            db_item = self.prepare_item(item)
+            db_item = self.write_item(item)
+            yield db_item
+
+    def write_item(self, item):
+        item.update(**self.split_datetime(item['date']))
+        msc_tz = timezone(timedelta(seconds=10800))
+        if item['time'] > (datetime.now(tz=msc_tz) - timedelta(days=7)):
+            db_item = SocialNetworkNews(**item, social_network='vk')
             db_item = crud.create_news(SessionLocal(), db_item)
             return db_item
-
-    def prepare_item(self, item):
-        item.update(**self.split_datetime(item['date']))
-        db_item = SocialNetworkNews(**item, social_network='vk')
-        return db_item
 
     @staticmethod
     def split_datetime(news_datetime):
