@@ -1,20 +1,24 @@
 from argparse import ArgumentParser
 import json
+from datetime import datetime, timedelta, timezone
 
 from telethon.sync import TelegramClient
 import time
 
 from data_collection.util import clean_url_queries, BAD_QUERIES
+from db_lib.models import SocialNetworkNews
+from db_lib.database import SessionLocal
+from db_lib import crud
 
 
-def read_last_callback(client, source_path, destination_path):
+def read_last_callback(client, source_path, destination_path, to_db):
     with open(source_path) as fin:
         source = json.load(fin)
     news = []
     for s in source:
         print('start: ', s['domain'])
         try:
-            channel_news = read_last(client, s['tg_id'], s['domain'])
+            channel_news = read_last(client, s['tg_id'], s['domain'], to_db)
         except ValueError:
             channel_news = []
         news.extend(channel_news)
@@ -24,7 +28,22 @@ def read_last_callback(client, source_path, destination_path):
         json.dump(news, fout, ensure_ascii=False)
 
 
-def read_last(client, chat_id, domain):
+def split_datetime(news_datetime: datetime):
+    msc_tz = timezone(timedelta(seconds=10800))
+    news_datetime = datetime.fromtimestamp(news_datetime.timestamp(), tz=msc_tz)
+    split = {'date': news_datetime.date(), 'time': news_datetime}
+    return split
+
+
+def save_to_db(item):
+    item.update(**split_datetime(item['date']))
+    msc_tz = timezone(timedelta(seconds=10800))
+    if item['time'] > (datetime.now(tz=msc_tz) - timedelta(days=7)):
+        db_item = SocialNetworkNews(**item, social_network='tg', likes=0)
+        crud.create_news(SessionLocal(), db_item)
+
+
+def read_last(client, chat_id, domain, to_db):
     news = []
     for msg in client.get_messages(chat_id, limit=100):
         datetime = msg.date
@@ -42,15 +61,18 @@ def read_last(client, chat_id, domain):
             replies = 0
         news.append(
             {
+                'post_id': msg.id,
                 'source_name': domain,
-                'datetime': datetime.isoformat(),
+                'date': datetime,
                 'text': text,
-                'url': url,
+                'link': url,
                 'views': views,
-                'forwards': forwards,
-                'replies': replies
+                'reposts': forwards,
+                'comments': replies
             }
         )
+        if to_db:
+            save_to_db(news[-1])
     return news
 
 
@@ -67,12 +89,8 @@ def get_channel_id(client, source_path, destination_path):
 
 def setup_parser(parser: ArgumentParser):
     parser.add_argument(
-        '-to_db',
-        help='Write to db',
-        action='store_true'
-    )
-    parser.add_argument(
         '-destination',
+        dest='destination_path',
         help='Json path to write output',
         default='tg.json'
     )
@@ -80,6 +98,7 @@ def setup_parser(parser: ArgumentParser):
     get_channel_id_parser = subparsers.add_parser('get_channel_id', help='Get tg channel ids')
     get_channel_id_parser.add_argument(
         '-source',
+        dest='source_path',
         help='Json path to input',
         default='source_files/social_media.json'
     )
@@ -88,8 +107,14 @@ def setup_parser(parser: ArgumentParser):
     read_last_parser = subparsers.add_parser('get_last', help='Get last 100 msg')
     read_last_parser.add_argument(
         '-source',
+        dest='source_path',
         help='Json path to input',
         default='source_files/tg_channels.json'
+    )
+    read_last_parser.add_argument(
+        '-to_db',
+        help='Write to db',
+        action='store_true'
     )
     read_last_parser.set_defaults(callback=read_last_callback)
     return parser
@@ -109,7 +134,9 @@ if __name__ == '__main__':
     client = TelegramClient('session_name', api_id, api_hash)
     client.start()
 
-    cli_args.callback(client, cli_args.source, cli_args.destination)
+    cli_args = vars(cli_args)
+    callback = cli_args.pop('callback')
+    callback(client, **cli_args)
 
 
 
