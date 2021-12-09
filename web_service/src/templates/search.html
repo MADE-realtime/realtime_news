@@ -131,6 +131,7 @@
                 </ul>
                 {% endif %}
                 {% if stats_1[2] %}
+                {% include "plotly/by-day-plot-1.html" ignore missing %}
                 <p>Упоминания за последние 7 дней:</p>
                 <ul>
                   {% for date, count in stats_1[2].stats[:7] %}
@@ -174,6 +175,7 @@
                 </ul>
                 {% endif %}
                 {% if stats_2[2] %}
+                {% include "plotly/by-day-plot-2.html" ignore missing %}
                 <p>Упоминания за последние 7 дней:</p>
                 <ul>
                   {% for date, count in stats_2[2].stats[:7] %}

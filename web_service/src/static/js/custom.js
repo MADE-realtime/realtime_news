@@ -24,8 +24,6 @@ window.onload = (event) => {
     };
     dateStart.value = startDateParam;
     dateEnd.value = endDateParam;
-    firstWord.value = firstWordParam;
-    secondWord.value = secondWordParam;
 
     document.querySelectorAll('.show-more-button').forEach(item => {
         item.addEventListener('click', function() {
@@ -71,6 +69,9 @@ window.onload = (event) => {
     dateEnd.addEventListener("change", function(event) {
         updateUrlParams("end_date", event.target.value)
     });
+
+    firstWord.value = firstWordParam;
+    secondWord.value = secondWordParam;
 
 };
 
