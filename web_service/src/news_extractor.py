@@ -3,7 +3,7 @@ import re
 from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
-from typing import Dict
+from typing import Dict, List
 
 import pandas as pd
 from models import ListNews, News
@@ -196,6 +196,7 @@ class DBNewsExtractor(BaseNewsExtractor):
     def show_news_by_regex(self, db: Session, word: str) -> ListNews:
         news_list = crud.get_all_news(db, limit=LIMIT_NEWS)
         word_re = rf'\b{word}\b'
+        news_list = _clean_nones_from_content(news_list)
         news_list = [
             one_news for one_news in news_list if re.match(word_re, one_news.content, flags=re.IGNORECASE) is not None
         ]
@@ -211,3 +212,10 @@ class DBNewsExtractor(BaseNewsExtractor):
                 ]
             }
         )
+
+
+def _clean_nones_from_content(news_list: List[News]) -> ListNews:
+    for i, news in enumerate(news_list):
+        if news.content is None:
+            news_list[i].content = news.title
+    return news_list
