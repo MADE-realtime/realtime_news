@@ -22,5 +22,9 @@ def list_tuples_to_lists(list_tuples) -> (List, List):
 def draw_by_day_plot(list_tuples, file_name) -> None:
     file_path = Path.joinpath(PLOTLY_HTML_PATH, file_name)
     xs, ys = list_tuples_to_lists(list_tuples)
-    fig = px.line(x=xs, y=ys)
+    if xs and ys:
+        fig = px.bar(x=xs, y=ys, labels={'x': 'Дата'})
+    else:
+        fig = px.bar(x=[0], y=[0], labels={'x': 'Дата'})
+    fig.update_xaxes(type='category')
     fig.write_html(file=file_path, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False)

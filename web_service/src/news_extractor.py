@@ -195,9 +195,9 @@ class DBNewsExtractor(BaseNewsExtractor):
 
     def show_news_by_regex(self, db: Session, word: str) -> ListNews:
         news_list = crud.get_all_news(db, limit=LIMIT_NEWS)
-        word_re = rf'\b{word}\b'
+        word_re = r'\b' + word + r'\b'
         news_list = [
-            one_news for one_news in news_list if re.match(word_re, one_news.content, flags=re.IGNORECASE) is not None
+            one_news for one_news in news_list if re.match(word_re, str(one_news.content), flags=re.IGNORECASE) is not None
         ]
         selected_news = [one_news for one_news in news_list if word.lower() in one_news.content.lower()]
         # Не менять порядок в statistics

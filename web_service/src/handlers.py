@@ -71,8 +71,8 @@ async def vs_search_handler(request: Request,
     news_info = []
     for word in words['words']:
         news_info.append(NEWS_EXTRACTOR.show_news_by_regex(db, word))
-    draw_by_day_plot(news_info[0].statistics[2].news_counter_list, 'by-day-plot-1.html')
-    draw_by_day_plot(news_info[1].statistics[2].news_counter_list, 'by-day-plot-2.html')
+    draw_by_day_plot(news_info[0].statistics[2].stats, 'by-day-plot-1.html')
+    draw_by_day_plot(news_info[1].statistics[2].stats, 'by-day-plot-2.html')
     return templates.TemplateResponse(
         SEARCH_TEMPLATE_NAME, {'request': request,
                                'words': words['words'],
