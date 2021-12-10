@@ -68,16 +68,21 @@ async def vs_search_handler(request: Request,
     :return:
     """
     words = {'words': [word_1, word_2]}
-    news_info = []
+    news_info, plots = [], {'word_1': {}, 'word_2': {}}
     for word in words['words']:
         news_info.append(NEWS_EXTRACTOR.show_news_by_regex(db, word))
-    draw_by_day_plot(news_info[0].statistics[2].stats, 'by-day-plot-1.html')
-    draw_by_day_plot(news_info[1].statistics[2].stats, 'by-day-plot-2.html')
+    # plots['word_1']['by_day'] = draw_by_day_plot(news_info[0].statistics[2].stats, 'by-day-plot-1.html')
+    # plots['word_2']['by_day'] = draw_by_day_plot(news_info[1].statistics[2].stats, 'by-day-plot-2.html')
+    # draw_by_day_plot(news_info[0].statistics[2].stats, 'by-day-plot-1.html')
+    # draw_by_day_plot(news_info[1].statistics[2].stats, 'by-day-plot-2.html')
+    # draw_by_day_plot(news_info[0].statistics[2].stats, 'by-day-plot-1.jpeg')
+    # draw_by_day_plot(news_info[1].statistics[2].stats, 'by-day-plot-2.jpeg')
     return templates.TemplateResponse(
         SEARCH_TEMPLATE_NAME, {'request': request,
                                'words': words['words'],
                                'news_1': news_info[0].news_list, 'stats_1': news_info[0].statistics,
                                'news_2': news_info[1].news_list, 'stats_2': news_info[1].statistics,
+                               'plots': plots,
                                }
     )
 

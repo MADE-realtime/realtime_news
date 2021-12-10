@@ -11,3 +11,4 @@ TEMPLATE_NAME = 'index.html'
 SEARCH_TEMPLATE_NAME = 'search.html'
 FAVICON_PATH = Path('web_service/src/static/img/favicon.ico')
 PLOTLY_HTML_PATH = Path('web_service/src/templates/plotly')
+PLOTLY_IMAGES_PATH = Path('web_service/src/static/plotly')

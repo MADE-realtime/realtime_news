@@ -1,9 +1,10 @@
 from typing import List
 from datetime import date, datetime
 from pathlib import Path
+import plotly
 import plotly.express as px
 
-from config import PLOTLY_HTML_PATH
+from config import PLOTLY_HTML_PATH, PLOTLY_IMAGES_PATH
 
 
 def convert_str_to_date(str_date) -> date:
@@ -20,11 +21,19 @@ def list_tuples_to_lists(list_tuples) -> (List, List):
 
 
 def draw_by_day_plot(list_tuples, file_name) -> None:
-    file_path = Path.joinpath(PLOTLY_HTML_PATH, file_name)
+    file_path = Path.joinpath(PLOTLY_IMAGES_PATH, file_name)
     xs, ys = list_tuples_to_lists(list_tuples)
     if xs and ys:
-        fig = px.bar(x=xs, y=ys, labels={'x': 'Дата'})
+        fig = px.line(x=xs, y=ys, labels={'x': 'Дата'})
     else:
-        fig = px.bar(x=[0], y=[0], labels={'x': 'Дата'})
+        fig = px.line(x=[0], y=[0], labels={'x': 'Дата'})
     fig.update_xaxes(type='category')
-    fig.write_html(file=file_path, include_plotlyjs="cdn", include_mathjax="cdn", full_html=False)
+    fig.write_image(file=file_path,
+                    width=600,
+                    height=300)
+    # fig.write_html(file=file_path,
+    #                include_plotlyjs=False,
+    #                include_mathjax="cdn",
+    #                default_width='100%',
+    #                default_height='250px',
+    #                full_html=True)
