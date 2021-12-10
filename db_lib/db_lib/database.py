@@ -9,7 +9,7 @@ from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
 print(find_dotenv())
 print(os.environ.get("DATABASE_URL"))
-engine = create_engine(os.environ.get("DATABASE_URL"))
+engine = create_engine(os.environ.get("DATABASE_URL"), pool_size=20)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()

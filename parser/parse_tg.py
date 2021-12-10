@@ -22,7 +22,7 @@ def read_last_callback(client, source_path, destination_path, to_db):
         except ValueError:
             channel_news = []
         news.extend(channel_news)
-        time.sleep(0.5)
+        time.sleep(1)
 
     with open(destination_path, 'w') as fout:
         json.dump(news, fout, ensure_ascii=False)
@@ -72,7 +72,9 @@ def read_last(client, chat_id, domain, to_db):
             }
         )
         if to_db:
-            save_to_db(news[-1])
+            save_to_db(news[-1].copy())
+            time.sleep(0.05)
+        news[-1]['date'] = news[-1]['date'].isoformat()
     return news
 
 
@@ -83,6 +85,7 @@ def get_channel_id(client, source_path, destination_path):
     for s in source:
         entity = client.get_entity(s['link'])
         s['tg_id'] = entity.id
+        time.sleep(1)
     with open(destination_path, 'w') as fout:
         json.dump(source, fout)
 
