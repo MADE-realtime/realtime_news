@@ -214,7 +214,7 @@ class DBNewsExtractor(BaseNewsExtractor):
         )
 
 
-def _clean_nones_from_content(news_list: List[News]) -> ListNews:
+def _clean_nones_from_content(news_list: List[News]) -> List[News]:
     for i, news in enumerate(news_list):
         if news.content is None:
             news_list[i].content = news.title
