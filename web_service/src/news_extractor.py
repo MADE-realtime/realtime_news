@@ -1,17 +1,19 @@
 import random
+import re
 from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
-from typing import Dict
+from typing import Dict, List
 
 import pandas as pd
 from models import ListNews, News
 from sqlalchemy.orm import Session
 from utils import convert_str_to_date
 
+from config import LIMIT_NEWS
 from db_lib import crud
 from db_lib.database import SessionLocal
-from statistics import NgramsBuilder
+from statistics import NgramsBuilder, StatisticsByResource, ByDayCounter
 
 
 class BaseNewsExtractor(ABC):
@@ -47,6 +49,13 @@ class BaseNewsExtractor(ABC):
     def show_news_by_filters(self, db: Session, topic: str, end_date: str, start_date: str, num_random_news: int):
         """
         Метод для показа новостей по заданным фильтрам
+        """
+        pass
+
+    @abstractmethod
+    def show_news_by_regex(self, db: Session, word: str):
+        """
+        Метод для поиска новостей по регулярному выражению
         """
         pass
 
@@ -128,7 +137,7 @@ class DBNewsExtractor(BaseNewsExtractor):
         news_list = random.choices(crud.get_all_news(db), k=num_random_news)
         return ListNews(
             **{'news_list': news_list, 'statistics': [
-                NgramsBuilder().predict(news_list),
+                NgramsBuilder().predict(news_list,)
             ]}
         )
 
@@ -140,7 +149,7 @@ class DBNewsExtractor(BaseNewsExtractor):
         )
         return ListNews(
             **{'news_list': news_list, 'statistics': [
-                NgramsBuilder().predict(news_list),
+                NgramsBuilder().predict(news_list)
             ]}
         )
 
@@ -156,7 +165,7 @@ class DBNewsExtractor(BaseNewsExtractor):
         )
         return ListNews(
             **{'news_list': news_list, 'statistics': [
-                NgramsBuilder().predict(news_list),
+                NgramsBuilder().predict(news_list,)
             ]}
         )
 
@@ -180,6 +189,33 @@ class DBNewsExtractor(BaseNewsExtractor):
         return ListNews.parse_obj(
             {
                 'news_list': news_list,
-                'statistics': NgramsBuilder().predict(news_list),
+                'statistics': [NgramsBuilder().predict(news_list)]
             }
         )
+
+    def show_news_by_regex(self, db: Session, word: str) -> ListNews:
+        news_list = crud.get_all_news(db, limit=LIMIT_NEWS)
+        word_re = r'\b' + word + r'\b'
+        news_list = _clean_nones_from_content(news_list)
+        news_list = [
+            one_news for one_news in news_list if re.match(word_re, str(one_news.content), flags=re.IGNORECASE) is not None
+        ]
+        selected_news = [one_news for one_news in news_list if word.lower() in one_news.content.lower()]
+        # Не менять порядок в statistics
+        return ListNews.parse_obj(
+            {
+                'news_list': selected_news,
+                'statistics': [
+                    NgramsBuilder().predict(selected_news),
+                    StatisticsByResource().predict(selected_news),
+                    ByDayCounter().predict(selected_news),
+                ]
+            }
+        )
+
+
+def _clean_nones_from_content(news_list: List[News]) -> List[News]:
+    for i, news in enumerate(news_list):
+        if news.content is None:
+            news_list[i].content = news.title
+    return news_list

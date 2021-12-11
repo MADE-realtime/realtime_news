@@ -3,12 +3,16 @@ window.onload = (event) => {
     const newsTopic = document.getElementById("news-topic");
     const dateStart = document.getElementById("date-start");
     const dateEnd = document.getElementById("date-end");
+    const firstWord = document.getElementById("first-word");
+    const secondWord = document.getElementById("second-word");
     const queryParams = new URLSearchParams(window.location.search);
 
     var newsNumberParam = queryParams.get("number");
     var topicParam = queryParams.get("topic");
     var startDateParam = queryParams.get("start_date");
     var endDateParam = queryParams.get("end_date");
+    var firstWordParam = queryParams.get("word_1");
+    var secondWordParam = queryParams.get("word_2");
     newsNumber.value = newsNumberParam;
     for (var i, j = 1; i = newsTopic.options[j]; j++) {
         if (i.value == topicParam) {
@@ -39,7 +43,7 @@ window.onload = (event) => {
             else if(this.getAttribute('data-more') == 1) {
                 this.setAttribute('data-more', 0);
                 this.style.display = 'inline';
-                this.innerHTML = 'Читать полностью';
+                this.innerHTML = 'Показать новость полностью';
 
                 this.parentElement.parentElement.querySelector('.full-text').style.display = 'none';
                 this.parentElement.parentElement.querySelector('.text-dots').style.display = 'inline';
@@ -65,6 +69,9 @@ window.onload = (event) => {
     dateEnd.addEventListener("change", function(event) {
         updateUrlParams("end_date", event.target.value)
     });
+
+    firstWord.value = firstWordParam;
+    secondWord.value = secondWordParam;
 
 };
 
@@ -110,11 +117,56 @@ function clearFilters(){
     document.getElementById("news-topic").selectedIndex = 0;
     document.getElementById("date-start").value = "";
     document.getElementById("date-end").value = "";
+    document.getElementById("first-word").value = "";
+    document.getElementById("second-word").value = "";
     let searchParams = new URLSearchParams(window.location.search);
     searchParams.set("number", 10)
     searchParams.delete("topic");
     searchParams.delete("start_date");
     searchParams.delete("end_date");
+    searchParams.delete("word_1");
+    searchParams.delete("word_2");
+    if (window.history.replaceState) {
+        const url = window.location.protocol
+                    + "//" + window.location.host
+                    + window.location.pathname
+                    + "?"
+                    + searchParams.toString();
+
+        window.history.replaceState({
+            path: url
+        }, "", url)
+    }
+    location.reload();
+}
+
+function clearVsSearchFilters(){
+    document.getElementById("first-word").value = "";
+    document.getElementById("second-word").value = "";
+    let searchParams = new URLSearchParams(window.location.search);
+    searchParams.delete("word_1");
+    searchParams.delete("word_2");
+    if (window.history.replaceState) {
+        const url = window.location.protocol
+                    + "//" + window.location.host
+                    + window.location.pathname
+                    + "?"
+                    + searchParams.toString();
+
+        window.history.replaceState({
+            path: url
+        }, "", url)
+    }
+    location.reload();
+}
+
+function updateVsSearchFilters() {
+//    clearVsSearchFilters();
+    let searchParams = new URLSearchParams(window.location.search);
+    var firstVal = document.getElementById("first-word").value;
+    var secondVal = document.getElementById("second-word").value;
+    searchParams.set("word_1", firstVal);
+    searchParams.set("word_2", secondVal);
     if (window.history.replaceState) {
         const url = window.location.protocol
                     + "//" + window.location.host

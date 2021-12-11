@@ -45,3 +45,12 @@ service:
 	docker compose up
 
 ci:	lint test
+
+cleaup:
+	docker container prune
+	docker image prune
+	docker volume prune
+	docker system prune
+	docker builder prune
+	rm -rf migrations
+	rm -rf postgres*

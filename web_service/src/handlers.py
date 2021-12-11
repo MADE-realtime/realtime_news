@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from config import FAVICON_PATH, TEMPLATE_NAME
+from config import FAVICON_PATH, TEMPLATE_NAME, SEARCH_TEMPLATE_NAME
 from datetime import datetime
 from fastapi import Depends, FastAPI, Request
 from fastapi.responses import FileResponse, HTMLResponse
@@ -11,6 +11,7 @@ from news_extractor import BaseNewsExtractor, DBNewsExtractor
 from sqlalchemy.orm import Session
 
 from db_lib.database import SessionLocal
+from utils import draw_by_day_plot
 
 app = FastAPI()
 # NEWS_EXTRACTOR = PandasNewsExtractor(LENTA_MINI_DATASET_FILEPATH)
@@ -48,7 +49,41 @@ async def main_handler(request: Request,
         end_date = datetime.date(datetime.now())
     news_list = NEWS_EXTRACTOR.show_news_by_filters(db, topic, end_date, start_date, number)
     return templates.TemplateResponse(
-        TEMPLATE_NAME, {"request": request, 'news': news_list.news_list, 'stats': news_list.statistics}
+        TEMPLATE_NAME, {"request": request, 'news': news_list.news_list, 'stats': news_list.statistics[0]}
+    )
+
+
+@app.get(
+    '/search',
+    response_class=HTMLResponse,
+    response_model=ListNews,
+)
+async def vs_search_handler(request: Request,
+                            word_1: Optional[str] = '',
+                            word_2: Optional[str] = '',
+                            db: Session = Depends(get_db)
+                            ):
+    """
+    Get statistics of some word in news
+    :return:
+    """
+    words = {'words': [word_1, word_2]}
+    news_info, plots = [], {'word_1': {}, 'word_2': {}}
+    for word in words['words']:
+        news_info.append(NEWS_EXTRACTOR.show_news_by_regex(db, word))
+    # plots['word_1']['by_day'] = draw_by_day_plot(news_info[0].statistics[2].stats, 'by-day-plot-1.html')
+    # plots['word_2']['by_day'] = draw_by_day_plot(news_info[1].statistics[2].stats, 'by-day-plot-2.html')
+    # draw_by_day_plot(news_info[0].statistics[2].stats, 'by-day-plot-1.html')
+    # draw_by_day_plot(news_info[1].statistics[2].stats, 'by-day-plot-2.html')
+    # draw_by_day_plot(news_info[0].statistics[2].stats, 'by-day-plot-1.jpeg')
+    # draw_by_day_plot(news_info[1].statistics[2].stats, 'by-day-plot-2.jpeg')
+    return templates.TemplateResponse(
+        SEARCH_TEMPLATE_NAME, {'request': request,
+                               'words': words['words'],
+                               'news_1': news_info[0].news_list, 'stats_1': news_info[0].statistics,
+                               'news_2': news_info[1].news_list, 'stats_2': news_info[1].statistics,
+                               'plots': plots,
+                               }
     )
 
 
@@ -58,7 +93,7 @@ async def main_handler(request: Request,
     response_model=ListNews,
 )
 def get_all_handler(
-    request: Request, num_random_news: int, db: Session = Depends(get_db)
+        request: Request, num_random_news: int, db: Session = Depends(get_db)
 ):
     """
     Get random number news from all the time
@@ -76,7 +111,7 @@ def get_all_handler(
     response_model=ListNews,
 )
 def get_date_handler(
-    request: Request, start_date: str, end_date: str, db: Session = Depends(get_db)
+        request: Request, start_date: str, end_date: str, db: Session = Depends(get_db)
 ):
     """
     Get news by day
@@ -95,11 +130,11 @@ def get_date_handler(
     response_model=ListNews,
 )
 def get_topic_handler(
-    request: Request,
-    topic: str,
-    start_date: str,
-    end_date: str,
-    db: Session = Depends(get_db),
+        request: Request,
+        topic: str,
+        start_date: str,
+        end_date: str,
+        db: Session = Depends(get_db),
 ):
     """
     Get news by day and topic
