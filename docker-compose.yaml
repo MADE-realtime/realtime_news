@@ -20,6 +20,8 @@ services:
     build:
       context: .
       dockerfile: parser/Dockerfile
+    volumes:
+      - ./tg_session/session_name.session:/code/session_name.session
     depends_on:
       db:
         condition: service_healthy

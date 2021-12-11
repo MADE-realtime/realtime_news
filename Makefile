@@ -33,6 +33,10 @@ migrate:
 	$(VENV)/bin/alembic -c db_lib/alembic.ini revision --autogenerate -m 'Added required tables'
 	$(VENV)/bin/alembic -c db_lib/alembic.ini upgrade head
 
+
+populate:
+	$(VENV)/bin/python web_service/src/scripts/populate.py
+
 up:
 	$(VENV)/bin/python $(CODE)/run_server.py
 
