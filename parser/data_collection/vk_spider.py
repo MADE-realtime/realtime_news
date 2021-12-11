@@ -1,6 +1,7 @@
 import re
 from argparse import ArgumentParser
 from datetime import datetime, timedelta, timezone
+from sqlalchemy.exc import IntegrityError
 from urllib.parse import urlparse
 
 from scrapy.spiders import Spider
@@ -132,8 +133,11 @@ class DatabaseAdapter(SpiderVK):
         item.update(**self.split_datetime(item['date']))
         msc_tz = timezone(timedelta(seconds=10800))
         if item['time'] > (datetime.now(tz=msc_tz) - timedelta(days=7)):
-            db_item = SocialNetworkNews(**item, social_network='vk')
-            crud.create_news(SessionLocal(), db_item)
+            try:
+                db_item = SocialNetworkNews(**item, social_network='vk')
+                crud.create_news(SessionLocal(), db_item)
+            except IntegrityError:
+                pass
             db_item = SocialNetworkStats(
                 post_id=item['post_id'],
                 comments=item['comments'],

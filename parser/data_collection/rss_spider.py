@@ -1,5 +1,6 @@
 import re
 from argparse import ArgumentParser
+from sqlalchemy.exc import IntegrityError
 
 from dateutil import parser as date_parser
 from scrapy.spiders import Spider
@@ -178,9 +179,12 @@ class DatabaseAdapter(SpiderRSS):
 
     def parse_rss_xml(self, response: XmlResponse):
         for item in super(DatabaseAdapter, self).parse_rss_xml(response):
-            db_item = self.prepare_item(item)
-            db_item = crud.create_news(SessionLocal(), db_item)
-            return db_item
+            try:
+                db_item = self.prepare_item(item)
+                db_item = crud.create_news(SessionLocal(), db_item)
+                return db_item
+            except IntegrityError:
+                pass
 
     def prepare_item(self, item):
         preproc_item = {key: item.get(key, None) for key in self.legal_keys}
