@@ -11,7 +11,7 @@ from news_extractor import BaseNewsExtractor, DBNewsExtractor
 from sqlalchemy.orm import Session
 
 from db_lib.database import SessionLocal
-from utils import draw_by_day_plot
+from utils import get_vs_plots_data, draw_by_day_plot
 
 app = FastAPI()
 # NEWS_EXTRACTOR = PandasNewsExtractor(LENTA_MINI_DATASET_FILEPATH)
@@ -68,15 +68,11 @@ async def vs_search_handler(request: Request,
     :return:
     """
     words = {'words': [word_1, word_2]}
-    news_info, plots = [], {'word_1': {}, 'word_2': {}}
+    news_info = []
     for word in words['words']:
         news_info.append(NEWS_EXTRACTOR.show_news_by_regex(db, word))
-    # plots['word_1']['by_day'] = draw_by_day_plot(news_info[0].statistics[2].stats, 'by-day-plot-1.html')
-    # plots['word_2']['by_day'] = draw_by_day_plot(news_info[1].statistics[2].stats, 'by-day-plot-2.html')
-    # draw_by_day_plot(news_info[0].statistics[2].stats, 'by-day-plot-1.html')
-    # draw_by_day_plot(news_info[1].statistics[2].stats, 'by-day-plot-2.html')
-    # draw_by_day_plot(news_info[0].statistics[2].stats, 'by-day-plot-1.jpeg')
-    # draw_by_day_plot(news_info[1].statistics[2].stats, 'by-day-plot-2.jpeg')
+    plots = get_vs_plots_data(news_info)
+
     return templates.TemplateResponse(
         SEARCH_TEMPLATE_NAME, {'request': request,
                                'words': words['words'],

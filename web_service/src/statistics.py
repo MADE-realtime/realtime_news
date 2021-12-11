@@ -68,7 +68,7 @@ class ByDayCounter(Statistics):
         news_counter = defaultdict(int)
         for one_news in news:
             if one_news.date:
-                news_counter[one_news.date.strftime("%d/%m/%Y")] += 1
+                news_counter[one_news.date.strftime("%d.%m.%Y")] += 1
         news_counter_list = []
         for date, count in news_counter.items():
             if date:

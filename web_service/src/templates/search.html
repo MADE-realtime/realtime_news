@@ -130,6 +130,7 @@
                   <li>{{ source }}: {{ count }}</li>
                   {% endfor %}
                 </ul>
+                <div id="by-source-plot-1" style="width: 100%; height: 300px;"></div>
                 {% endif %}
                 {% if stats_1[2] %}
                 <p>Упоминания за последние 7 дней:</p>
@@ -138,6 +139,7 @@
                   <li>{{ date }}: {{ count }}</li>
                   {% endfor %}
                 </ul>
+                <div id="by-day-plot-1" style="width:100%; height:260px;"></div>
                 {% endif %}
                 {% if stats_1[0] %}
                 <p>30 самых частых n-грамм:</p>
@@ -173,6 +175,7 @@
                   <li>{{ source }}: {{ count }}</li>
                   {% endfor %}
                 </ul>
+                <div id="by-source-plot-2" style="width: 100%; height: 300px;"></div>
                 {% endif %}
                 {% if stats_2[2] %}
                 <p>Упоминания за последние 7 дней:</p>
@@ -181,6 +184,7 @@
                   <li>{{ date }}: {{ count }}</li>
                   {% endfor %}
                 </ul>
+                <div id="by-day-plot-2" style="width:100%; height:250px;"></div>
                 {% endif %}
                 {% if stats_2[0] %}
                 <p>30 самых частых n-грамм:</p>
@@ -333,6 +337,87 @@
         </div>
       </div>
     </footer>
+
+    {% block javascript %}
+
+    {% if stats_1[1] %}
+    <script type="text/javascript">
+      BYSOURCEONE = document.getElementById('by-source-plot-1');
+
+      Plotly.plot( BYSOURCEONE,
+        [{
+          labels: {{ plots.word_1.by_source.x | tojson }},
+          values: {{ plots.word_1.by_source.y | tojson }},
+          type: "pie"
+        }],
+        {
+          margin: { t: 1 },
+          height: 300,
+        },
+        {showSendToCloud:true}
+      );
+    </script>
+    {% endif %}
+
+    {% if stats_2[1] %}
+    <script type="text/javascript">
+      BYSOURCETWO = document.getElementById('by-source-plot-2');
+
+      Plotly.plot( BYSOURCETWO,
+        [{
+          labels: {{ plots.word_2.by_source.x | tojson }},
+          values: {{ plots.word_2.by_source.y | tojson }},
+          type: "pie"
+        }],
+        {
+          margin: { t: 1 },
+          height: 300,
+        },
+        {showSendToCloud:true}
+      );
+    </script>
+    {% endif %}
+
+    {% if stats_1[2] %}
+    <script type="text/javascript">
+      BYDAYONE = document.getElementById('by-day-plot-1');
+
+      Plotly.plot( BYDAYONE, [{
+        x: {{ plots.word_1.by_day.x | tojson }},
+        y: {{ plots.word_1.by_day.y | tojson }}
+        }],
+        {
+        margin: { t: 1 },
+        xaxis: { showline: true, domain: [0, 1], showgrid: true, rangemode: "tozero" },
+        yaxis: { showline: true, rangemode: "tozero" },
+        height: 230,
+        },
+        {showSendToCloud:true}
+      );
+    </script>
+    {% endif %}
+
+    {% if stats_2[2] %}
+    <script type="text/javascript">
+      BYDAYTWO = document.getElementById('by-day-plot-2');
+
+      Plotly.plot( BYDAYTWO,
+        [{
+          x: {{ plots.word_2.by_day.x | tojson  }},
+          y: {{ plots.word_2.by_day.y | tojson  }}
+        }],
+        {
+        margin: { t: 1 },
+        xaxis: { showline: true, domain: [0, 1], showgrid: true, rangemode: "tozero" },
+        yaxis: { showline: true, rangemode: "tozero" },
+        height: 230,
+        },
+        {showSendToCloud:true}
+      );
+    </script>
+    {% endif %}
+
+    {% endblock %}
 
   </body>
 
