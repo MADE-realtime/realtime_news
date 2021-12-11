@@ -8,7 +8,7 @@ from scrapy.linkextractors.lxmlhtml import LxmlLinkExtractor
 from scrapy.http import Response, Request, TextResponse
 
 from data_collection.util import read_urls_file, clean_url_queries, BAD_QUERIES
-from db_lib.models import SocialNetworkNews
+from db_lib.models import SocialNetworkNews, SocialNetworkStats
 from db_lib.database import SessionLocal
 from db_lib import crud
 
@@ -133,7 +133,16 @@ class DatabaseAdapter(SpiderVK):
         msc_tz = timezone(timedelta(seconds=10800))
         if item['time'] > (datetime.now(tz=msc_tz) - timedelta(days=7)):
             db_item = SocialNetworkNews(**item, social_network='vk')
-            db_item = crud.create_news(SessionLocal(), db_item)
+            crud.create_news(SessionLocal(), db_item)
+            db_item = SocialNetworkStats(
+                post_id=item['post_id'],
+                comments=item['comments'],
+                likes=item['likes'],
+                reposts=item['reposts'],
+                views=item['views'],
+                social_network='vk',
+            )
+            crud.create_news(SessionLocal(), db_item)
             return db_item
 
     @staticmethod
