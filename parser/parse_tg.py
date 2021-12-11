@@ -3,10 +3,11 @@ import json
 from datetime import datetime, timedelta, timezone
 
 from telethon.sync import TelegramClient
+from sqlalchemy.exc import IntegrityError
 import time
 
 from data_collection.util import clean_url_queries, BAD_QUERIES
-from db_lib.models import SocialNetworkNews
+from db_lib.models import SocialNetworkNews, SocialNetworkStats
 from db_lib.database import SessionLocal
 from db_lib import crud
 
@@ -39,7 +40,19 @@ def save_to_db(item):
     item.update(**split_datetime(item['date']))
     msc_tz = timezone(timedelta(seconds=10800))
     if item['time'] > (datetime.now(tz=msc_tz) - timedelta(days=7)):
-        db_item = SocialNetworkNews(**item, social_network='tg', likes=0)
+        try:
+            db_item = SocialNetworkNews(**item, social_network='tg', likes=0)
+            crud.create_news(SessionLocal(), db_item)
+        except IntegrityError:
+            pass
+        db_item = SocialNetworkStats(
+            post_id=item['post_id'],
+            comments=item['comments'],
+            likes=0,
+            reposts=item['reposts'],
+            views=item['views'],
+            social_network='tg',
+        )
         crud.create_news(SessionLocal(), db_item)
 
 
