@@ -34,6 +34,11 @@ def get_all_news(db: Session,
     return db.query(News).offset(skip).limit(limit).all()
 
 
+def save_cluster_num_to_existing_news():
+# TODO: Ponomarev
+# TODO: check that function works with func web_service.src.scripts.clusterisation.write_clusters_num_to_db
+
+
 def get_news_by_topic_and_date(db: Session,
                                topic: str,
                                start_date: date,

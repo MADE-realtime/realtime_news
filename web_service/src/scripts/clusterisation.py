@@ -5,6 +5,7 @@ import fasttext.util
 import numpy as np
 
 from db_lib.db_lib.crud import get_all_news
+# from db_lib.db_lib.models import News
 from web_service.src.config import LANGUAGE_SHORT_FOR_FASTTEXT, LIMIT_NEWS
 from web_service.src.models import News
 from web_service.src.news_extractor import clean_nones_from_content
@@ -18,7 +19,7 @@ def download_language_model():
 
 def cluster_news_content(news_list: List[News]) -> np.ndarray:
     model = download_language_model()
-    cluster = AgglomerativeClustering(
+    clusterer = AgglomerativeClustering(
         n_clusters=None,
         affinity='cosine',
         linkage='complete',
@@ -26,7 +27,7 @@ def cluster_news_content(news_list: List[News]) -> np.ndarray:
     )
     news_list = clean_nones_from_content(news_list)
     content_emb = [model[one_news.content] for one_news in news_list]
-    clusters = cluster.fit_predict(content_emb)
+    clusters = clusterer.fit_predict(content_emb)
     return clusters
 
 
