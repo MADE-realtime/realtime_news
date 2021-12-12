@@ -1,3 +1,4 @@
+import re
 from abc import ABC, abstractmethod
 from collections import defaultdict
 
@@ -29,6 +30,7 @@ class NgramsBuilder(Statistics):
 
     def predict(self, news: List[News], *args, **kwargs) -> StatisticsModels:
         news_texts = [one_news.content for one_news in news if one_news.content]
+        news_texts = self._cut_non_cyrillic_characters(news_texts)
         if not news_texts:
             return StatisticsModels(type=self.name, stats=[('none', 0)])
         frequencies = np.array(
@@ -38,9 +40,21 @@ class NgramsBuilder(Statistics):
         sorted_args = np.argsort(frequencies)[::-1]
         ans_list = []
         for i_word in sorted_args:
-            if frequencies[i_word] >= MIN_NGRAM_FREQ:
+            if frequencies[i_word] >= MIN_NGRAM_FREQ and self._has_cyrillic(vocab[i_word]):
                 ans_list.append((vocab[i_word], frequencies[i_word]))
         return StatisticsModels(type=self.name, stats=ans_list)
+
+    @staticmethod
+    def _cut_non_cyrillic_characters(news_texts: List[str]) -> List[str]:
+        CLEANR = re.compile('<.*?>')
+        news_texts = [re.sub(CLEANR, '', text) for text in news_texts]
+        news_texts = [re.sub(r'[a-zA-Z]', '', text) for text in news_texts]
+        news_texts = [text for text in news_texts if text != '']
+        return news_texts
+
+    @staticmethod
+    def _has_cyrillic(text):
+        return bool(re.search('[а-яА-Я]', text))
 
 
 class StatisticsByResource(Statistics):
