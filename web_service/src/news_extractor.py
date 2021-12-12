@@ -196,7 +196,7 @@ class DBNewsExtractor(BaseNewsExtractor):
     def show_news_by_regex(self, db: Session, word: str) -> ListNews:
         news_list = crud.get_all_news(db, limit=LIMIT_NEWS)
         word_re = r'\b' + word + r'\b'
-        news_list = _clean_nones_from_content(news_list)
+        news_list = clean_nones_from_content(news_list)
         news_list = [
             one_news for one_news in news_list if re.match(word_re, str(one_news.content), flags=re.IGNORECASE) is not None
         ]
@@ -214,7 +214,7 @@ class DBNewsExtractor(BaseNewsExtractor):
         )
 
 
-def _clean_nones_from_content(news_list: List[News]) -> List[News]:
+def clean_nones_from_content(news_list: List[News]) -> List[News]:
     for i, news in enumerate(news_list):
         if news.content is None:
             news_list[i].content = news.title
