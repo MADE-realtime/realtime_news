@@ -70,3 +70,4 @@ class RequestInfo(Base):
     method = Column(String)
     host = Column(String)
     user_agent = Column(String)
+    time = Column(DateTime)
