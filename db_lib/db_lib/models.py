@@ -60,3 +60,13 @@ class SocialNetworkStats(Base):
     reposts = Column(Integer)
     views = Column(Integer)
     social_network = Column(String)
+
+
+class RequestInfo(Base):
+    __tablename__ = "request_info"
+
+    id = Column(Integer, primary_key=True, index=True)
+    url = Column(String)
+    method = Column(String)
+    host = Column(String)
+    user_agent = Column(String)
