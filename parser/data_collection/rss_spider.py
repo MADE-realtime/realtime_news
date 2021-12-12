@@ -15,7 +15,9 @@ from data_collection.util import (
     get_domain,
     extract_all_tags,
     clean_url_queries,
-    is_comment_url, BAD_QUERIES
+    is_comment_url,
+    BAD_QUERIES,
+    has_cyrillic
 )
 from db_lib.models import News
 from db_lib.database import SessionLocal
@@ -106,6 +108,9 @@ class SpiderRSS(Spider):
 
     def parse_rss_xml(self, response: XmlResponse):
         domain = get_domain(response.url)
+        if not has_cyrillic(response.text):
+            self.log(f'Filter by lang: {domain}')
+            return
         for rss_item in response.xpath('//item'):
             parser_name, parser = self.find_parser(response.url)
             self.log(f'parse {response.url} with {parser_name} parser')
