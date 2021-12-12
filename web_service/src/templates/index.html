@@ -61,51 +61,108 @@
         </div>
 
         <!-- Filters -->
-        <div id="filters" class="row columns is-multiline">
+        <div id="filters1" class="row columns is-multiline">
 
-          <div class="column is-2 field">
-            <div class="control">
-              <input id="news-number" class="input" type="number" value="10">
-            </div>
-            <p class="help has-text-white">новостей</p>
-          </div>
-
-          <div class="column is-4 field is-horizontal">
-            <div class="field-body">
-              <div class="field">
-                <div class="control">
-                  <input id="date-start" class="input" type="date">
+          <div class="column">
+            <div class="field is-horizontal">
+              <div class="field-body">
+                <div class="field">
+                  <p class="control">
+                    <input id="news-number" class="input" type="number" value="10">
+                  </p>
+                  <p class="help has-text-white">новостей</p>
                 </div>
-                <p class="help has-text-white">от</p>
-              </div>
-              <div class="field">
-                <div class="control">
-                  <input id="date-end" class="input" type="date">
+                <div class="field">
+                  <p class="control">
+                    <input id="date-start" class="input" type="date">
+                  </p>
+                  <p class="help has-text-white">от</p>
                 </div>
-                <p class="help has-text-white">до</p>
+                <div class="field">
+                  <p class="control">
+                    <input id="date-end" class="input" type="date">
+                  </p>
+                  <p class="help has-text-white">до</p>
+                </div>
+                <div class="field">
+                  <div class="select">
+                    <select id="news-topic">
+                      <option value="" disabled selected>Выберите тему</option>
+                      {% if topics %}
+                      {% for topic in topics %}
+                      <option>{{ topic }}</option>
+                      {% endfor %}
+                      {% endif %}
+                    </select>
+                  </div>
+                  <p class="help has-text-white">тема</p>
+                </div>
+                <div class="field">
+                  <div class="control">
+                    <button id="update" class="button is-primary" onclick="updateFilters()">
+                      Поиск
+                    </button>
+                  </div>
+                </div>
+                <div class="field">
+                  <div class="control">
+                    <button id="clear" class="button is-danger is-outlined is-pulled-right" onclick="clearFilters()">
+                      <span class="icon">
+                        <i class="fas fa-times"></i>
+                      </span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-
-          <div class="column is-6 field">
-            <div class="select">
-              <select id="news-topic">
-                <option value="" disabled selected>Выберите тему</option>
-                {% if topics %}
-                {% for topic in topics %}
-                <option>{{ topic }}</option>
-                {% endfor %}
-                {% endif %}
-              </select>
-            </div>
-            <button id="clear" class="button is-danger is-outlined is-pulled-right" onclick="clearFilters()">
-              <span class="icon">
-                <i class="fas fa-times"></i>
-              </span>
-            </button>
-          </div>
-
         </div>
+
+<!--        <div id="filters" class="row columns is-multiline">-->
+
+<!--          <div class="column is-2 field">-->
+<!--            <div class="control">-->
+<!--              <input id="news-number" class="input" type="number" value="10">-->
+<!--            </div>-->
+<!--            <p class="help has-text-white">новостей</p>-->
+<!--          </div>-->
+
+<!--          <div class="column is-4 field is-horizontal">-->
+<!--            <div class="field-body">-->
+<!--              <div class="field">-->
+<!--                <div class="control">-->
+<!--                  <input id="date-start" class="input" type="date">-->
+<!--                </div>-->
+<!--                <p class="help has-text-white">от</p>-->
+<!--              </div>-->
+<!--              <div class="field">-->
+<!--                <div class="control">-->
+<!--                  <input id="date-end" class="input" type="date">-->
+<!--                </div>-->
+<!--                <p class="help has-text-white">до</p>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+
+<!--          <div class="column is-6 field">-->
+<!--            <div class="select">-->
+<!--              <select id="news-topic">-->
+<!--                <option value="" disabled selected>Выберите тему</option>-->
+<!--                {% if topics %}-->
+<!--                {% for topic in topics %}-->
+<!--                <option>{{ topic }}</option>-->
+<!--                {% endfor %}-->
+<!--                {% endif %}-->
+<!--              </select>-->
+<!--            </div>-->
+<!--            <button id="clear" class="button is-danger is-outlined is-pulled-right" onclick="clearFilters()">-->
+<!--              <span class="icon">-->
+<!--                <i class="fas fa-times"></i>-->
+<!--              </span>-->
+<!--            </button>-->
+<!--          </div>-->
+
+<!--        </div>-->
         <!-- End filters -->
 
         <!-- Start news -->

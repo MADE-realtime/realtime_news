@@ -45,6 +45,7 @@ async def main_handler(request: Request,
     Get random number news by filters
     :return:
     """
+    # TODO: Проверка на пустые фильтры
     if not end_date:
         end_date = datetime.date(datetime.now())
     news_list = NEWS_EXTRACTOR.show_news_by_filters(db, topic, end_date, start_date, number)
