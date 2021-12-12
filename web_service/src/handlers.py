@@ -1,8 +1,8 @@
 from typing import List, Optional
 
-from config import FAVICON_PATH, TEMPLATE_NAME, SEARCH_TEMPLATE_NAME
+from config import FAVICON_PATH, TEMPLATE_NAME, SEARCH_TEMPLATE_NAME, SINGLE_TEMPLATE_NAME
 from datetime import datetime
-from fastapi import Depends, FastAPI, Request
+from fastapi import Depends, FastAPI, Request, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -82,6 +82,27 @@ async def vs_search_handler(request: Request,
                                'plots': plots,
                                }
     )
+
+
+@app.get(
+    '/news/{news_id}',
+    response_class=HTMLResponse,
+    # response_model=ListNews,
+)
+async def single_news_handler(
+        request: Request, news_id: int, db: Session = Depends(get_db)
+):
+    """
+    Get random number news from all the time
+    :return:
+    """
+    single_news = NEWS_EXTRACTOR.show_single_news(db, news_id)
+    if single_news:
+        return templates.TemplateResponse(
+            SINGLE_TEMPLATE_NAME, {"request": request, 'single_news': single_news}
+        )
+    else:
+        raise HTTPException(status_code=404, detail="No news with such id found")
 
 
 @app.get(

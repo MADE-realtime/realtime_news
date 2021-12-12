@@ -28,6 +28,11 @@ def get_news_by_filters(db: Session,
         return db.query(News).offset(skip).limit(limit).all()
 
 
+def get_single_news(db: Session,
+                    news_id: int) -> News:
+    return db.query(News).get(news_id)
+
+
 def get_all_news(db: Session,
                  skip: int = 0,
                  limit: int = 100) -> List[News]:

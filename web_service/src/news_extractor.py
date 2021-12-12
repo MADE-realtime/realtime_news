@@ -59,6 +59,13 @@ class BaseNewsExtractor(ABC):
         """
         pass
 
+    @abstractmethod
+    def show_single_news(self, db: Session, news_id: int):
+        """
+        Метод для показа новости по id
+        """
+        pass
+
 
 class PandasNewsExtractor(BaseNewsExtractor):
     def __init__(self, path_to_df: Path):
@@ -137,7 +144,7 @@ class DBNewsExtractor(BaseNewsExtractor):
         news_list = random.choices(crud.get_all_news(db), k=num_random_news)
         return ListNews(
             **{'news_list': news_list, 'statistics': [
-                NgramsBuilder().predict(news_list,)
+                NgramsBuilder().predict(news_list, )
             ]}
         )
 
@@ -165,7 +172,7 @@ class DBNewsExtractor(BaseNewsExtractor):
         )
         return ListNews(
             **{'news_list': news_list, 'statistics': [
-                NgramsBuilder().predict(news_list,)
+                NgramsBuilder().predict(news_list, )
             ]}
         )
 
@@ -198,7 +205,8 @@ class DBNewsExtractor(BaseNewsExtractor):
         word_re = r'\b' + word + r'\b'
         news_list = _clean_nones_from_content(news_list)
         news_list = [
-            one_news for one_news in news_list if re.match(word_re, str(one_news.content), flags=re.IGNORECASE) is not None
+            one_news for one_news in news_list if
+            re.match(word_re, str(one_news.content), flags=re.IGNORECASE) is not None
         ]
         selected_news = [one_news for one_news in news_list if word.lower() in one_news.content.lower()]
         # Не менять порядок в statistics
@@ -212,6 +220,12 @@ class DBNewsExtractor(BaseNewsExtractor):
                 ]
             }
         )
+
+    def show_single_news(self, db: Session, news_id: int) -> Dict:
+        single_news = crud.get_single_news(db, news_id)
+        return {
+            'single_news': single_news,
+        }
 
 
 def _clean_nones_from_content(news_list: List[News]) -> List[News]:
