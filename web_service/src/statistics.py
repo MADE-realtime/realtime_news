@@ -88,3 +88,23 @@ class ByDayCounter(Statistics):
             if date:
                 news_counter_list.append((date, count))
         return StatisticsModels(type=self.name, stats=news_counter_list)
+
+class Classificator():
+    def __init__(self):
+        self.builder = pickle.load(open('model.save', 'rb'))
+        self.name = 'Classificator'
+        self.ganers = ['Россия', 'Спорт', 'Экономика', 'Мир', 'Из жизни','Интернет и СМИ', 'Культура', 
+                       'Наука и техника', 'Преступность']
+
+    def predict(self, news):
+        news_texts = [one_news.text for one_news in news]
+        news_texts = self._preprocessing(news_texts)
+        ans_list = self.builder.predict(news_texts)
+        ans_list = [self.ganers[np.where(ans == 1)[0][0]] for ans in ans_list]
+        
+        return ans_list
+
+    @staticmethod
+    def _preprocessing(news_texts):
+        news_texts = [text.replace('[^\w\s]', '').lower() for text in news_texts]
+        return news_texts
