@@ -30,7 +30,7 @@ format:
 	$(VENV)/bin/unify --in-place --recursive $(ALL)
 
 up:
-    /etc/init.d/cron start
+	/etc/init.d/cron start
 	crontab cron_schedule.txt
 	touch all.log
 	tail -f all.log
