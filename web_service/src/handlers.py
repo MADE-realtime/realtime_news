@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 
 from db_lib.database import SessionLocal
 from utils import get_vs_plots_data, draw_by_day_plot
+from session_logging import session_log
 
 app = FastAPI()
 # NEWS_EXTRACTOR = PandasNewsExtractor(LENTA_MINI_DATASET_FILEPATH)
@@ -34,6 +35,7 @@ def get_db():
     response_class=HTMLResponse,
     response_model=ListNews,
 )
+@session_log
 async def main_handler(request: Request,
                        topic: Optional[str] = None,
                        start_date: Optional[str] = '1991-05-12',
@@ -58,6 +60,7 @@ async def main_handler(request: Request,
     response_class=HTMLResponse,
     response_model=ListNews,
 )
+@session_log
 async def vs_search_handler(request: Request,
                             word_1: Optional[str] = '',
                             word_2: Optional[str] = '',
@@ -88,6 +91,7 @@ async def vs_search_handler(request: Request,
     response_class=HTMLResponse,
     response_model=ListNews,
 )
+@session_log
 def get_all_handler(
         request: Request, num_random_news: int, db: Session = Depends(get_db)
 ):
@@ -106,6 +110,7 @@ def get_all_handler(
     response_class=HTMLResponse,
     response_model=ListNews,
 )
+@session_log
 def get_date_handler(
         request: Request, start_date: str, end_date: str, db: Session = Depends(get_db)
 ):
@@ -125,6 +130,7 @@ def get_date_handler(
     response_class=HTMLResponse,
     response_model=ListNews,
 )
+@session_log
 def get_topic_handler(
         request: Request,
         topic: str,
