@@ -96,10 +96,10 @@ async def single_news_handler(
     Get random number news from all the time
     :return:
     """
-    single_news = NEWS_EXTRACTOR.show_single_news(db, news_id)
-    if single_news:
+    news = NEWS_EXTRACTOR.show_single_news(db, news_id)
+    if news:
         return templates.TemplateResponse(
-            SINGLE_TEMPLATE_NAME, {"request": request, 'single_news': single_news}
+            SINGLE_TEMPLATE_NAME, {"request": request, 'single_news': news['single_news']}
         )
     else:
         raise HTTPException(status_code=404, detail="No news with such id found")

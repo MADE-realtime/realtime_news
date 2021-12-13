@@ -29,6 +29,15 @@ window.onload = (event) => {
     if (newsNumberParam) {
         newsNumber.value = newsNumberParam;
     }
+//    if (newsNumberParam) {
+//        for (var i, j = 1; i = newsNumber.options[j]; j++) {
+//        if (i.value == newsNumberParam) {
+//            newsNumber.selectedIndex = j;
+//            break;
+//        } else {
+//            newsNumber.selectedIndex = 0;
+//        }
+//    };
     if (topicParam) {
         for (var i, j = 1; i = newsTopic.options[j]; j++) {
         if (i.value == topicParam) {
