@@ -91,7 +91,7 @@ class ByDayCounter(Statistics):
 
 class Classificator():
     def __init__(self):
-        self.builder = pickle.load(open('model.save', 'rb'))
+        self.builder = pickle.load(open('models/model.save', 'rb'))
         self.name = 'Classificator'
         self.ganers = ['Россия', 'Спорт', 'Экономика', 'Мир', 'Из жизни','Интернет и СМИ', 'Культура', 
                        'Наука и техника', 'Преступность']
