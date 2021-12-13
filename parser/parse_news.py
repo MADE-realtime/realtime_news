@@ -1,3 +1,4 @@
+import logging
 from argparse import ArgumentParser
 
 from scrapy.crawler import CrawlerProcess
@@ -32,6 +33,13 @@ if __name__ == '__main__':
     arg_parser = init_arg_parser()
     cli_args = arg_parser.parse_args()
     cli_args = vars(cli_args)
+
+    logging.basicConfig(
+        filename='all.log',
+        filemode='w',
+        format='%(levelname)s: %(message)s',
+        level=logging.INFO
+    )
 
     crawl_proc = CrawlerProcess(settings={
         'DOWNLOAD_DELAY': 3,

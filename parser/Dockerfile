@@ -38,6 +38,7 @@ RUN pip uninstall --yes poetry
 # copy src
 COPY parser/ /code/
 COPY .env /code/.env
+RUN apt-get update && apt-get install -y cron && rm -rf /var/lib/apt/lists/*
 
 # run it
 ENTRYPOINT [""]
