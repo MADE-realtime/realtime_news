@@ -30,10 +30,10 @@ services:
 
   realtime_web:
     container_name: realtime_web
-    image: "terysy/realtime_web:latest"
+    image: "terysy/realtime_web:12312"
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: web_service/Dockerfile
     ports:
       - "80:8000"
     volumes:
@@ -44,13 +44,3 @@ services:
         condition: service_healthy
     links:
       - db
-
-  pgadmin:
-    container_name: pgadmin
-    ports:
-      - "5050:80"
-    image: dpage/pgadmin4
-    env_file: .env
-    depends_on:
-      db:
-        condition: service_healthy

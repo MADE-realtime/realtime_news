@@ -1,13 +1,16 @@
 from sqlalchemy.orm import Session
 
 from .models import News
-from typing import List
+from typing import List, Any
 from datetime import date
 
 
 def get_news(db: Session,
              news_id: int) -> News:
     return db.query(News).filter(News.id == news_id).first()
+
+def get_all_news_by_id(db: Session, news_ids: List[int]) -> List[News]:
+    return db.query(News).filter(News.id in news_ids)
 
 
 def get_news_by_filters(db: Session,
@@ -32,11 +35,6 @@ def get_all_news(db: Session,
                  skip: int = 0,
                  limit: int = 100) -> List[News]:
     return db.query(News).offset(skip).limit(limit).all()
-
-
-def save_cluster_num_to_existing_news():
-# TODO: Ponomarev
-# TODO: check that function works with func web_service.src.scripts.clusterisation.write_clusters_num_to_db
 
 
 def get_news_by_topic_and_date(db: Session,
@@ -66,3 +64,10 @@ def create_news(db: Session, news: News):
     db.commit()
     db.refresh(news)
     return news
+
+
+def save_all_news(db: Session, news_list: List[News]) -> List[News]:
+    db.add_all(news_list)
+    db.commit()
+    db.refresh(news_list)
+    return news_list

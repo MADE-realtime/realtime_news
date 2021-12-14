@@ -11,7 +11,11 @@ WORKDIR /code/
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
         gcc \
+        libxml2-dev \
+        libxslt1-dev \
         libsasl2-dev \
+        zlib1g-dev \
+        g++ \
         libldap2-dev \
         libssl-dev \
         graphviz \
@@ -20,26 +24,20 @@ RUN apt-get update \
         make \
  && rm -rf /var/lib/apt/lists/*
 
-COPY Makefile /code/
-
+# copy code
+COPY web_service/ web_service/
 # copy libs
-COPY db_lib /code/db_lib
+COPY db_lib/ db_lib/
+# copy env
+COPY ../.env .env
 
-# copy poetry
-COPY pyproject.toml /code/
-COPY poetry.lock /code/
+
+WORKDIR /code/web_service/
 
 # install dependencies
 RUN make venv
-
-# drop poetry
+## drop poetry
 RUN pip uninstall --yes poetry
-
-# copy src
-COPY web_service/src/ /code/web_service/src/
-COPY parser /code/parser/
-COPY .env /code/.env
-
-# run it
+## run it
 ENTRYPOINT [""]
 CMD ["make"]

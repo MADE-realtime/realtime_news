@@ -20,25 +20,20 @@ RUN apt-get update \
         make \
  && rm -rf /var/lib/apt/lists/*
 
-COPY parser/Makefile /code/
-
+# copy code
+COPY parser/ parser/
 # copy libs
-COPY db_lib /code/db_lib
+COPY db_lib db_lib/
+# copy env
+COPY ../.env .env
 
-# copy poetry
-COPY pyproject.toml /code/
-COPY poetry.lock /code/
+
+WORKDIR /code/parser/
 
 # install dependencies
 RUN make venv
-
 # drop poetry
 RUN pip uninstall --yes poetry
-
-# copy src
-COPY parser/ /code/
-COPY .env /code/.env
-
-# run it
+## run it
 ENTRYPOINT [""]
 CMD ["make"]

@@ -5,7 +5,12 @@ ALL = $(CODE) $(TESTS)
 
 VENV ?= .venv
 
+clean_all_local: venv_rm cleanup poetry_lock venv
+
 all: migrate up
+
+venv_rm:
+	rm -rf $(VENV)
 
 venv:
 	python3.8 -m venv $(VENV)
@@ -33,7 +38,6 @@ migrate:
 	$(VENV)/bin/alembic -c db_lib/alembic.ini revision --autogenerate -m 'Added required tables'
 	$(VENV)/bin/alembic -c db_lib/alembic.ini upgrade head
 
-
 populate:
 	$(VENV)/bin/python web_service/src/scripts/populate.py
 
@@ -46,7 +50,7 @@ service:
 
 ci:	lint test
 
-cleaup:
+cleanup:
 	docker container prune
 	docker image prune
 	docker volume prune
@@ -54,3 +58,11 @@ cleaup:
 	docker builder prune
 	rm -rf migrations
 	rm -rf postgres*
+	rm -rf db_lib/dist
+
+poetry_lock:
+	cd parser && poetry lock
+	cd web_service && poetry lock
+
+cluster:
+	$(VENV)/bin/python $(CODE)/clusterisation.py

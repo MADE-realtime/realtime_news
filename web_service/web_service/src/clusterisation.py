@@ -4,11 +4,13 @@ from sklearn.cluster import AgglomerativeClustering
 import fasttext.util
 import numpy as np
 
-from db_lib.db_lib.crud import get_all_news
-# from db_lib.db_lib.models import News
-from web_service.src.config import LANGUAGE_SHORT_FOR_FASTTEXT, LIMIT_NEWS
-from web_service.src.models import News
-from web_service.src.news_extractor import clean_nones_from_content
+from db_lib.crud import get_all_news, save_all_news
+from config import LANGUAGE_SHORT_FOR_FASTTEXT, LIMIT_NEWS
+from models import News
+from news_extractor import clean_nones_from_content
+from db_lib.database import SessionLocal
+from fastapi import Depends
+from sqlalchemy.orm import Session
 
 
 def download_language_model():
@@ -31,15 +33,15 @@ def cluster_news_content(news_list: List[News]) -> np.ndarray:
     return clusters
 
 
-def write_clusters_num_to_db(cluster_num: np.ndarray):
-    ...
+def cluster_messages(db: Session = SessionLocal()):
 
+    """Загружаем все сообщения (пока сообщений немного) и кластеризуем их с помощью кластеризатора"""
 
-def cluster_messages():
-    '''Загружаем все сообщения (пока сообщений немного) и кластеризуем их с помощью кластеризатора'''
-    news_list = get_all_news(limin=LIMIT_NEWS)
+    news_list = get_all_news(db, limit=LIMIT_NEWS)
     cluster_num = cluster_news_content(news_list)
-    write_clusters_num_to_db(cluster_num)
+    for i in range(len(news_list)):
+        news_list[i].cluster_num = cluster_num[i]
+    save_all_news(db, news_list)
 
 
 if __name__ == '__main__':
