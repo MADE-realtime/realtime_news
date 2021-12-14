@@ -3,11 +3,12 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 
 import numpy as np
+import pickle
 from typing import Dict, List
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from stop_words import get_stop_words
-
-from config import LANGUAGE, MIN_NGRAM_FREQ
+from sklearn import  pipeline, preprocessing, multiclass, naive_bayes
+from config import LANGUAGE, MIN_NGRAM_FREQ, CLASS_OF_NEWS
 from models import ListNews, News, StatisticsModels
 
 
@@ -89,22 +90,23 @@ class ByDayCounter(Statistics):
                 news_counter_list.append((date, count))
         return StatisticsModels(type=self.name, stats=news_counter_list)
 
-class Classificator():
-    def __init__(self):
-        self.builder = pickle.load(open('models/model.save', 'rb'))
-        self.name = 'Classificator'
-        self.ganers = ['Россия', 'Спорт', 'Экономика', 'Мир', 'Из жизни','Интернет и СМИ', 'Культура', 
-                       'Наука и техника', 'Преступность']
+class Classificator(Statistics):
+        def __init__(self):
+            self.builder = pickle.load(open('model.save', 'rb'))
+            self.name = 'Get_class_of_news'
+            self.class_news = CLASS_OF_NEWS
 
-    def predict(self, news):
-        news_texts = [one_news.text for one_news in news]
-        news_texts = self._preprocessing(news_texts)
-        ans_list = self.builder.predict(news_texts)
-        ans_list = [self.ganers[np.where(ans == 1)[0][0]] for ans in ans_list]
-        
-        return ans_list
+        def predict(self, news: List[News], *args, **kwargs) -> StatisticsModels:
+            news_texts = [one_news.content for one_news in news if one_news.content]
+            news_texts = self._preprocessing(news_texts)
+            if not news_texts:
+                return StatisticsModels(type=self.name, stats='')
+            ans_list = self.builder.predict(news_texts)
+            ans_list = [self.class_news[np.where(ans == 1)[0][0]] for ans in ans_list]
 
-    @staticmethod
-    def _preprocessing(news_texts):
-        news_texts = [text.replace('[^\w\s]', '').lower() for text in news_texts]
-        return news_texts
+            return StatisticsModels(type=self.name, stats=ans_list)
+    
+        @staticmethod\n",
+        def _preprocessing(news_texts: List[str]) -> List[str]:\n",
+            news_texts = [text.replace('[^\\w\\s]', '').lower() for text in news_texts]\n",
+            return news_texts"
