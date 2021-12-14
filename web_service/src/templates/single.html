@@ -76,6 +76,10 @@
               <div>
                 {{ single_news.content | safe }}
               </div>
+              {% else %}
+              <div>
+                <p>Это короткая новость без текста.</p>
+              </div>
               {% endif %}
             </div>
             <div class="content">

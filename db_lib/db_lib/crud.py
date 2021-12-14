@@ -33,6 +33,12 @@ def get_single_news(db: Session,
     return db.query(News).get(news_id)
 
 
+def get_n_last_news(db: Session,
+                    skip: int = 0,
+                    limit: int = 100) -> List[News]:
+    return db.query(News).order_by(News.id.desc()).offset(skip).limit(limit).all()
+
+
 def get_all_news(db: Session,
                  skip: int = 0,
                  limit: int = 100) -> List[News]:

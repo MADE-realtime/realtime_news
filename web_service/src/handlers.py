@@ -62,6 +62,7 @@ async def main_handler(request: Request,
 async def vs_search_handler(request: Request,
                             word_1: Optional[str] = '',
                             word_2: Optional[str] = '',
+                            mode: Optional[str] = 'full',
                             db: Session = Depends(get_db)
                             ):
     """
@@ -71,7 +72,7 @@ async def vs_search_handler(request: Request,
     words = {'words': [word_1, word_2]}
     news_info = []
     for word in words['words']:
-        news_info.append(NEWS_EXTRACTOR.show_news_by_regex(db, word))
+        news_info.append(NEWS_EXTRACTOR.show_news_by_regex(db, word, mode))
     plots = get_vs_plots_data(news_info)
 
     return templates.TemplateResponse(

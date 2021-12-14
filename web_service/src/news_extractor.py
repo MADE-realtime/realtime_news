@@ -200,15 +200,22 @@ class DBNewsExtractor(BaseNewsExtractor):
             }
         )
 
-    def show_news_by_regex(self, db: Session, word: str) -> ListNews:
-        news_list = crud.get_all_news(db, limit=LIMIT_NEWS)
-        word_re = r'\b' + word + r'\b'
-        news_list = _clean_nones_from_content(news_list)
-        news_list = [
-            one_news for one_news in news_list if
-            re.match(word_re, str(one_news.content), flags=re.IGNORECASE) is not None
-        ]
-        selected_news = [one_news for one_news in news_list if word.lower() in one_news.content.lower()]
+    def show_news_by_regex(self, db: Session, word: str, mode: str = 'full') -> ListNews:
+        if word:
+            news_list = crud.get_n_last_news(db, limit=LIMIT_NEWS)
+        else:
+            news_list = crud.get_all_news(db, limit=0)
+        word_re = rf'\b{word}\b'
+        if mode == 'full':
+            selected_news = [
+                one_news for one_news in news_list if re.search(word_re, _one_news_to_string(one_news), flags=re.IGNORECASE)
+            ]
+        else:
+            news_list = _clean_nones_from_content(news_list)
+            selected_news = [
+                one_news for one_news in news_list if re.search(word_re, str(one_news.content), flags=re.IGNORECASE)
+            ]
+
         # Не менять порядок в statistics
         return ListNews.parse_obj(
             {
@@ -226,6 +233,14 @@ class DBNewsExtractor(BaseNewsExtractor):
         return {
             'single_news': single_news,
         }
+
+
+def _to_str(text):
+    return '' if text is None else str(text)
+
+
+def _one_news_to_string(one_news: News) -> str:
+    return _to_str(one_news.title) + ' ' + _to_str(one_news.content)
 
 
 def _clean_nones_from_content(news_list: List[News]) -> List[News]:
