@@ -3,6 +3,7 @@ from argparse import ArgumentParser
 from sqlalchemy.exc import IntegrityError
 
 from dateutil import parser as date_parser
+from lxml.html.clean import clean_html
 from scrapy.spiders import Spider
 from scrapy.linkextractors.lxmlhtml import LxmlLinkExtractor
 from scrapy.linkextractors import IGNORED_EXTENSIONS
@@ -17,7 +18,8 @@ from data_collection.util import (
     clean_url_queries,
     is_comment_url,
     BAD_QUERIES,
-    has_cyrillic
+    has_cyrillic,
+    has_html
 )
 from db_lib.models import News
 from db_lib.database import SessionLocal
@@ -125,24 +127,35 @@ class SpiderRSS(Spider):
             else:
                 self.log(f'Filtered: {parsed_item}')
 
-    @staticmethod
-    def parse_rss_item(rss_item, parser):
+    def parse_rss_item(self, rss_item, parser):
         parsed_data = dict()
-        for field, xpath_list in parser.items():
-            if isinstance(xpath_list, str):
-                xpath_list = [xpath_list]
-            assert isinstance(xpath_list, list), 'Expected list type in xpath'
-            field_data = None
-            for xpath in xpath_list:
-                selected_data = rss_item.xpath(xpath).getall()
-                if len(selected_data) == 1:
-                    field_data = selected_data[0]
-                elif len(selected_data) > 1:
-                    field_data = selected_data
-                if field_data:
-                    break
+        for field, xpath_candidates in parser.items():
+            field_data = self.any_xpath_select(rss_item, xpath_candidates)
+            field_data = self.clean_from_tags(field_data)
             parsed_data[field] = field_data
         return parsed_data
+
+    def any_xpath_select(self, xml_item, xpath_candidates):
+        if isinstance(xpath_candidates, str):
+            xpath_candidates = [xpath_candidates]
+        assert isinstance(xpath_candidates, list), 'Expected list type in xpath_candidates'
+        field_data = None
+        for xpath in xpath_candidates:
+            selected_data = xml_item.xpath(xpath).getall()
+            if len(selected_data) == 1:
+                field_data = selected_data[0]
+            elif len(selected_data) > 1:
+                field_data = selected_data
+            if field_data:
+                break
+        return field_data
+
+    def clean_from_tags(self, field_data):
+        if not isinstance(field_data, str):
+            return field_data
+        if has_html(field_data):
+            return clean_html(field_data)
+        return field_data
 
     def find_parser(self, response_url):
         for parser_name, (rule, parser) in self.rss_parser_zoo.items():
@@ -165,6 +178,8 @@ class SpiderRSS(Spider):
 
     def filter_item(self, parsed_item):
         if parsed_item.get('source_url', None) is None:
+            return False
+        if parsed_item.get('title', None) is None:
             return False
         return not is_comment_url(parsed_item['source_url'])
 
