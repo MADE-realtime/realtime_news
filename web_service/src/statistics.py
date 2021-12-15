@@ -104,7 +104,7 @@ class Classificator(Statistics):
 
             return StatisticsModels(type=self.name, stats=ans_list)
     
-        @staticmethod\n",
+        @staticmethod
         def _preprocessing(news_texts: List[str]) -> List[str]:\n",
             news_texts = [text.replace('[^\\w\\s]', '').lower() for text in news_texts]\n",
             return news_texts"
