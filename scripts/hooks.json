@@ -10,5 +10,11 @@
     "execute-command": "/home/ubuntu/scripts/redeploy-realtime_parser.sh",
     "command-working-directory": "/home/ubuntu/scripts",
     "response-message": "Redeploying parser."
+  },
+  {
+    "id": "redeploy-realtime_ml_jobs",
+    "execute-command": "/home/ubuntu/scripts/redeploy-realtime_ml_jobs.sh",
+    "command-working-directory": "/home/ubuntu/scripts",
+    "response-message": "Redeploying ml jobsr."
   }
 ]

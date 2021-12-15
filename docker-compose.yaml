@@ -44,3 +44,16 @@ services:
         condition: service_healthy
     links:
       - db
+
+  realtime_ml_jobs:
+    container_name: realtime_ml_jobs
+    image: "terysy/realtime_ml_jobs:12312"
+    build:
+      context: .
+      dockerfile: ml_jobs/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    links:
+      - db
+

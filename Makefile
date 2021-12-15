@@ -1,4 +1,4 @@
-CODE = web_service/src
+CODE = web_service/web_service/src
 TESTS = web_service/tests
 
 ALL = $(CODE) $(TESTS)
@@ -39,7 +39,7 @@ migrate:
 	$(VENV)/bin/alembic -c db_lib/alembic.ini upgrade head
 
 populate:
-	$(VENV)/bin/python web_service/src/scripts/populate.py
+	$(VENV)/bin/python $(CODE)/scripts/populate.py
 
 up:
 	$(VENV)/bin/python $(CODE)/run_server.py
@@ -63,6 +63,7 @@ cleanup:
 poetry_lock:
 	cd parser && poetry lock
 	cd web_service && poetry lock
+	cd ml_jobs && poetry lock
 
 cluster:
 	$(VENV)/bin/python $(CODE)/clusterisation.py

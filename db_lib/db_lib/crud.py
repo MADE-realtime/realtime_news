@@ -58,6 +58,13 @@ def get_news_by_date(db: Session,
         .filter(News.time <= end_date) \
         .offset(skip).limit(limit).all()
 
+def get_news_without_cluster(db: Session,
+                             skip: int = 0,
+                             limit: int = 1000) -> List[News]:
+    return db.query(News)\
+        .filter(News.cluster_num.isnot(None)) \
+        .offset(skip).limit(limit).all()
+
 
 def create_news(db: Session, news: News):
     db.add(news)

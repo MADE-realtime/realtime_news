@@ -1,5 +1,5 @@
-CODE =
-TESTS = test
+CODE = ml_jobs
+DB_LIB = ../db_lib
 
 ALL = $(CODE) $(TESTS)
 
@@ -7,15 +7,15 @@ VENV ?= .venv
 
 all: up
 
+venv_rm:
+	rm -rf $(VENV)
+
 venv:
 	python3.8 -m venv $(VENV)
 	$(VENV)/bin/python -m pip install --upgrade pip
 	$(VENV)/bin/python -m pip install --no-compile poetry
 	$(VENV)/bin/poetry config virtualenvs.create false
 	$(VENV)/bin/poetry install --no-dev --no-interaction --no-ansi
-
-test:
-	$(VENV)/bin/pytest -v tests
 
 lint:
 	$(VENV)/bin/flake8 --jobs 4 --statistics --show-source $(CODE)
@@ -29,9 +29,23 @@ format:
 	$(VENV)/bin/autoflake --recursive --in-place --remove-all-unused-imports $(ALL)
 	$(VENV)/bin/unify --in-place --recursive $(ALL)
 
-up:
-	$(VENV)/bin/python parser/parse_news.py -d vk.json vk_db -start_urls parser/source_files/vk.url
-	$(VENV)/bin/python parser/parse_news.py -d rss_news.json rss_db -s parser/source_files/smi.url -r parser/data_collection/rss_parser.yaml
-	$(VENV)/bin/python parser/parse_tg.py get_last -to_db
+cluster:
+	$(VENV)/bin/python $(CODE)/clusterisation.py
 
-ci:	lint parser/test
+cluster-local:
+	python $(CODE)/clusterisation.py
+
+populate:
+	$(VENV)/bin/python $(CODE)/scripts/populate.py
+
+up:
+	/etc/init.d/cron start
+	crontab $(CODE)/cron_schedule.txt
+	touch all.log
+	tail -f all.log
+
+service:
+	docker-compose build
+	docker-compose up
+
+ci:	lint test

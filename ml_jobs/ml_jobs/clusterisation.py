@@ -4,12 +4,10 @@ from sklearn.cluster import AgglomerativeClustering
 import fasttext.util
 import numpy as np
 
-from db_lib.crud import get_all_news, update_list_news
+from db_lib.crud import get_all_news
 from config import LANGUAGE_SHORT_FOR_FASTTEXT, LIMIT_NEWS
-from models import News
-from news_extractor import clean_nones_from_content
+from db_lib.models import News
 from db_lib.database import SessionLocal
-from fastapi import Depends
 from sqlalchemy.orm import Session
 
 
