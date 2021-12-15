@@ -18,3 +18,7 @@ body {
 .show-more-button{
     white-space: nowrap;
 }
+
+.title a {
+    color: #4a4a4a;
+}

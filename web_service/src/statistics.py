@@ -1,6 +1,7 @@
 import re
 from abc import ABC, abstractmethod
 from collections import defaultdict
+from datetime import datetime
 
 import numpy as np
 import pickle
@@ -66,11 +67,10 @@ class StatisticsByResource(Statistics):
     def predict(self, news: List[News], *args, **kwargs) -> StatisticsModels:
         news_counter = defaultdict(int)
         for one_news in news:
-            news_counter[one_news.source_name] += 1
-        news_counter_list = []
-        for source_name, count in news_counter.items():
-            if source_name:
-                news_counter_list.append((source_name, count))
+            if one_news.source_name:
+                news_counter[one_news.source_name] += 1
+        news_counter_list = sorted(news_counter.items(), key=lambda kv: kv[1], reverse=True)
+
         return StatisticsModels(type=self.name, stats=news_counter_list)
 
 
@@ -84,10 +84,8 @@ class ByDayCounter(Statistics):
         for one_news in news:
             if one_news.date:
                 news_counter[one_news.date.strftime("%d.%m.%Y")] += 1
-        news_counter_list = []
-        for date, count in news_counter.items():
-            if date:
-                news_counter_list.append((date, count))
+        news_counter_list = sorted(news_counter.items(), key=lambda kv: datetime.strptime(kv[0], '%d.%m.%Y'))
+
         return StatisticsModels(type=self.name, stats=news_counter_list)
 
 class Classificator(Statistics):
