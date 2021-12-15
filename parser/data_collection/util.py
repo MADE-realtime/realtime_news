@@ -64,3 +64,7 @@ def extract_all_tags(xml_tag):
 
 def has_cyrillic(text):
     return bool(re.search('[а-яА-Я]', text))
+
+
+def has_html(maybe_html_string):
+    return bool(BeautifulSoup(maybe_html_string, "html.parser").find())
