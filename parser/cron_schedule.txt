@@ -1,1 +1,1 @@
-*/15 * * * * cd /code/ && sh /code/parse_all.sh
+* */1 * * * cd /code/scripts && sh main.sh
