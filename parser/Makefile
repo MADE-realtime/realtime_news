@@ -31,7 +31,7 @@ format:
 
 up:
 	/etc/init.d/cron start
-# 	crontab cron_schedule.txt
+	crontab cron_schedule.txt
 	touch all.log
 	tail -f all.log
 
