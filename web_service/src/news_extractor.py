@@ -182,16 +182,18 @@ class DBNewsExtractor(BaseNewsExtractor):
             topic: str,
             end_date: str,
             start_date: str = '1991-05-12',
-            num_random_news: int = 10,
+            num_news: int = 10,
     ) -> ListNews:
         news_list = crud.get_news_by_filters(db,
-                                             topic,
-                                             convert_str_to_date(start_date),
-                                             convert_str_to_date(end_date))
-        news_list_len = len(news_list)
-        if num_random_news > news_list_len:
-            num_random_news = news_list_len
-        news_list = random.choices(news_list, k=num_random_news)
+                                             topic=topic,
+                                             start_date=convert_str_to_date(start_date),
+                                             end_date=convert_str_to_date(end_date),
+                                             limit=num_news)
+        # news_list_len = len(news_list)
+        # if num_news > news_list_len:
+        #     num_news = news_list_len
+        # news_list = random.choices(news_list, k=num_random_news)
+        news_list = _clean_img_urls(news_list)
 
         return ListNews.parse_obj(
             {
@@ -215,6 +217,7 @@ class DBNewsExtractor(BaseNewsExtractor):
             selected_news = [
                 one_news for one_news in news_list if re.search(word_re, str(one_news.content), flags=re.IGNORECASE)
             ]
+        selected_news = _clean_img_urls(selected_news)
 
         # Не менять порядок в statistics
         return ListNews.parse_obj(
@@ -248,3 +251,13 @@ def _clean_nones_from_content(news_list: List[News]) -> List[News]:
         if news.content is None:
             news_list[i].content = news.title
     return news_list
+
+
+def _clean_img_urls(news_list: List[News]) -> List[News]:
+    for i, news in enumerate(news_list):
+        news_list[i].image_url = _remove_extra_link(news_list[i].image_url)
+    return news_list
+
+
+def _remove_extra_link(links: str) -> str:
+    return links.lstrip('{').rstrip('}').split(',')[0]

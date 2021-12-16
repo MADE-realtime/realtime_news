@@ -2,52 +2,14 @@
 <html lang="ru">
 
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% include 'header.html' %}
     <title>{{ single_news.title }} / Новости / RTN</title>
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="stylesheet" href="{{ url_for('static', path='/css/bulma.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', path='/css/fontawesome/all.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', path='/css/custom.css') }}">
-    <script type="text/javascript" src="{{ url_for('static', path='/js/custom.js') }}"></script>
-    <link rel="stylesheet" href="https://bulma.io/vendor/fontawesome-free-5.15.2-web/css/all.min.css">
-
   </head>
 
   <body>
 
     <!-- START NAV -->
-    <nav class="navbar is-dark">
-      <div class="container">
-        <div class="navbar-brand">
-          <a class="navbar-item" href="#">
-            <img src="{{ url_for('static', path='/img/logo-rtn-white.png') }}" alt="Realtime news logo">
-          </a>
-          <span class="navbar-burger burger" data-target="navbarMenu">
-            <span></span>
-            <span></span>
-            <span></span>
-          </span>
-        </div>
-        <div id="navbarMenu" class="navbar-menu">
-          <div class="navbar-end">
-            <a class="navbar-item">
-              Категории
-            </a>
-            <a class="navbar-item">
-              В тренде
-            </a>
-            <a class="navbar-item">
-              О нас
-            </a>
-            <a class="navbar-item">
-              Личный кабинет
-            </a>
-          </div>
-        </div>
-      </div>
-    </nav>
+    {% include 'main-nav.html' %}
     <!-- END NAV -->
 
     <div class="container">
@@ -78,7 +40,8 @@
               </div>
               {% else %}
               <div>
-                <p>Это короткая новость без текста.</p>
+                <p><a href="{{ single_news.source_url }}" target="_blank">Эту новость можно прочитать полностью в
+                  источнике. <span class="icon"><i class="fas fa-external-link-alt"></i></span></a></p>
               </div>
               {% endif %}
             </div>
@@ -117,9 +80,9 @@
                 </div>
                 <div class="content">
                   {% if single_news.source_name %}
-                  <p class="subtitle is-6">{{ single_news.source_name }}</p>
+                  <p class="subtitle is-6"><a href="{{ single_news.source_url }}">{{ single_news.source_name }}</a></p>
                   {% else %}
-                  <p>Неизвестная газета</p>
+                  <p class="subtitle is-6"><a href="{{ single_news.source_url }}">Неизвестная газета</a></p>
                   {% endif %}
                 </div>
               </div>
@@ -127,40 +90,12 @@
           </div>
         </div>
 
-        <!-- Start stats -->
-<!--        <div class="row">-->
-<!--          <div class="box">-->
-<!--            <h2 class="title is-3">N-граммы. Топ-30</h2>-->
-<!--            <div class="tags">-->
-<!--              {% if stats and stats.stats and (stats.type == "Ngrams") %}-->
-<!--              {% for ngram in stats.stats[:30] %}-->
-<!--              <span class="tag">{{ngram[0]}}: {{ngram[1]}}</span>-->
-<!--              {% endfor %}-->
-<!--              {% endif %}-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
-        <!-- End stats -->
-
       </div>
 
     </div>
 
-    <footer class="footer is-dark">
-      <div class="container">
-        <div class="content has-text-centered">
-          <div class="soc">
-            <a href="#"><i class="fa fa-github-alt fa-lg" aria-hidden="true"></i></a>
-            <a href="#"><i class="fa fa-youtube fa-lg" aria-hidden="true"></i></a>
-            <a href="#"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a>
-            <a href="#"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a>
-          </div>
-          <p>
-            <strong>Realtime news</strong> by 5 nice guys.
-          </p>
-        </div>
-      </div>
-    </footer>
+    <!-- Footer -->
+    {% include 'footer.html' %}
 
   </body>
 
