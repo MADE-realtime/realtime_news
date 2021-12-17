@@ -233,6 +233,7 @@ class DBNewsExtractor(BaseNewsExtractor):
 
     def show_single_news(self, db: Session, news_id: int) -> Dict:
         single_news = crud.get_single_news(db, news_id)
+        single_news.image_url = _remove_extra_link(single_news.image_url)
         return {
             'single_news': single_news,
         }
@@ -260,4 +261,5 @@ def _clean_img_urls(news_list: List[News]) -> List[News]:
 
 
 def _remove_extra_link(links: str) -> str:
-    return links.lstrip('{').rstrip('}').split(',')[0]
+    if links:
+        return links.lstrip('{').rstrip('}').split(',')[0]

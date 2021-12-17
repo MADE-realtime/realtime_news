@@ -48,6 +48,8 @@
             <div class="content">
               {% if single_news.topic %}
               <span class="tag is-primary">{{ single_news.topic }}</span>
+              {% else %}
+              <span class="tag is-primary">Общее</span>
               {% endif %}
               {% if single_news.tags %}
               <span class="tag">{{ single_news.tags }}</span>

@@ -110,6 +110,8 @@
                 <div class="media-content mb-3">
                   {% if card.topic %}
                   <span class="tag is-primary">{{ card.topic }}</span>
+                  {% else %}
+                  <span class="tag is-primary">Общее</span>
                   {% endif %}
                   {% if card.tags %}
                   <span class="tag">{{ card.tags }}</span>
