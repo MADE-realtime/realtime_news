@@ -18,6 +18,8 @@ RUN apt-get update \
         libgraphviz-dev \
         libpq-dev \
         make \
+        cron \
+        procps \
  && rm -rf /var/lib/apt/lists/*
 
 # copy code

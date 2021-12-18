@@ -1,8 +1,8 @@
 from typing import List, Optional
 
-from config import FAVICON_PATH, TEMPLATE_NAME, SEARCH_TEMPLATE_NAME
+from config import FAVICON_PATH, TEMPLATE_NAME, SEARCH_TEMPLATE_NAME, SINGLE_TEMPLATE_NAME
 from datetime import datetime
-from fastapi import Depends, FastAPI, Request
+from fastapi import Depends, FastAPI, Request, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from db_lib.database import get_db
 
 from utils import get_vs_plots_data, draw_by_day_plot
+from session_logging import session_log
 
 app = FastAPI()
 # NEWS_EXTRACTOR = PandasNewsExtractor(LENTA_MINI_DATASET_FILEPATH)
@@ -27,6 +28,7 @@ templates = Jinja2Templates(directory="web_service/src/templates")
     response_class=HTMLResponse,
     response_model=ListNews,
 )
+@session_log
 async def main_handler(request: Request,
                        topic: Optional[str] = None,
                        start_date: Optional[str] = '1991-05-12',
@@ -38,6 +40,11 @@ async def main_handler(request: Request,
     Get random number news by filters
     :return:
     """
+    # TODO: Проверка на пустые фильтры
+    if number < 5:
+        number = 5
+    elif number > 200:
+        number = 200
     if not end_date:
         end_date = datetime.date(datetime.now())
     news_list = NEWS_EXTRACTOR.show_news_by_filters(db, topic, end_date, start_date, number)
@@ -51,9 +58,11 @@ async def main_handler(request: Request,
     response_class=HTMLResponse,
     response_model=ListNews,
 )
+@session_log
 async def vs_search_handler(request: Request,
                             word_1: Optional[str] = '',
                             word_2: Optional[str] = '',
+                            mode: Optional[str] = 'full',
                             db: Session = Depends(get_db)
                             ):
     """
@@ -63,7 +72,7 @@ async def vs_search_handler(request: Request,
     words = {'words': [word_1, word_2]}
     news_info = []
     for word in words['words']:
-        news_info.append(NEWS_EXTRACTOR.show_news_by_regex(db, word))
+        news_info.append(NEWS_EXTRACTOR.show_news_by_regex(db, word, mode))
     plots = get_vs_plots_data(news_info)
 
     return templates.TemplateResponse(
@@ -77,10 +86,32 @@ async def vs_search_handler(request: Request,
 
 
 @app.get(
+    '/news/{news_id}',
+    response_class=HTMLResponse,
+    # response_model=ListNews,
+)
+async def single_news_handler(
+        request: Request, news_id: int, db: Session = Depends(get_db)
+):
+    """
+    Get random number news from all the time
+    :return:
+    """
+    news = NEWS_EXTRACTOR.show_single_news(db, news_id)
+    if news:
+        return templates.TemplateResponse(
+            SINGLE_TEMPLATE_NAME, {"request": request, 'single_news': news['single_news']}
+        )
+    else:
+        raise HTTPException(status_code=404, detail="No news with such id found")
+
+
+@app.get(
     '/get_random_news/{num_random_news}',
     response_class=HTMLResponse,
     response_model=ListNews,
 )
+@session_log
 def get_all_handler(
         request: Request, num_random_news: int, db: Session = Depends(get_db)
 ):
@@ -99,6 +130,7 @@ def get_all_handler(
     response_class=HTMLResponse,
     response_model=ListNews,
 )
+@session_log
 def get_date_handler(
         request: Request, start_date: str, end_date: str, db: Session = Depends(get_db)
 ):
@@ -118,6 +150,7 @@ def get_date_handler(
     response_class=HTMLResponse,
     response_model=ListNews,
 )
+@session_log
 def get_topic_handler(
         request: Request,
         topic: str,

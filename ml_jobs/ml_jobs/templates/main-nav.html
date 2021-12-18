@@ -1,0 +1,63 @@
+<nav class="navbar is-dark">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/">
+        <img src="{{ url_for('static', path='/img/logo-rtn-white.png') }}" alt="Realtime news logo">
+      </a>
+      <span class="navbar-burger burger" data-target="navbarMenu">
+        <span>
+          <a class="navbar-item" href="/search">
+            <span class="icon"><i class="fas fa-compress-alt"></i></span>
+            <span>Сравнить слова</span>
+          </a>
+        </span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div id="navbarMenu" class="navbar-menu">
+      <div class="navbar-end">
+<!--        <div class="navbar-item has-dropdown is-hoverable">-->
+<!--        <a class="navbar-link">-->
+<!--          Темы новостей-->
+<!--        </a>-->
+<!--        <div class="navbar-dropdown">-->
+<!--          <a class="navbar-item">-->
+<!--            Политика-->
+<!--          </a>-->
+<!--          <a class="navbar-item">-->
+<!--            Экономика-->
+<!--          </a>-->
+<!--          <a class="navbar-item">-->
+<!--            Спорт-->
+<!--          </a>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--        <a class="navbar-item">-->
+<!--          В тренде-->
+<!--        </a>-->
+        <a class="navbar-item" href="/search">
+          <span class="icon"><i class="fas fa-compress-alt"></i></span>
+          <span>Сравнить слова</span>
+        </a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link">
+            <span class="icon"><i class="fas fa-star"></i></span>
+            <span>Сравнить слова</span>
+          </a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="/search?word_1=Путин&word_2=Байден">
+              Путин vs Байден
+            </a>
+            <a class="navbar-item" href="/search?word_1=Зенит&word_2=Спартак">
+              Зенит vs Спартак
+            </a>
+            <a class="navbar-item" href="/search?word_1=Tesla&word_2=Apple">
+              Tesla vs Apple
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

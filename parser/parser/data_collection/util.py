@@ -60,3 +60,11 @@ def is_comment_url(url):
 def extract_all_tags(xml_tag):
     soup = BeautifulSoup(xml_tag, 'xml')
     return [t.name for t in soup.descendants if t.name]
+
+
+def has_cyrillic(text):
+    return bool(re.search('[а-яА-Я]', text))
+
+
+def has_html(maybe_html_string):
+    return bool(BeautifulSoup(maybe_html_string, "html.parser").find())

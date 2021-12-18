@@ -1,0 +1,1 @@
+kill -9 $(ps -ef | grep parse_all | awk '{print $2}')

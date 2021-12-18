@@ -2,52 +2,14 @@
 <html lang="ru">
 
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% include 'header.html' %}
     <title>Новости - в реальном времени и с аналитикой</title>
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="stylesheet" href="{{ url_for('static', path='/css/bulma.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', path='/css/fontawesome/all.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', path='/css/custom.css') }}">
-    <script type="text/javascript" src="{{ url_for('static', path='/js/custom.js') }}"></script>
-    <link rel="stylesheet" href="https://bulma.io/vendor/fontawesome-free-5.15.2-web/css/all.min.css">
-
   </head>
 
   <body>
 
     <!-- START NAV -->
-    <nav class="navbar is-dark">
-      <div class="container">
-        <div class="navbar-brand">
-          <a class="navbar-item" href="#">
-            <img src="{{ url_for('static', path='/img/logo-rtn-white.png') }}" alt="Realtime news logo">
-          </a>
-          <span class="navbar-burger burger" data-target="navbarMenu">
-            <span></span>
-            <span></span>
-            <span></span>
-          </span>
-        </div>
-        <div id="navbarMenu" class="navbar-menu">
-          <div class="navbar-end">
-            <a class="navbar-item">
-              Категории
-            </a>
-            <a class="navbar-item">
-              В тренде
-            </a>
-            <a class="navbar-item">
-              О нас
-            </a>
-            <a class="navbar-item">
-              Личный кабинет
-            </a>
-          </div>
-        </div>
-      </div>
-    </nav>
+    {% include 'main-nav.html' %}
     <!-- END NAV -->
 
     <div class="container">
@@ -61,50 +23,70 @@
         </div>
 
         <!-- Filters -->
-        <div id="filters" class="row columns is-multiline">
+        <div id="filters1" class="row columns is-multiline">
 
-          <div class="column is-2 field">
-            <div class="control">
-              <input id="news-number" class="input" type="number" value="10">
-            </div>
-            <p class="help has-text-white">новостей</p>
-          </div>
-
-          <div class="column is-4 field is-horizontal">
-            <div class="field-body">
-              <div class="field">
-                <div class="control">
-                  <input id="date-start" class="input" type="date">
+          <div class="column">
+            <div class="field is-horizontal">
+              <div class="field-body">
+                <div class="field">
+                  <p class="control">
+                    <input id="news-number" class="input" type="number" min="5" max="200" value="10">
+<!--                    <div class="select">-->
+<!--                      <select id="news-number">-->
+<!--                        <option value="10" selected>10</option>-->
+<!--                        <option value="20">20</option>-->
+<!--                        <option value="30">30</option>-->
+<!--                        <option value="50">50</option>-->
+<!--                        <option value="100">100</option>-->
+<!--                      </select>-->
+<!--                    </div>-->
+                  </p>
+                  <p class="help has-text-white">новостей</p>
                 </div>
-                <p class="help has-text-white">от</p>
-              </div>
-              <div class="field">
-                <div class="control">
-                  <input id="date-end" class="input" type="date">
+                <div class="field">
+                  <p class="control">
+                    <input id="date-start" class="input" type="date">
+                  </p>
+                  <p class="help has-text-white">от</p>
                 </div>
-                <p class="help has-text-white">до</p>
+                <div class="field">
+                  <p class="control">
+                    <input id="date-end" class="input" type="date">
+                  </p>
+                  <p class="help has-text-white">до</p>
+                </div>
+                <div class="field">
+                  <div class="select">
+                    <select id="news-topic">
+                      <option value="" disabled selected>Выберите тему</option>
+                      {% if topics %}
+                      {% for topic in topics %}
+                      <option>{{ topic }}</option>
+                      {% endfor %}
+                      {% endif %}
+                    </select>
+                  </div>
+                  <p class="help has-text-white">тема</p>
+                </div>
+                <div class="field">
+                  <div class="control">
+                    <button id="update" class="button is-primary" onclick="updateFilters()">
+                      Поиск
+                    </button>
+                  </div>
+                </div>
+                <div class="field">
+                  <div class="control">
+                    <button id="clear" class="button is-danger is-outlined is-pulled-right" onclick="clearFilters()">
+                      <span class="icon">
+                        <i class="fas fa-times"></i>
+                      </span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-
-          <div class="column is-6 field">
-            <div class="select">
-              <select id="news-topic">
-                <option value="" disabled selected>Выберите тему</option>
-                {% if topics %}
-                {% for topic in topics %}
-                <option>{{ topic }}</option>
-                {% endfor %}
-                {% endif %}
-              </select>
-            </div>
-            <button id="clear" class="button is-danger is-outlined is-pulled-right" onclick="clearFilters()">
-              <span class="icon">
-                <i class="fas fa-times"></i>
-              </span>
-            </button>
-          </div>
-
         </div>
         <!-- End filters -->
 
@@ -122,20 +104,14 @@
               <div class="card-content">
                 <div class="media mb-3">
                   <div class="media-content">
-                    <p class="title is-5 no-padding">{{ card.title }}</p>
+                    <p class="title is-5 no-padding"><a href="/news/{{ card.id }}">{{ card.title | safe }}</a></p>
                   </div>
-                </div>
-                <div class="content mb-3">
-                  {% if card.content %}
-                  <span class="short-text"></span>
-                  <span class="full-text">{{ card.content | safe }}</span>
-                  <span class="text-dots">...</span>
-                  <b><span class="show-more-button" data-more="0">Показать новость полностью</span></b>
-                  {% endif %}
                 </div>
                 <div class="media-content mb-3">
                   {% if card.topic %}
                   <span class="tag is-primary">{{ card.topic }}</span>
+                  {% else %}
+                  <span class="tag is-primary">Общее</span>
                   {% endif %}
                   {% if card.tags %}
                   <span class="tag">{{ card.tags }}</span>
@@ -144,9 +120,9 @@
                 <div class="card-image">
                 <figure class="image is-16by9">
                   {% if card.image_url %}
-                  <img src="{{ card.image_url }}" alt="{{ card.title }}">
+                  <a href="/news/{{ card.id }}"><img src="{{ card.image_url }}" alt="{{ card.title }}"></a>
                   {% else %}
-                  <img src="{{ url_for('static', path='/img/news-placeholder.jpg') }}" alt="{{ card.title }}">
+                  <a href="/news/{{ card.id }}"><img src="{{ url_for('static', path='/img/news-placeholder.jpg') }}" alt="{{ card.title }}"></a>
                   {% endif %}
                 </figure>
               </div>
@@ -168,9 +144,9 @@
                     </div>
                     <div class="media-content">
                       {% if card.source_name %}
-                      <p class="subtitle is-6">{{ card.source_name }}</p>
+                      <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">{{ card.source_name }}</a></p>
                       {% else %}
-                      <p>Неизвестная газета</p>
+                      <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">Неизвестная газета</a></p>
                       {% endif %}
                     </div>
                   </div>
@@ -188,7 +164,7 @@
         <!-- Start stats -->
         <div class="row">
           <div class="box">
-            <h2 class="title is-3">N-граммы. Топ-30</h2>
+            <h2 class="title is-3">Контекст показанных новостей</h2>
             <div class="tags">
               {% if stats and stats.stats and (stats.type == "Ngrams") %}
               {% for ngram in stats.stats[:30] %}
@@ -204,21 +180,8 @@
 
     </div>
 
-    <footer class="footer is-dark">
-      <div class="container">
-        <div class="content has-text-centered">
-          <div class="soc">
-            <a href="#"><i class="fa fa-github-alt fa-lg" aria-hidden="true"></i></a>
-            <a href="#"><i class="fa fa-youtube fa-lg" aria-hidden="true"></i></a>
-            <a href="#"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a>
-            <a href="#"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a>
-          </div>
-          <p>
-            <strong>Realtime news</strong> by 5 nice guys.
-          </p>
-        </div>
-      </div>
-    </footer>
+    <!-- Footer -->
+    {% include 'footer.html' %}
 
   </body>
 

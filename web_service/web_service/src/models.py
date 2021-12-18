@@ -7,6 +7,7 @@ from typing import Optional
 
 
 class News(BaseModel):
+    id: int = None
     source_url: str = None
     title: str = None
     content: str = None

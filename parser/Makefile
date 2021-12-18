@@ -30,8 +30,9 @@ format:
 	$(VENV)/bin/unify --in-place --recursive $(ALL)
 
 up:
-	$(VENV)/bin/python parser/parse_news.py -d vk.json vk_db -start_urls parser/source_files/vk.url
-	$(VENV)/bin/python parser/parse_news.py -d rss_news.json rss_db -s parser/source_files/smi.url -r parser/data_collection/rss_parser.yaml
-	$(VENV)/bin/python parser/parse_tg.py get_last -to_db
+	/etc/init.d/cron start
+	crontab cron_schedule.txt
+	touch all.log
+	tail -f all.log
 
 ci:	lint parser/test

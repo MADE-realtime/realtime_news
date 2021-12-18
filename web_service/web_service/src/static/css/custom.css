@@ -18,3 +18,19 @@ body {
 .show-more-button{
     white-space: nowrap;
 }
+
+.title a, .media-content a {
+    color: #4a4a4a;
+}
+
+.media-left {
+    margin-right: 0.5rem;
+}
+
+.navbar-item .fa-compress-alt {
+    color: red;
+}
+
+.navbar-item .fa-star {
+    color: #ffcc1f;
+}
