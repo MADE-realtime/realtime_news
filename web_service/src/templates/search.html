@@ -2,53 +2,15 @@
 <html lang="ru">
 
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Сравнение слов - в реальном времени и с аналитикой / RTN</title>
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="stylesheet" href="{{ url_for('static', path='/css/bulma.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', path='/css/fontawesome/all.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', path='/css/custom.css') }}">
-    <script type="text/javascript" src="{{ url_for('static', path='/js/custom.js') }}"></script>
-    <link rel="stylesheet" href="https://bulma.io/vendor/fontawesome-free-5.15.2-web/css/all.min.css">
+    {% include 'header.html' %}
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-
+    <title>Сравнение слов - в реальном времени и с аналитикой / RTN</title>
   </head>
 
   <body>
 
     <!-- START NAV -->
-    <nav class="navbar is-dark">
-      <div class="container">
-        <div class="navbar-brand">
-          <a class="navbar-item" href="#">
-            <img src="{{ url_for('static', path='/img/logo-rtn-white.png') }}" alt="Realtime news logo">
-          </a>
-          <span class="navbar-burger burger" data-target="navbarMenu">
-            <span></span>
-            <span></span>
-            <span></span>
-          </span>
-        </div>
-        <div id="navbarMenu" class="navbar-menu">
-          <div class="navbar-end">
-            <a class="navbar-item">
-              Категории
-            </a>
-            <a class="navbar-item">
-              В тренде
-            </a>
-            <a class="navbar-item">
-              О нас
-            </a>
-            <a class="navbar-item">
-              Личный кабинет
-            </a>
-          </div>
-        </div>
-      </div>
-    </nav>
+    {% include 'main-nav.html' %}
     <!-- END NAV -->
 
     <div class="container">
@@ -105,11 +67,9 @@
         <!-- End filters -->
 
         <!-- Start stats -->
-        <div id="stats" class="row">
+        <div id="stats" class="row columns">
 
-          <div class="columns is-mobile">
-
-            <div class="column">
+          <div class="column">
               <div class="box content">
 
                 {% if words[0] %}
@@ -200,8 +160,6 @@
               </div>
             </div>
 
-          </div>
-
         </div>
         <!-- End stats -->
 
@@ -223,7 +181,7 @@
               <div class="card-content">
                 <div class="media mb-3">
                   <div class="media-content">
-                    <p class="title is-6 no-padding"><a href="/news/{{ card.id }}" target="_blank">{{ card.title }}</a></p>
+                    <p class="title is-6 no-padding"><a href="/news/{{ card.id }}" target="_blank">{{ card.title | safe }}</a></p>
                   </div>
                 </div>
                 <div class="content">
@@ -266,7 +224,7 @@
 
             {% if words[1] %}
             <h3 class="title is-5 mt-5" style="color: ghostwhite;">Новости по слову {{ words[1].capitalize() }}</h3>
-            <h4 class="subtitle" style="color: ghostwhite;">до 15 штук</h4>
+            <h4 class="subtitle" style="color: ghostwhite;">до 15 новостей</h4>
             {% endif %}
 
             {% for card in news_2[:15] %}
@@ -276,7 +234,7 @@
               <div class="card-content">
                 <div class="media mb-3">
                   <div class="media-content">
-                    <p class="title is-6 no-padding"><a href="/news/{{ card.id }}" target="_blank">{{ card.title }}</a></p>
+                    <p class="title is-6 no-padding"><a href="/news/{{ card.id }}" target="_blank">{{ card.title | safe }}</a></p>
                   </div>
                 </div>
                 <div class="content">
@@ -322,21 +280,8 @@
     </div>
 
 
-    <footer class="footer is-dark">
-      <div class="container">
-        <div class="content has-text-centered">
-          <div class="soc">
-            <a href="#"><i class="fa fa-github-alt fa-lg" aria-hidden="true"></i></a>
-            <a href="#"><i class="fa fa-youtube fa-lg" aria-hidden="true"></i></a>
-            <a href="#"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a>
-            <a href="#"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a>
-          </div>
-          <p>
-            <strong>Realtime news</strong> by 5 nice guys.
-          </p>
-        </div>
-      </div>
-    </footer>
+    <!-- Footer -->
+    {% include 'footer.html' %}
 
     {% block javascript %}
 
