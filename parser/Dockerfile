@@ -27,7 +27,7 @@ COPY parser/ parser/
 # copy libs
 COPY db_lib db_lib/
 # copy env
-COPY ../.env .env
+COPY .env .env
 
 
 WORKDIR /code/parser/

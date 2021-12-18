@@ -30,7 +30,7 @@ COPY ml_jobs/ ml_jobs/
 # copy libs
 COPY db_lib/ db_lib/
 # copy env
-COPY ../.env .env
+COPY .env .env
 
 
 WORKDIR /code/ml_jobs/

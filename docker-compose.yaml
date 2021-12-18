@@ -30,7 +30,7 @@ services:
 
   realtime_web:
     container_name: realtime_web
-    image: "terysy/realtime_web:12312"
+    image: "terysy/realtime_web:latest"
     build:
       context: .
       dockerfile: web_service/Dockerfile
@@ -47,7 +47,7 @@ services:
 
   realtime_ml_jobs:
     container_name: realtime_ml_jobs
-    image: "terysy/realtime_ml_jobs:12312"
+    image: "terysy/realtime_ml_jobs:latest"
     build:
       context: .
       dockerfile: ml_jobs/Dockerfile

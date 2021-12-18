@@ -21,17 +21,6 @@ jobs:
       - name: Publish web_service Docker image
         run: docker push --all-tags $REPO
 
-  redeploy-web:
-    name: Redeploy web webhook call
-    runs-on: ubuntu-18.04
-    needs: [docker-web]
-    steps:
-      - name: Deploy docker container webhook for web_service
-        uses: joelwmale/webhook-action@master
-        env:
-          WEBHOOK_URL: ${{ secrets.DEPLOY_WEBHOOK_URL_WEB  }}
-
-
   docker-parser:
     name: Publish - Docker Hub
     runs-on: ubuntu-18.04
@@ -46,17 +35,6 @@ jobs:
         run: docker build -t $REPO:latest -t $REPO:${GITHUB_SHA::8} -f parser/Dockerfile .
       - name: Publish parser Docker image
         run: docker push --all-tags $REPO
-
-  redeploy-parser:
-    name: Redeploy parser webhook call
-    runs-on: ubuntu-18.04
-    needs: [ docker-parser]
-    steps:
-      - name: Deploy docker container webhook for parser
-        uses: joelwmale/webhook-action@master
-        env:
-          WEBHOOK_URL: ${{ secrets.DEPLOY_WEBHOOK_URL_PARSER  }}
-
 
   docker-ml_jobs:
     name: Publish - Docker Hub
@@ -73,12 +51,13 @@ jobs:
       - name: Publish ml_jobs Docker image
         run: docker push --all-tags $REPO
 
-    redeploy-parser:
-      name: Redeploy ml_jobs webhook call
-      runs-on: ubuntu-18.04
-      needs: [ docker-ml_jobs ]
-      steps:
-        - name: Deploy docker container webhook for ml_jobs
-          uses: joelwmale/webhook-action@master
-          env:
-            WEBHOOK_URL: ${{ secrets.DEPLOY_WEBHOOK_URL_ML_JOBS }}
+
+  redeploy-parser:
+    name: Redeploy ml_jobs webhook call
+    runs-on: ubuntu-18.04
+    needs: [ docker-ml_jobs, docker-web, docker-parser ]
+    steps:
+      - name: Deploy all docker containers webhook
+        uses: joelwmale/webhook-action@master
+        env:
+          WEBHOOK_URL: ${{ secrets.DEPLOY_WEBHOOK_URL_ALL}}

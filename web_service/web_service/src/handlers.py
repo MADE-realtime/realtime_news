@@ -9,8 +9,8 @@ from fastapi.templating import Jinja2Templates
 from models import ListNews, News
 from news_extractor import BaseNewsExtractor, DBNewsExtractor
 from sqlalchemy.orm import Session
-from db_lib.database import get_db
 
+from db_lib.database import SessionLocal
 from utils import get_vs_plots_data, draw_by_day_plot
 from session_logging import session_log
 
@@ -21,6 +21,13 @@ NEWS_EXTRACTOR: BaseNewsExtractor = DBNewsExtractor()
 app.mount("/static", StaticFiles(directory="web_service/src/static"), name="static")
 templates = Jinja2Templates(directory="web_service/src/templates")
 
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 @app.get(
