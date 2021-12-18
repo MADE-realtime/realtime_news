@@ -33,7 +33,7 @@ services:
     image: "terysy/realtime_web:latest"
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: web_service/Dockerfile
     ports:
       - "80:8000"
     volumes:
@@ -45,12 +45,15 @@ services:
     links:
       - db
 
-  pgadmin:
-    container_name: pgadmin
-    ports:
-      - "5050:80"
-    image: dpage/pgadmin4
-    env_file: .env
+  realtime_ml_jobs:
+    container_name: realtime_ml_jobs
+    image: "terysy/realtime_ml_jobs:latest"
+    build:
+      context: .
+      dockerfile: ml_jobs/Dockerfile
     depends_on:
       db:
         condition: service_healthy
+    links:
+      - db
+

@@ -1,11 +1,10 @@
-CODE = web_service/web_service/src
+CODE = web_service/src
 TESTS = web_service/tests
+DB_LIB = ../db_lib
 
 ALL = $(CODE) $(TESTS)
 
 VENV ?= .venv
-
-clean_all_local: venv_rm cleanup poetry_lock venv
 
 all: migrate up
 
@@ -35,35 +34,10 @@ format:
 	$(VENV)/bin/unify --in-place --recursive $(ALL)
 
 migrate:
-	$(VENV)/bin/alembic -c db_lib/alembic.ini revision --autogenerate -m 'Added required tables'
-	$(VENV)/bin/alembic -c db_lib/alembic.ini upgrade head
-
-populate:
-	$(VENV)/bin/python $(CODE)/scripts/populate.py
+	$(VENV)/bin/alembic -c $(DB_LIB)/alembic.ini revision --autogenerate -m 'Added required tables'
+	$(VENV)/bin/alembic -c $(DB_LIB)/alembic.ini upgrade head
 
 up:
 	$(VENV)/bin/python $(CODE)/run_server.py
 
-service:
-	docker compose build
-	docker compose up
-
 ci:	lint test
-
-cleanup:
-	docker container prune
-	docker image prune
-	docker volume prune
-	docker system prune
-	docker builder prune
-	rm -rf migrations
-	rm -rf postgres*
-	rm -rf db_lib/dist
-
-poetry_lock:
-	cd parser && poetry lock
-	cd web_service && poetry lock
-	cd ml_jobs && poetry lock
-
-cluster:
-	$(VENV)/bin/python $(CODE)/clusterisation.py
