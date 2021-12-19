@@ -17,7 +17,7 @@ jobs:
         run: docker login -u ${{ secrets.DOCKER_USER }}
              -p ${{ secrets.DOCKER_PASS }}
       - name: Build web_service Docker image
-        run: docker build -t $REPO:latest -t $REPO:${GITHUB_SHA::8} .
+        run: docker build -t $REPO:latest -t $REPO:${GITHUB_SHA::8} -f web_service/Dockerfile .
       - name: Publish web_service Docker image
         run: docker push --all-tags $REPO
 
