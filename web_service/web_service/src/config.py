@@ -11,6 +11,7 @@ TEMPLATE_NAME = 'index.html'
 SEARCH_TEMPLATE_NAME = 'search.html'
 SINGLE_TEMPLATE_NAME = 'single.html'
 FAVICON_PATH = Path('web_service/src/static/img/favicon.ico')
+PATH_TO_CATEGORIES_CLASSIFICATOR = Path('models/model.save')
 PLOTLY_HTML_PATH = Path('web_service/src/templates/plotly')
 PLOTLY_IMAGES_PATH = Path('web_service/src/static/plotly')
 CLASS_OF_NEWS = ['Россия', 'Спорт', 'Экономика', 'Мир', 'Из жизни','Интернет и СМИ', 'Культура', 

@@ -1,16 +1,17 @@
+import pickle
 import re
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from datetime import datetime
+from pathlib import Path
 
 import numpy as np
-import pickle
 from typing import Dict, List
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from stop_words import get_stop_words
-from sklearn import pipeline, preprocessing, multiclass, naive_bayes
-from config import LANGUAGE, MIN_NGRAM_FREQ, CLASS_OF_NEWS
-from models import ListNews, News, StatisticsModels
+
+from web_service.web_service.src.config import LANGUAGE, MIN_NGRAM_FREQ, CLASS_OF_NEWS, PATH_TO_CATEGORIES_CLASSIFICATOR
+from web_service.web_service.src.models import ListNews, News, StatisticsModels
 
 
 class Statistics(ABC):
@@ -89,10 +90,11 @@ class ByDayCounter(Statistics):
         return StatisticsModels(type=self.name, stats=news_counter_list)
 
 
-class Classificator(Statistics):
-        def __init__(self):
-            self.builder = pickle.load(open('model.save', 'rb'))
-            self.name = 'Get_class_of_news'
+class CategoriesClassificator(Statistics):
+        def __init__(self, path_to_classifier: Path = Path('models/model.save')):
+            with open(path_to_classifier, 'rb') as file:
+                self.builder = pickle.load(file)
+            self.name = 'news_categories'
             self.class_news = CLASS_OF_NEWS
 
         def predict(self, news: List[News], *args, **kwargs) -> StatisticsModels:
@@ -101,7 +103,11 @@ class Classificator(Statistics):
             if not news_texts:
                 return StatisticsModels(type=self.name, stats='')
             ans_list = self.builder.predict(news_texts)
-            ans_list = [self.class_news[np.where(ans == 1)[0][0]] for ans in ans_list]
+            ans_list = [
+                (
+                    self.class_news[np.where(ans == 1)[0][0]], i
+                ) for i, ans in enumerate(ans_list)
+            ]
 
             return StatisticsModels(type=self.name, stats=ans_list)
     
