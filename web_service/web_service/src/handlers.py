@@ -48,6 +48,10 @@ async def main_handler(request: Request,
     :return:
     """
     # TODO: Проверка на пустые фильтры
+    if number < 5:
+        number = 5
+    elif number > 200:
+        number = 200
     if not end_date:
         end_date = datetime.date(datetime.now())
     news_list = NEWS_EXTRACTOR.show_news_by_filters(db, topic, end_date, start_date, number)

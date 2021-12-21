@@ -1,0 +1,1 @@
+0 0 * * * /code/ml_jobs/.venv/bin/python /code/ml_jobs/ml_jobs/clusterisation.py

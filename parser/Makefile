@@ -5,7 +5,7 @@ ALL = $(CODE) $(TESTS)
 
 VENV ?= .venv
 
-all:up
+all: up
 
 venv:
 	python3.8 -m venv $(VENV)
@@ -35,4 +35,4 @@ up:
 	touch all.log
 	tail -f all.log
 
-ci:	lint test
+ci:	lint parser/test

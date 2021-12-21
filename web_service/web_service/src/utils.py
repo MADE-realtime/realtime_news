@@ -12,7 +12,7 @@ def convert_str_to_date(str_date) -> date:
         return str_date
     if isinstance(str_date, datetime):
         return str_date.date()
-    return datetime.strptime(str_date, '%Y-%d-%m').date()
+    return datetime.strptime(str_date, '%Y-%m-%d').date()
 
 
 def list_tuples_to_lists(list_tuples) -> (List, List):
