@@ -11,6 +11,7 @@ from news_extractor import BaseNewsExtractor, DBNewsExtractor
 from sqlalchemy.orm import Session
 
 from db_lib.database import SessionLocal
+from db_lib import crud
 from utils import get_vs_plots_data, draw_by_day_plot
 from session_logging import session_log
 

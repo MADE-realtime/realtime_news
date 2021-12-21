@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from .models import News
+from .models import News, SocialNetworkNews
 from typing import List
 from datetime import date
 
@@ -18,14 +18,14 @@ def get_news_by_filters(db: Session,
                         limit: int = 100) -> List[News]:
     if topic:
         return db.query(News) \
-            .order_by(News.id.desc())\
+            .order_by(News.time.desc())\
             .filter(News.topic == topic) \
             .filter(News.date >= start_date) \
             .filter(News.date <= end_date) \
             .offset(skip).limit(limit).all()
     else:
         return db.query(News) \
-            .order_by(News.id.desc())\
+            .order_by(News.time.desc())\
             .filter(News.date >= start_date) \
             .filter(News.date <= end_date) \
             .offset(skip).limit(limit).all()
@@ -68,6 +68,12 @@ def get_news_by_date(db: Session,
         .filter(News.time >= start_date) \
         .filter(News.time <= end_date) \
         .offset(skip).limit(limit).all()
+
+
+def get_news_count(db: Session) -> int:
+    news_count = db.query(News.id).count()
+    social_news_count = db.query(SocialNetworkNews.id).count()
+    return news_count + social_news_count
 
 
 def create_news(db: Session, news: News):
