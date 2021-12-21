@@ -32,7 +32,7 @@ format:
 up:
 	/etc/init.d/cron start
 	crontab cron_schedule.txt
-	touch all.log
-	tail -f all.log
+	touch parser/all.log
+	tail -f parser/all.log
 
 ci:	lint parser/test
