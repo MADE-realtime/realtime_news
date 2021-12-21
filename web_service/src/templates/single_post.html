@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="{{ url_for('static', path='/css/custom.css') }}">
     <script type="text/javascript" src="{{ url_for('static', path='/js/custom.js') }}"></script>
     <link rel="stylesheet" href="https://bulma.io/vendor/fontawesome-free-5.15.2-web/css/all.min.css">
-
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   </head>
 
   <body>
@@ -81,6 +81,18 @@
                 <p>Это короткая новость без текста.</p>
               </div>
               {% endif %}
+              {% if comments_plot %}
+                <div id="comments-plot" style="width: 100%; height: 300px;"></div>
+              {% endif %}
+              {% if likes_plot %}
+                <div id="likes-plot" style="width: 100%; height: 300px;"></div>
+              {% endif %}
+              {% if views_plot %}
+                <div id="views-plot" style="width: 100%; height: 300px;"></div>
+              {% endif %}
+              {% if reposts_plot %}
+                <div id="reposts-plot" style="width: 100%; height: 300px;"></div>
+              {% endif %}
             </div>
             <div class="content">
               {% if single_news.time %}
@@ -144,6 +156,86 @@
         </div>
       </div>
     </footer>
+
+    {% block javascript %}
+
+    {% if comments_plot %}
+    <script type="text/javascript">
+      BYDAYONE = document.getElementById('comments-plot');
+
+      Plotly.plot( BYDAYONE, [{
+        x: {{ comments_plot.x | tojson }},
+        y: {{ comments_plot.y | tojson }}
+        }],
+        {
+        margin: { t: 1 },
+        xaxis: { showline: true, domain: [0, 1], showgrid: true, rangemode: "tozero" },
+        yaxis: { showline: true, rangemode: "tozero" },
+        height: 230,
+        },
+        {showSendToCloud:true}
+      );
+    </script>
+    {% endif %}
+
+    {% if likes_plot %}
+    <script type="text/javascript">
+      BYDAYONE = document.getElementById('likes-plot');
+
+      Plotly.plot( BYDAYONE, [{
+        x: {{ likes_plot.x | tojson }},
+        y: {{ likes_plot.y | tojson }}
+        }],
+        {
+        margin: { t: 1 },
+        xaxis: { showline: true, domain: [0, 1], showgrid: true, rangemode: "tozero" },
+        yaxis: { showline: true, rangemode: "tozero" },
+        height: 230,
+        },
+        {showSendToCloud:true}
+      );
+    </script>
+    {% endif %}
+
+    {% if views_plot %}
+    <script type="text/javascript">
+      BYDAYONE = document.getElementById('views-plot');
+
+      Plotly.plot( BYDAYONE, [{
+        x: {{ views_plot.x | tojson }},
+        y: {{ views_plot.y | tojson }}
+        }],
+        {
+        margin: { t: 1 },
+        xaxis: { showline: true, domain: [0, 1], showgrid: true, rangemode: "tozero" },
+        yaxis: { showline: true, rangemode: "tozero" },
+        height: 230,
+        },
+        {showSendToCloud:true}
+      );
+    </script>
+    {% endif %}
+
+    {% if reposts_plot %}
+    <script type="text/javascript">
+      BYDAYONE = document.getElementById('reposts-plot');
+
+      Plotly.plot( BYDAYONE, [{
+        x: {{ reposts_plot.x | tojson }},
+        y: {{ reposts_plot.y | tojson }}
+        }],
+        {
+        margin: { t: 1 },
+        xaxis: { showline: true, domain: [0, 1], showgrid: true, rangemode: "tozero" },
+        yaxis: { showline: true, rangemode: "tozero" },
+        height: 230,
+        },
+        {showSendToCloud:true}
+      );
+    </script>
+    {% endif %}
+
+    {% endblock %}
 
   </body>
 
