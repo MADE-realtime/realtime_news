@@ -1,18 +1,17 @@
-from typing import List, Optional
+from typing import Optional
 
-from config import FAVICON_PATH, TEMPLATE_NAME, SEARCH_TEMPLATE_NAME, SINGLE_TEMPLATE_NAME
+from config import FAVICON_PATH, TEMPLATE_NAME, SEARCH_TEMPLATE_NAME, SINGLE_TEMPLATE_NAME, SINGLE_POST_TEMPLATE_NAME
 from datetime import datetime
 from fastapi import Depends, FastAPI, Request, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from models import ListNews, News
+from models import ListNews
 from news_extractor import BaseNewsExtractor, DBNewsExtractor
 from sqlalchemy.orm import Session
 
 from db_lib.database import SessionLocal
-from db_lib import crud
-from utils import get_vs_plots_data, draw_by_day_plot
+from utils import get_vs_plots_data, get_vk_tg_stat_plot
 from session_logging import session_log
 
 app = FastAPI()
@@ -97,6 +96,7 @@ async def vs_search_handler(request: Request,
     response_class=HTMLResponse,
     # response_model=ListNews,
 )
+@session_log
 async def single_news_handler(
         request: Request, news_id: int, db: Session = Depends(get_db)
 ):
@@ -174,6 +174,39 @@ def get_topic_handler(
     return templates.TemplateResponse(
         TEMPLATE_NAME, {"request": request, 'news': news_list.news_list, 'stats': news_list.statistics}
     )
+
+
+@app.get(
+    '/vk_tg/{news_id}',
+    response_class=HTMLResponse,
+    # response_model=ListNews,
+)
+@session_log
+async def single_vk_tg_handler(
+        request: Request, news_id: int, db: Session = Depends(get_db)
+):
+    """
+    Get vk_tg news
+    :return:
+    """
+    news = NEWS_EXTRACTOR.show_vk_tg_news(db, news_id)['single_news']
+    post_id = news.post_id
+    social_network = news.social_network
+    news_stat = NEWS_EXTRACTOR.show_vk_tg_stat(db, post_id, social_network)
+    news_stat = get_vk_tg_stat_plot(news_stat)
+    if news:
+        return templates.TemplateResponse(
+            SINGLE_POST_TEMPLATE_NAME, {
+                "request": request,
+                'single_news':  news,
+                'comments_plot': news_stat['comments'],
+                'likes_plot': news_stat['likes'],
+                'views_plot': news_stat['views'],
+                'reposts_plot': news_stat['reposts'],
+            }
+        )
+    else:
+        raise HTTPException(status_code=404, detail="No news with such id found")
 
 
 @app.get('/favicon.ico', response_class=FileResponse, include_in_schema=False)

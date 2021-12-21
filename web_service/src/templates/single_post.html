@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ single_news.title }} / Новости / RTN</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/bulma.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/fontawesome/all.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/custom.css') }}">
+    <script type="text/javascript" src="{{ url_for('static', path='/js/custom.js') }}"></script>
+    <link rel="stylesheet" href="https://bulma.io/vendor/fontawesome-free-5.15.2-web/css/all.min.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- START NAV -->
+    <nav class="navbar is-dark">
+      <div class="container">
+        <div class="navbar-brand">
+          <a class="navbar-item" href="#">
+            <img src="{{ url_for('static', path='/img/logo-rtn-white.png') }}" alt="Realtime news logo">
+          </a>
+          <span class="navbar-burger burger" data-target="navbarMenu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+        </div>
+        <div id="navbarMenu" class="navbar-menu">
+          <div class="navbar-end">
+            <a class="navbar-item">
+              Категории
+            </a>
+            <a class="navbar-item">
+              В тренде
+            </a>
+            <a class="navbar-item">
+              О нас
+            </a>
+            <a class="navbar-item">
+              Личный кабинет
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <!-- END NAV -->
+
+    <div class="container">
+
+      <div class="section">
+
+        <div class="columns mb-6">
+          <div class="column is-2">
+            <a href="/" class="button is-medium">
+              <span class="icon is-medium">
+                <i class="fas fa-arrow-left"></i>
+              </span>
+              <span>Главная</span>
+            </a>
+          </div>
+          <div class="column is-8 has-text-centered">
+            <h1 class="title is-1" style="color: ghostwhite;">{{ single_news.title }}</h1>
+          </div>
+        </div>
+
+        <!-- Start news -->
+        <div id="news" class="row columns mb-6">
+          <div class="column is-8 is-offset-2 box p-6">
+            <div class="content">
+              {% if single_news.text %}
+              <div>
+                {{ single_news.text | safe }}
+              </div>
+              {% else %}
+              <div>
+                <p>Это короткая новость без текста.</p>
+              </div>
+              {% endif %}
+              {% if comments_plot %}
+                <div id="comments-plot" style="width: 100%; height: 300px;"></div>
+              {% endif %}
+              {% if likes_plot %}
+                <div id="likes-plot" style="width: 100%; height: 300px;"></div>
+              {% endif %}
+              {% if views_plot %}
+                <div id="views-plot" style="width: 100%; height: 300px;"></div>
+              {% endif %}
+              {% if reposts_plot %}
+                <div id="reposts-plot" style="width: 100%; height: 300px;"></div>
+              {% endif %}
+            </div>
+            <div class="content">
+              {% if single_news.time %}
+              <time datetime="{{ single_news.date }}">{{ single_news.time }}</time>
+              {% else %}
+              <span>Сегодня</span>
+              {% endif %}
+              <div class="media">
+                <div class="media-left">
+                  <figure class="image is-16x16 m-0">
+                    {% if single_news.logo_url %}
+                    <img src="{{ single_news.logo_url }}" alt="{{ single_news.source_name }}">
+                    {% else %}
+                    <img src="{{ url_for('static', path='/img/rtn-small-logo.png') }}" alt="{{ single_news.source_name }}">
+                    {% endif %}
+                  </figure>
+                </div>
+                <div class="content">
+                  {% if single_news.source_name %}
+                  <p class="subtitle is-6">{{ single_news.source_name }}</p>
+                  {% else %}
+                  <p>Неизвестная газета</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Start stats -->
+<!--        <div class="row">-->
+<!--          <div class="box">-->
+<!--            <h2 class="title is-3">N-граммы. Топ-30</h2>-->
+<!--            <div class="tags">-->
+<!--              {% if stats and stats.stats and (stats.type == "Ngrams") %}-->
+<!--              {% for ngram in stats.stats[:30] %}-->
+<!--              <span class="tag">{{ngram[0]}}: {{ngram[1]}}</span>-->
+<!--              {% endfor %}-->
+<!--              {% endif %}-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+        <!-- End stats -->
+
+      </div>
+
+    </div>
+
+    <footer class="footer is-dark">
+      <div class="container">
+        <div class="content has-text-centered">
+          <div class="soc">
+            <a href="#"><i class="fa fa-github-alt fa-lg" aria-hidden="true"></i></a>
+            <a href="#"><i class="fa fa-youtube fa-lg" aria-hidden="true"></i></a>
+            <a href="#"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a>
+            <a href="#"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a>
+          </div>
+          <p>
+            <strong>Realtime news</strong> by 5 nice guys.
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    {% block javascript %}
+
+    {% if comments_plot %}
+    <script type="text/javascript">
+      BYDAYONE = document.getElementById('comments-plot');
+
+      Plotly.plot( BYDAYONE, [{
+        x: {{ comments_plot.x | tojson }},
+        y: {{ comments_plot.y | tojson }}
+        }],
+        {
+        margin: { t: 1 },
+        xaxis: { showline: true, domain: [0, 1], showgrid: true, rangemode: "tozero" },
+        yaxis: { showline: true, rangemode: "tozero" },
+        height: 230,
+        },
+        {showSendToCloud:true}
+      );
+    </script>
+    {% endif %}
+
+    {% if likes_plot %}
+    <script type="text/javascript">
+      BYDAYONE = document.getElementById('likes-plot');
+
+      Plotly.plot( BYDAYONE, [{
+        x: {{ likes_plot.x | tojson }},
+        y: {{ likes_plot.y | tojson }}
+        }],
+        {
+        margin: { t: 1 },
+        xaxis: { showline: true, domain: [0, 1], showgrid: true, rangemode: "tozero" },
+        yaxis: { showline: true, rangemode: "tozero" },
+        height: 230,
+        },
+        {showSendToCloud:true}
+      );
+    </script>
+    {% endif %}
+
+    {% if views_plot %}
+    <script type="text/javascript">
+      BYDAYONE = document.getElementById('views-plot');
+
+      Plotly.plot( BYDAYONE, [{
+        x: {{ views_plot.x | tojson }},
+        y: {{ views_plot.y | tojson }}
+        }],
+        {
+        margin: { t: 1 },
+        xaxis: { showline: true, domain: [0, 1], showgrid: true, rangemode: "tozero" },
+        yaxis: { showline: true, rangemode: "tozero" },
+        height: 230,
+        },
+        {showSendToCloud:true}
+      );
+    </script>
+    {% endif %}
+
+    {% if reposts_plot %}
+    <script type="text/javascript">
+      BYDAYONE = document.getElementById('reposts-plot');
+
+      Plotly.plot( BYDAYONE, [{
+        x: {{ reposts_plot.x | tojson }},
+        y: {{ reposts_plot.y | tojson }}
+        }],
+        {
+        margin: { t: 1 },
+        xaxis: { showline: true, domain: [0, 1], showgrid: true, rangemode: "tozero" },
+        yaxis: { showline: true, rangemode: "tozero" },
+        height: 230,
+        },
+        {showSendToCloud:true}
+      );
+    </script>
+    {% endif %}
+
+    {% endblock %}
+
+  </body>
+
+</html>

@@ -66,6 +66,12 @@ class BaseNewsExtractor(ABC):
         """
         pass
 
+    def show_vk_tg_news(self, db, news_id):
+        pass
+
+    def show_vk_tg_stat(self, db, post_id, social_network):
+        pass
+
 
 class PandasNewsExtractor(BaseNewsExtractor):
     def __init__(self, path_to_df: Path):
@@ -242,6 +248,17 @@ class DBNewsExtractor(BaseNewsExtractor):
         return {
             'single_news': single_news,
         }
+
+    def show_vk_tg_news(self, db: Session, news_id: int) -> Dict:
+        vk_tg_news = crud.get_social_network_news(db, news_id)
+        return {
+            'single_news': vk_tg_news,
+        }
+
+    def show_vk_tg_stat(self, db: Session, post_id: int, social_network: str):
+        vk_tg_stat = crud.get_social_network_stats(db, post_id, social_network)  # List[SocialNetworkStats]
+        return vk_tg_stat
+
 
 
 def _to_str(text):
