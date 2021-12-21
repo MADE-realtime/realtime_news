@@ -4,11 +4,14 @@ from sklearn.cluster import AgglomerativeClustering
 import fasttext.util
 import numpy as np
 
-from db_lib.crud import get_all_news
+from datetime import date
+from db_lib.crud import get_news_by_filters
 from config import LANGUAGE_SHORT_FOR_FASTTEXT, LIMIT_NEWS
 from db_lib.models import News
 from db_lib.database import SessionLocal
 from sqlalchemy.orm import Session
+import click
+import numpy
 
 
 def download_language_model():
@@ -25,6 +28,9 @@ def clean_nones_from_content(news_list: List[News]) -> List[News]:
 
 
 def cluster_news_content(news_list: List[News]) -> np.ndarray:
+    if not news_list:
+        return numpy.array(news_list)
+
     model = download_language_model()
     clusterer = AgglomerativeClustering(
         n_clusters=None,
@@ -32,17 +38,23 @@ def cluster_news_content(news_list: List[News]) -> np.ndarray:
         linkage='complete',
         distance_threshold=0.25,
     )
-    news_list = clean_nones_from_content(news_list)
-    content_emb = [model[one_news.content] for one_news in news_list]
-    clusters = clusterer.fit_predict(content_emb)
+    # news_list = clean_nones_from_content(news_list)
+    # content_emb = [model[one_news.content] for one_news in news_list]
+    title_emb = [model[one_news.title] for one_news in news_list]
+    clusters = clusterer.fit_predict(title_emb)
     return clusters
 
 
-def cluster_messages(db: Session = SessionLocal()):
+@click.command()
+@click.option("--start_date", type=click.DateTime(formats=["%Y-%m-%d"]),
+              default=str(date.today()))
+@click.option("--end_date", type=click.DateTime(formats=["%Y-%m-%d"]),
+              default=str(date.today()))
+def cluster_messages(start_date: date, end_date: date, db: Session = SessionLocal()):
 
     """Загружаем все сообщения (пока сообщений немного) и кластеризуем их с помощью кластеризатора"""
 
-    news_list = get_all_news(db, limit=LIMIT_NEWS)
+    news_list = get_news_by_filters(db, topic=None, start_date=start_date, end_date=end_date, limit=LIMIT_NEWS)
     cluster_num = cluster_news_content(news_list)
     for i in range(len(news_list)):
         news_list[i].cluster_num = cluster_num[i].item()

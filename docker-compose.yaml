@@ -1,4 +1,5 @@
-version: "2.1"
+version: "3.7"
+
 services:
   db:
     container_name: db
@@ -45,15 +46,14 @@ services:
     links:
       - db
 
-  realtime_ml_jobs:
-    container_name: realtime_ml_jobs
-    image: "terysy/realtime_ml_jobs:latest"
-    build:
-      context: .
-      dockerfile: ml_jobs/Dockerfile
-    depends_on:
-      db:
-        condition: service_healthy
-    links:
-      - db
-
+#  realtime_clusterisation:
+#    container_name: realtime_clusterisation
+#    image: "terysy/realtime_clusterisation:latest"
+#    build:
+#      context: .
+#      dockerfile: clusterisation/Dockerfile
+#    depends_on:
+#      db:
+#        condition: service_healthy
+#    links:
+#      - db

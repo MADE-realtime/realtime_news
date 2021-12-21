@@ -22,23 +22,21 @@ RUN apt-get update \
         libgraphviz-dev \
         libpq-dev \
         make \
-        cron \
  && rm -rf /var/lib/apt/lists/*
 
 # copy code
-COPY ml_jobs/ ml_jobs/
+COPY clusterisation/ clusterisation/
 # copy libs
 COPY db_lib/ db_lib/
 # copy env
 COPY .env .env
 
 
-WORKDIR /code/ml_jobs/
+WORKDIR /code/clusterisation/
 
 # install dependencies
 RUN make venv
 ## drop poetry
 RUN pip uninstall --yes poetry
 ## run it
-ENTRYPOINT [""]
-CMD ["make"]
+ENTRYPOINT ["make", "cluster-last"]

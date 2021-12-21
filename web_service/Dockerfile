@@ -11,11 +11,7 @@ WORKDIR /code/
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
         gcc \
-        libxml2-dev \
-        libxslt1-dev \
         libsasl2-dev \
-        zlib1g-dev \
-        g++ \
         libldap2-dev \
         libssl-dev \
         graphviz \

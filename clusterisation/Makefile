@@ -1,7 +1,4 @@
-CODE = ml_jobs
 DB_LIB = ../db_lib
-
-ALL = $(CODE) $(TESTS)
 
 VENV ?= .venv
 
@@ -29,14 +26,17 @@ format:
 	$(VENV)/bin/autoflake --recursive --in-place --remove-all-unused-imports $(ALL)
 	$(VENV)/bin/unify --in-place --recursive $(ALL)
 
+cluster-old:
+	$(VENV)/bin/python clusterisation.py --start_date=2012-09-05 --end_date=2021-12-05
+
 cluster:
-	$(VENV)/bin/python $(CODE)/clusterisation.py
+	$(VENV)/bin/python clusterisation.py --start_date=2021-12-11 --end_date=2021-12-15
+
+cluster-last:
+	$(VENV)/bin/python clusterisation.py --start_date=2021-12-16
 
 cluster-local:
-	python $(CODE)/clusterisation.py
-
-populate:
-	$(VENV)/bin/python $(CODE)/scripts/populate.py
+	$(VENV)/bin/python clusterisation.py
 
 up:
 	/etc/init.d/cron start
