@@ -84,7 +84,7 @@ def get_social_network_stats(db: Session,
 
 
 def get_social_network_stats_by_domain(db: Session,
-                                       domain: str) -> SocialNetworkStats:
+                                       domain: str):
     join_expression = (SocialNetworkStats.post_id == SocialNetworkNews.post_id) & \
                       (SocialNetworkStats.social_network == SocialNetworkNews.social_network)
     query = [
@@ -93,7 +93,12 @@ def get_social_network_stats_by_domain(db: Session,
         func.max(SocialNetworkStats.views).label('views'),
         func.max(SocialNetworkStats.likes).label('likes'),
     ]
-    return db.query(query) \
+    return db.query(
+        SocialNetworkStats.post_id,
+        SocialNetworkNews.date,
+        SocialNetworkNews.social_network,
+        *query
+    ) \
         .join(SocialNetworkNews, join_expression)\
         .filter(SocialNetworkNews.source_name == domain)\
         .group_by(
