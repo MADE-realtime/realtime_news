@@ -14,5 +14,6 @@ FAVICON_PATH = Path('web_service/src/static/img/favicon.ico')
 PATH_TO_CATEGORIES_CLASSIFICATOR = Path('models/model.save')
 PLOTLY_HTML_PATH = Path('web_service/src/templates/plotly')
 PLOTLY_IMAGES_PATH = Path('web_service/src/static/plotly')
-CLASS_OF_NEWS = ['Россия', 'Спорт', 'Экономика', 'Мир', 'Из жизни','Интернет и СМИ', 'Культура', 
-                           'Наука и техника', 'Преступность']
+CLASS_OF_NEWS = ['Россия', 'Спорт', 'Экономика',
+                 'Мир', 'Из жизни','Интернет и СМИ', 'Культура',
+                 'Наука и техника', 'Преступность']
