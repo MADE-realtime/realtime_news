@@ -201,7 +201,6 @@ class DBNewsExtractor(BaseNewsExtractor):
                 'news_list': news_list,
                 'statistics': [
                     NgramsBuilder().predict(news_list),
-                    CategoriesClassificator().predict(news_list),
                     StatisticsByResource().predict(news_list),
                     ByDayCounter().predict(news_list),
                 ]
@@ -233,7 +232,6 @@ class DBNewsExtractor(BaseNewsExtractor):
                     NgramsBuilder().predict(selected_news, cnt),
                     StatisticsByResource().predict(selected_news),
                     ByDayCounter().predict(selected_news),
-                    CategoriesClassificator().predict(selected_news),
                 ]
             }
         )

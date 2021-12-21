@@ -12,9 +12,9 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from stop_words import get_stop_words
 from wordcloud import WordCloud
 
-from web_service.web_service.src.config import LANGUAGE, MIN_NGRAM_FREQ, CLASS_OF_NEWS, \
+from config import LANGUAGE, MIN_NGRAM_FREQ, CLASS_OF_NEWS, \
     PATH_TO_CATEGORIES_CLASSIFICATOR, WORDCLOUD_IMAGE_NAME, PATH_TO_SAVE_IMAGE
-from web_service.web_service.src.models import ListNews, News, StatisticsModels
+from models import ListNews, News, StatisticsModels
 
 
 class Statistics(ABC):
@@ -35,11 +35,12 @@ class NgramsBuilder(Statistics):
         self.name = 'Ngrams'
 
     def predict(self, news: List[News], cnt: int = 0, *args, **kwargs) -> StatisticsModels:
-        news_texts = [one_news.content for one_news in news if one_news.content]
+        news_texts = [one_news.title + ' ' + one_news.content for one_news in news if one_news.content]
         news_texts = self._cut_non_cyrillic_characters(news_texts)
-        self.build_word_count_image(news_texts, cnt)
         if not news_texts:
             return StatisticsModels(type=self.name, stats=[('none', 0)])
+        if cnt:
+            self.build_word_count_image(news_texts, cnt)
         frequencies = np.array(
             np.sum(self.builder.fit_transform(news_texts).todense(), axis=0)
         )[0]
@@ -71,7 +72,8 @@ class NgramsBuilder(Statistics):
         plt.figure()
         plt.imshow(wordcloud, interpolation="bilinear")
         plt.axis("off")
-        plt.savefig(PATH_TO_SAVE_IMAGE / Path(f'{WORDCLOUD_IMAGE_NAME}_{cnt}.png'))
+        Path(PATH_TO_SAVE_IMAGE).mkdir(parents=True, exist_ok=True)
+        plt.savefig(PATH_TO_SAVE_IMAGE / Path(f'{WORDCLOUD_IMAGE_NAME}{cnt}.png'), pad_inches=0)
         return None
 
 
