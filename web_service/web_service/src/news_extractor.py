@@ -13,7 +13,7 @@ from utils import convert_str_to_date
 from config import LIMIT_NEWS
 from db_lib import crud
 from db_lib.database import SessionLocal
-from statistics import NgramsBuilder, StatisticsByResource, ByDayCounter
+from statistics import NgramsBuilder, StatisticsByResource, ByDayCounter, CategoriesClassificator
 
 
 class BaseNewsExtractor(ABC):
@@ -53,7 +53,7 @@ class BaseNewsExtractor(ABC):
         pass
 
     @abstractmethod
-    def show_news_by_regex(self, db: Session, word: str):
+    def show_news_by_regex(self, db: Session, word: str, mode: str, cnt: int):
         """
         Метод для поиска новостей по регулярному выражению
         """
@@ -199,11 +199,16 @@ class DBNewsExtractor(BaseNewsExtractor):
         return ListNews.parse_obj(
             {
                 'news_list': news_list,
-                'statistics': [NgramsBuilder().predict(news_list)]
+                'statistics': [
+                    NgramsBuilder().predict(news_list),
+                    CategoriesClassificator().predict(news_list),
+                    StatisticsByResource().predict(news_list),
+                    ByDayCounter().predict(news_list),
+                ]
             }
         )
 
-    def show_news_by_regex(self, db: Session, word: str, mode: str = 'full') -> ListNews:
+    def show_news_by_regex(self, db: Session, word: str, mode: str = 'full', cnt: int = 2) -> ListNews:
         if word:
             news_list = crud.get_n_last_news(db, limit=LIMIT_NEWS)
         else:
@@ -225,9 +230,10 @@ class DBNewsExtractor(BaseNewsExtractor):
             {
                 'news_list': selected_news,
                 'statistics': [
-                    NgramsBuilder().predict(selected_news),
+                    NgramsBuilder().predict(selected_news, cnt),
                     StatisticsByResource().predict(selected_news),
                     ByDayCounter().predict(selected_news),
+                    CategoriesClassificator().predict(selected_news),
                 ]
             }
         )

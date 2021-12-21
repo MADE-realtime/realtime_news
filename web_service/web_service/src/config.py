@@ -11,7 +11,11 @@ TEMPLATE_NAME = 'index.html'
 SEARCH_TEMPLATE_NAME = 'search.html'
 SINGLE_TEMPLATE_NAME = 'single.html'
 FAVICON_PATH = Path('web_service/src/static/img/favicon.ico')
+PATH_TO_SAVE_IMAGE = Path('web_service/web_service/src/static/wordcloud_images')
+PATH_TO_CATEGORIES_CLASSIFICATOR = Path('web_service/web_service/src/models/model.save')
 PLOTLY_HTML_PATH = Path('web_service/src/templates/plotly')
 PLOTLY_IMAGES_PATH = Path('web_service/src/static/plotly')
-CLASS_OF_NEWS = ['Россия', 'Спорт', 'Экономика', 'Мир', 'Из жизни', 'Интернет и СМИ', 'Культура',
-                           'Наука и техника', 'Преступность']
+CLASS_OF_NEWS = ['Россия', 'Спорт', 'Экономика',
+                 'Мир', 'Из жизни', 'Интернет и СМИ', 'Культура',
+                 'Наука и техника', 'Преступность']
+WORDCLOUD_IMAGE_NAME = 'wordcloud_image_'
