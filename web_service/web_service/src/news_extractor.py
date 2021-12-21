@@ -207,7 +207,7 @@ class DBNewsExtractor(BaseNewsExtractor):
             }
         )
 
-    def show_news_by_regex(self, db: Session, word: str, mode: str = 'full', cnt: int = 0) -> ListNews:
+    def show_news_by_regex(self, db: Session, word: str, mode: str = 'full', cnt: int = 2) -> ListNews:
         if word:
             news_list = crud.get_n_last_news(db, limit=LIMIT_NEWS)
         else:

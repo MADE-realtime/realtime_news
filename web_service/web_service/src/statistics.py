@@ -64,7 +64,7 @@ class NgramsBuilder(Statistics):
         return bool(re.search('[а-яА-Я]', text))
 
     @staticmethod
-    def build_word_count_image(news_texts: List[str], cnt: int = 0) -> None:
+    def build_word_count_image(news_texts: List[str], cnt: int = 2) -> None:
         wordcloud = WordCloud(
             stopwords=get_stop_words(LANGUAGE)
         ).generate(text=''.join(news_texts))
