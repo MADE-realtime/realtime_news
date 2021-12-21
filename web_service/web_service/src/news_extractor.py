@@ -195,6 +195,7 @@ class DBNewsExtractor(BaseNewsExtractor):
         # news_list = random.choices(news_list, k=num_random_news)
         news_list = _clean_img_urls(news_list)
 
+        # Не менять порядок в statistics
         return ListNews.parse_obj(
             {
                 'news_list': news_list,

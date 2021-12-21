@@ -48,7 +48,6 @@ async def main_handler(request: Request,
     Get random number news by filters
     :return:
     """
-    # TODO: Проверка на пустые фильтры
     if number < 5:
         number = 5
     elif number > 200:
