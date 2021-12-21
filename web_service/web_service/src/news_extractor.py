@@ -53,7 +53,7 @@ class BaseNewsExtractor(ABC):
         pass
 
     @abstractmethod
-    def show_news_by_regex(self, db: Session, word: str):
+    def show_news_by_regex(self, db: Session, word: str, mode: str, cnt: int):
         """
         Метод для поиска новостей по регулярному выражению
         """
@@ -207,7 +207,7 @@ class DBNewsExtractor(BaseNewsExtractor):
             }
         )
 
-    def show_news_by_regex(self, db: Session, word: str, mode: str = 'full') -> ListNews:
+    def show_news_by_regex(self, db: Session, word: str, mode: str = 'full', cnt: int = 0) -> ListNews:
         if word:
             news_list = crud.get_n_last_news(db, limit=LIMIT_NEWS)
         else:
@@ -229,7 +229,7 @@ class DBNewsExtractor(BaseNewsExtractor):
             {
                 'news_list': selected_news,
                 'statistics': [
-                    NgramsBuilder().predict(selected_news),
+                    NgramsBuilder().predict(selected_news, cnt),
                     StatisticsByResource().predict(selected_news),
                     ByDayCounter().predict(selected_news),
                     CategoriesClassificator().predict(selected_news),

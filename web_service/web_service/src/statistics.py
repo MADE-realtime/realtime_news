@@ -5,12 +5,15 @@ from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 from typing import Dict, List
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from stop_words import get_stop_words
+from wordcloud import WordCloud
 
-from web_service.web_service.src.config import LANGUAGE, MIN_NGRAM_FREQ, CLASS_OF_NEWS, PATH_TO_CATEGORIES_CLASSIFICATOR
+from web_service.web_service.src.config import LANGUAGE, MIN_NGRAM_FREQ, CLASS_OF_NEWS, \
+    PATH_TO_CATEGORIES_CLASSIFICATOR, WORDCLOUD_IMAGE_NAME, PATH_TO_SAVE_IMAGE
 from web_service.web_service.src.models import ListNews, News, StatisticsModels
 
 
@@ -31,9 +34,10 @@ class NgramsBuilder(Statistics):
         )
         self.name = 'Ngrams'
 
-    def predict(self, news: List[News], *args, **kwargs) -> StatisticsModels:
+    def predict(self, news: List[News], cnt: int = 0, *args, **kwargs) -> StatisticsModels:
         news_texts = [one_news.content for one_news in news if one_news.content]
         news_texts = self._cut_non_cyrillic_characters(news_texts)
+        self.build_word_count_image(news_texts, cnt)
         if not news_texts:
             return StatisticsModels(type=self.name, stats=[('none', 0)])
         frequencies = np.array(
@@ -58,6 +62,17 @@ class NgramsBuilder(Statistics):
     @staticmethod
     def _has_cyrillic(text):
         return bool(re.search('[а-яА-Я]', text))
+
+    @staticmethod
+    def build_word_count_image(news_texts: List[str], cnt: int = 0) -> None:
+        wordcloud = WordCloud(
+            stopwords=get_stop_words(LANGUAGE)
+        ).generate(text=''.join(news_texts))
+        plt.figure()
+        plt.imshow(wordcloud, interpolation="bilinear")
+        plt.axis("off")
+        plt.savefig(PATH_TO_SAVE_IMAGE / Path(f'{WORDCLOUD_IMAGE_NAME}_{cnt}.png'))
+        return None
 
 
 class StatisticsByResource(Statistics):
@@ -91,7 +106,7 @@ class ByDayCounter(Statistics):
 
 
 class CategoriesClassificator(Statistics):
-        def __init__(self, path_to_classifier: Path = Path('models/model.save')):
+        def __init__(self, path_to_classifier: Path = PATH_TO_CATEGORIES_CLASSIFICATOR):
             with open(path_to_classifier, 'rb') as file:
                 self.builder = pickle.load(file)
             self.name = 'news_categories'

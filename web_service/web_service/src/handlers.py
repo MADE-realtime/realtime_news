@@ -78,8 +78,8 @@ async def vs_search_handler(request: Request,
     """
     words = {'words': [word_1, word_2]}
     news_info = []
-    for word in words['words']:
-        news_info.append(NEWS_EXTRACTOR.show_news_by_regex(db, word, mode))
+    for i, word in enumerate(words['words']):
+        news_info.append(NEWS_EXTRACTOR.show_news_by_regex(db, word, mode, cnt=i))
     plots = get_vs_plots_data(news_info)
 
     return templates.TemplateResponse(
