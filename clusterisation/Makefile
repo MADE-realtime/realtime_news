@@ -1,11 +1,11 @@
-CODE =
-TESTS = test
-
-ALL = $(CODE) $(TESTS)
+DB_LIB = ../db_lib
 
 VENV ?= .venv
 
 all: up
+
+venv_rm:
+	rm -rf $(VENV)
 
 venv:
 	python3.8 -m venv $(VENV)
@@ -13,9 +13,6 @@ venv:
 	$(VENV)/bin/python -m pip install --no-compile poetry
 	$(VENV)/bin/poetry config virtualenvs.create false
 	$(VENV)/bin/poetry install --no-dev --no-interaction --no-ansi
-
-test:
-	$(VENV)/bin/pytest -v tests
 
 lint:
 	$(VENV)/bin/flake8 --jobs 4 --statistics --show-source $(CODE)
@@ -29,10 +26,26 @@ format:
 	$(VENV)/bin/autoflake --recursive --in-place --remove-all-unused-imports $(ALL)
 	$(VENV)/bin/unify --in-place --recursive $(ALL)
 
+cluster-old:
+	$(VENV)/bin/python clusterisation.py --start_date=2012-09-05 --end_date=2021-12-05
+
+cluster:
+	$(VENV)/bin/python clusterisation.py --start_date=2021-12-11 --end_date=2021-12-15
+
+cluster-last:
+	$(VENV)/bin/python clusterisation.py --start_date=2021-12-16
+
+cluster-local:
+	$(VENV)/bin/python clusterisation.py
+
 up:
 	/etc/init.d/cron start
-	crontab cron_schedule.txt
-	touch parser/all.log
-	tail -f parser/all.log
+	crontab $(CODE)/cron_schedule.txt
+	touch all.log
+	tail -f all.log
 
-ci:	lint parser/test
+service:
+	docker-compose build
+	docker-compose up
+
+ci:	lint test

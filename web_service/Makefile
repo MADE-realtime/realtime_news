@@ -1,11 +1,15 @@
-CODE =
-TESTS = test
+CODE = web_service/src
+TESTS = web_service/tests
+DB_LIB = ../db_lib
 
 ALL = $(CODE) $(TESTS)
 
 VENV ?= .venv
 
-all: up
+all: migrate up
+
+venv_rm:
+	rm -rf $(VENV)
 
 venv:
 	python3.8 -m venv $(VENV)
@@ -29,10 +33,11 @@ format:
 	$(VENV)/bin/autoflake --recursive --in-place --remove-all-unused-imports $(ALL)
 	$(VENV)/bin/unify --in-place --recursive $(ALL)
 
-up:
-	/etc/init.d/cron start
-	crontab cron_schedule.txt
-	touch parser/all.log
-	tail -f parser/all.log
+migrate:
+	$(VENV)/bin/alembic -c $(DB_LIB)/alembic.ini revision --autogenerate -m 'Added required tables'
+	$(VENV)/bin/alembic -c $(DB_LIB)/alembic.ini upgrade head
 
-ci:	lint parser/test
+up:
+	$(VENV)/bin/python $(CODE)/run_server.py
+
+ci:	lint test

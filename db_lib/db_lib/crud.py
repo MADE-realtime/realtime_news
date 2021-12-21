@@ -1,13 +1,17 @@
 from sqlalchemy.orm import Session
 
 from .models import News, SocialNetworkNews
-from typing import List
+from typing import List, Any
 from datetime import date
 
 
 def get_news(db: Session,
              news_id: int) -> News:
     return db.query(News).filter(News.id == news_id).first()
+
+
+def get_all_news_by_id(db: Session, news_ids: List[int]) -> List[News]:
+    return db.query(News).filter(News.id in news_ids)
 
 
 def get_news_by_filters(db: Session,
@@ -69,6 +73,13 @@ def get_news_by_date(db: Session,
         .filter(News.time <= end_date) \
         .offset(skip).limit(limit).all()
 
+def get_news_without_cluster(db: Session,
+                             skip: int = 0,
+                             limit: int = 1000) -> List[News]:
+    return db.query(News)\
+        .filter(News.cluster_num.isnot(None)) \
+        .offset(skip).limit(limit).all()
+
 
 def get_news_count(db: Session) -> int:
     news_count = db.query(News.id).count()
@@ -81,3 +92,10 @@ def create_news(db: Session, news: News):
     db.commit()
     db.refresh(news)
     return news
+
+
+def save_all_news(db: Session, news_list: List[News]) -> List[News]:
+    db.add_all(news_list)
+    db.commit()
+    db.refresh(news_list)
+    return news_list

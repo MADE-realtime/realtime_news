@@ -18,6 +18,7 @@ class News(BaseModel):
     source_name: str = None
     image_url: str = None
     logo_url: str = None
+    cluster_num: Optional[int] = None
 
     class Config:
         orm_mode = True

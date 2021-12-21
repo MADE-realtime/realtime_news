@@ -213,7 +213,7 @@ class DBNewsExtractor(BaseNewsExtractor):
                 one_news for one_news in news_list if re.search(word_re, _one_news_to_string(one_news), flags=re.IGNORECASE)
             ]
         else:
-            news_list = _clean_nones_from_content(news_list)
+            news_list = clean_nones_from_content(news_list)
             selected_news = [
                 one_news for one_news in news_list if re.search(word_re, str(one_news.content), flags=re.IGNORECASE)
             ]
@@ -247,7 +247,7 @@ def _one_news_to_string(one_news: News) -> str:
     return _to_str(one_news.title) + ' ' + _to_str(one_news.content)
 
 
-def _clean_nones_from_content(news_list: List[News]) -> List[News]:
+def clean_nones_from_content(news_list: List[News]) -> List[News]:
     for i, news in enumerate(news_list):
         if news.content is None:
             news_list[i].content = news.title

@@ -24,6 +24,7 @@ class News(Base):
     image_url = Column(String)
     logo_url = Column(String)
     title_post = Column(String)
+    cluster_num = Column(Integer)
 
 
 class SocialNetworkNews(Base):
