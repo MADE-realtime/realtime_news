@@ -1,6 +1,6 @@
 from typing import Optional
 
-from config import FAVICON_PATH, TEMPLATE_NAME, SEARCH_TEMPLATE_NAME, SINGLE_TEMPLATE_NAME
+from config import FAVICON_PATH, TEMPLATE_NAME, SEARCH_TEMPLATE_NAME, SINGLE_TEMPLATE_NAME, SINGLE_POST_TEMPLATE_NAME
 from datetime import datetime
 from fastapi import Depends, FastAPI, Request, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse
@@ -11,9 +11,8 @@ from news_extractor import BaseNewsExtractor, DBNewsExtractor
 from sqlalchemy.orm import Session
 
 from db_lib.database import SessionLocal
-from utils import get_vs_plots_data
+from utils import get_vs_plots_data, get_vk_tg_stat_plot
 from session_logging import session_log
-from web_service.src.utils import get_vk_tg_stat_plot
 
 app = FastAPI()
 # NEWS_EXTRACTOR = PandasNewsExtractor(LENTA_MINI_DATASET_FILEPATH)
@@ -194,7 +193,7 @@ async def single_vk_tg_handler(
     news_stat = get_vk_tg_stat_plot(news_stat)
     if news:
         return templates.TemplateResponse(
-            SINGLE_TEMPLATE_NAME, {
+            SINGLE_POST_TEMPLATE_NAME, {
                 "request": request,
                 'single_news':  news,
                 'comments_plot': news_stat['comments'],
