@@ -13,7 +13,7 @@ from utils import convert_str_to_date
 from config import LIMIT_NEWS
 from db_lib import crud
 from db_lib.database import SessionLocal
-from statistics import NgramsBuilder, StatisticsByResource, ByDayCounter, CategoriesClassificator
+from statistics import NgramsBuilder, StatisticsByResource, ByDayCounter, CategoriesStatistics
 
 
 class BaseNewsExtractor(ABC):
@@ -218,6 +218,7 @@ class DBNewsExtractor(BaseNewsExtractor):
                     NgramsBuilder().predict(news_list),
                     StatisticsByResource().predict(news_list),
                     ByDayCounter().predict(news_list),
+                    CategoriesStatistics().predict(news_list),
                 ]
             }
         )
@@ -247,6 +248,7 @@ class DBNewsExtractor(BaseNewsExtractor):
                     NgramsBuilder().predict(selected_news, cnt),
                     StatisticsByResource().predict(selected_news),
                     ByDayCounter().predict(selected_news),
+                    CategoriesStatistics().predict(selected_news),
                 ]
             }
         )

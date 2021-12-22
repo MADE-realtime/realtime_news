@@ -17,6 +17,7 @@ def download_model(model_path: Path = PATH_TO_CATEGORIES_CLASSIFICATOR) -> Any:
         model = pickle.load(f)
     return model
 
+
 def _preprocess_messages(news_list: List[News]) -> List[str]:
     news_texts = [news.content for news in news_list]
     news_texts = [text.replace('[^\\w\\s]', '').lower() for text in news_texts]
