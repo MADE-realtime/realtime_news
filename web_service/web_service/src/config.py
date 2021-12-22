@@ -8,6 +8,7 @@ DEFAULT_LOGO_URL = 'https://image.flaticon.com/icons/png/512/21/21601.png'
 MIN_NGRAM_FREQ = 2
 LIMIT_NEWS = 10_000
 TEMPLATE_NAME = 'index.html'
+NEWS_TEMPLATE_NAME = 'news.html'
 SEARCH_TEMPLATE_NAME = 'search.html'
 SINGLE_TEMPLATE_NAME = 'single.html'
 POSTS_TEMPLATE_NAME = 'posts.html'

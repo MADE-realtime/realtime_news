@@ -1,6 +1,8 @@
 from typing import Optional
 
-from config import FAVICON_PATH, TEMPLATE_NAME, SEARCH_TEMPLATE_NAME, SINGLE_TEMPLATE_NAME, POSTS_TEMPLATE_NAME, SINGLE_POST_TEMPLATE_NAME
+from config import FAVICON_PATH, TEMPLATE_NAME, SEARCH_TEMPLATE_NAME, \
+    SINGLE_TEMPLATE_NAME, POSTS_TEMPLATE_NAME, SINGLE_POST_TEMPLATE_NAME, \
+    NEWS_TEMPLATE_NAME
 from datetime import datetime
 from fastapi import Depends, FastAPI, Request, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse
@@ -44,7 +46,7 @@ async def main_handler(request: Request,
                        db: Session = Depends(get_db)
                        ):
     """
-    Get random number news by filters
+    Get clusters with news by filters
     :return:
     """
     if number < 5:
@@ -56,6 +58,35 @@ async def main_handler(request: Request,
     news_list = NEWS_EXTRACTOR.show_news_by_filters(db, topic, end_date, start_date, number)
     return templates.TemplateResponse(
         TEMPLATE_NAME, {"request": request, 'news': news_list.news_list, 'stats': news_list.statistics[0]}
+    )
+
+
+@app.get(
+    '/news',
+    response_class=HTMLResponse,
+    response_model=ListNews,
+)
+@session_log
+async def news_handler(request: Request,
+                       topic: Optional[str] = None,
+                       start_date: Optional[str] = '1991-05-12',
+                       end_date: Optional[str] = None,
+                       number: Optional[int] = 10,
+                       db: Session = Depends(get_db)
+                       ):
+    """
+    Get news by filters
+    :return:
+    """
+    if number < 5:
+        number = 5
+    elif number > 200:
+        number = 200
+    if not end_date:
+        end_date = datetime.date(datetime.now())
+    news_list = NEWS_EXTRACTOR.show_news_by_filters(db, topic, end_date, start_date, number)
+    return templates.TemplateResponse(
+        NEWS_TEMPLATE_NAME, {"request": request, 'news': news_list.news_list, 'stats': news_list.statistics[0]}
     )
 
 

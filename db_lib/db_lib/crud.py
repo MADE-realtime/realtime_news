@@ -23,14 +23,14 @@ def get_news_by_filters(db: Session,
                         limit: int = 100) -> List[News]:
     if topic:
         return db.query(News) \
-            .order_by(News.time.desc())\
+            .order_by(News.time.desc()) \
             .filter(News.topic == topic) \
             .filter(News.date >= start_date) \
             .filter(News.date <= end_date) \
             .offset(skip).limit(limit).all()
     else:
         return db.query(News) \
-            .order_by(News.time.desc())\
+            .order_by(News.time.desc()) \
             .filter(News.date >= start_date) \
             .filter(News.date <= end_date) \
             .offset(skip).limit(limit).all()
@@ -78,7 +78,7 @@ def get_news_by_date(db: Session,
 def get_news_without_cluster(db: Session,
                              skip: int = 0,
                              limit: int = 1000) -> List[News]:
-    return db.query(News)\
+    return db.query(News) \
         .filter(News.cluster_num.isnot(None)) \
         .offset(skip).limit(limit).all()
 
@@ -121,8 +121,8 @@ def get_social_network_stats(db: Session,
                              post_id: int,
                              social_network: str) -> SocialNetworkStats:
     return db.query(SocialNetworkStats) \
-        .filter(SocialNetworkStats.post_id == post_id)\
-        .filter(SocialNetworkStats.social_network == social_network)\
+        .filter(SocialNetworkStats.post_id == post_id) \
+        .filter(SocialNetworkStats.social_network == social_network) \
         .all()
 
 
@@ -142,11 +142,12 @@ def get_social_network_stats_by_domain(db: Session,
         SocialNetworkNews.social_network,
         *query
     ) \
-        .join(SocialNetworkNews, join_expression)\
-        .filter(SocialNetworkNews.source_name == domain)\
+        .join(SocialNetworkNews, join_expression) \
+        .filter(SocialNetworkNews.source_name == domain) \
         .group_by(
-            SocialNetworkStats.post_id,
-            SocialNetworkNews.date,
-            SocialNetworkNews.social_network
-        )\
+        SocialNetworkStats.post_id,
+        SocialNetworkNews.date,
+        SocialNetworkNews.social_network
+    ) \
         .all()
+

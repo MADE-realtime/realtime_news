@@ -3,13 +3,76 @@
 
   <head>
     {% include 'header.html' %}
-    <title>Новости - в реальном времени и с аналитикой</title>
+    <title>RTN Новости - в реальном времени и с аналитикой</title>
   </head>
 
   <body>
 
     <!-- START NAV -->
-    {% include 'main-nav.html' %}
+    <nav class="navbar is-dark">
+      <div class="container">
+        <div class="navbar-brand">
+          <a class="navbar-item" href="/">
+            <img src="../static/img/logo-rtn-white.png" alt="Realtime news logo">
+          </a>
+          <span class="navbar-burger burger" data-target="navbarMenu">
+            <span>
+              <a class="navbar-item" href="/search">
+                <span class="icon"><i class="fas fa-compress-alt"></i></span>
+                <span>Сравнить слова</span>
+              </a>
+            </span>
+            <span></span>
+            <span></span>
+          </span>
+        </div>
+        <div id="navbarMenu" class="navbar-menu">
+          <div class="navbar-end">
+    <!--        <div class="navbar-item has-dropdown is-hoverable">-->
+    <!--        <a class="navbar-link">-->
+    <!--          Темы новостей-->
+    <!--        </a>-->
+    <!--        <div class="navbar-dropdown">-->
+    <!--          <a class="navbar-item">-->
+    <!--            Политика-->
+    <!--          </a>-->
+    <!--          <a class="navbar-item">-->
+    <!--            Экономика-->
+    <!--          </a>-->
+    <!--          <a class="navbar-item">-->
+    <!--            Спорт-->
+    <!--          </a>-->
+    <!--        </div>-->
+    <!--      </div>-->
+    <!--        <a class="navbar-item">-->
+    <!--          В тренде-->
+    <!--        </a>-->
+            <a class="navbar-item" href="/search">
+              <span class="icon"><i class="fas fa-compress-alt"></i></span>
+              <span>Сравнить слова</span>
+            </a>
+            <div class="navbar-item has-dropdown is-hoverable">
+              <a class="navbar-link">
+                <span class="icon"><i class="fas fa-star"></i></span>
+                <span>Интересное</span>
+              </a>
+              <div class="navbar-dropdown">
+                <a class="navbar-item" href="/search?word_1=Путин&word_2=Байден">
+                  Путин vs Байден
+                </a>
+                <a class="navbar-item" href="/search?word_1=Зенит&word_2=Спартак">
+                  Зенит vs Спартак
+                </a>
+                <a class="navbar-item" href="/search?word_1=Tesla&word_2=Apple">
+                  Tesla vs Apple
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
     <!-- END NAV -->
 
     <div class="container">
@@ -90,74 +153,575 @@
         </div>
         <!-- End filters -->
 
+        <!-- Start clusters -->
+        <div id="main-cluster" class="row columns is-multiline">
+          <div class="tile is-ancestor column">
+            <div class="tile is-parent">
+              <div class="tile is-child card large">
+                <div class="card-content">
+                  <div class="media mb-3">
+                    <div class="media-content">
+<!--                      <p class="title is-5 no-padding"><a href="/news/{{ card.id }}">{{ card.title | safe }}</a></p>-->
+                      <p class="title is-5 no-padding"><a href="/news/{{ card.id }}">Очень интересная новость о
+                        том да о сем</a></p>
+                    </div>
+                  </div>
+                  <div class="media-content mb-3">
+                    <p>Небольшой вводный абзац про очень интересную новость о том да о сем и еще чего нибудь...</p>
+                  </div>
+                  <div class="media-content mb-3">
+<!--                    {% if card.topic %}-->
+<!--                    <span class="tag is-primary">{{ card.topic }}</span>-->
+<!--                    {% else %}-->
+                    <span class="tag is-primary">Общее</span>
+<!--                    {% endif %}-->
+<!--                    {% if card.tags %}-->
+<!--                    <span class="tag">{{ card.tags }}</span>-->
+                    <span class="tag">главное</span>
+                    <span class="tag">о важном</span>
+                    <span class="tag">в жизне</span>
+<!--                    {% endif %}-->
+                  </div>
+                  <div class="card-image">
+                    <figure class="image is-16by9">
+                      <a href="/news/{{ card.id }}"><img src="../static/img/news-placeholder.jpg" alt="...."></a>
+  <!--                    {% if card.image_url %}-->
+  <!--                    <a href="/news/{{ card.id }}"><img src="{{ card.image_url }}" alt="{{ card.title }}"></a>-->
+  <!--                    {% else %}-->
+  <!--                    <a href="/news/{{ card.id }}"><img src="{{ url_for('static', path='/img/news-placeholder.jpg') }}" alt="{{ card.title }}"></a>-->
+  <!--                    {% endif %}-->
+                    </figure>
+                  </div>
+                  <div class="content">
+<!--                    {% if card.time %}-->
+<!--                    <time datetime="{{ card.date }}">{{ card.time }}</time>-->
+<!--                    {% else %}-->
+                    <span>Сегодня</span>
+<!--                    {% endif %}-->
+                    <div class="media">
+                      <div class="media-left">
+                        <figure class="image is-16x16 m-0">
+<!--                          {% if card.logo_url %}-->
+<!--                          <img src="{{ card.logo_url }}" alt="{{ card.source_name }}">-->
+<!--                          {% else %}-->
+<!--                          <img src="{{ url_for('static', path='/img/rtn-small-logo.png') }}" alt="{{ card.source_name }}">-->
+<!--                          {% endif %}-->
+                          <img src="../static/img/rtn-small-logo.png" alt="{{ card.source_name }}">
+                        </figure>
+                      </div>
+                      <div class="media-content">
+<!--                        {% if card.source_name %}-->
+<!--                        <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">{{ card.source_name }}</a></p>-->
+<!--                        {% else %}-->
+<!--                        <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">Неизвестная газета</a></p>-->
+<!--                        {% endif %}-->
+                        <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">Неизвестная газета</a></p>
+                      </div>
+                    </div>
+                  </div>
+<!--                subnuws   -->
+                  <hr>
+                  <div class="content mb-3">
+                    <div class="media-content">
+                      <p class="title is-6 no-padding mb-3"><a href="/news/{{ card.id }}">Очень интересная новость о
+                          том и сем</a></p>
+                    </div>
+                    <div class="media">
+                      <div class="media-left">
+                        <figure class="image is-16x16 m-0">
+  <!--                          {% if card.logo_url %}-->
+  <!--                          <img src="{{ card.logo_url }}" alt="{{ card.source_name }}">-->
+  <!--                          {% else %}-->
+  <!--                          <img src="{{ url_for('static', path='/img/rtn-small-logo.png') }}" alt="{{ card.source_name }}">-->
+  <!--                          {% endif %}-->
+                          <img src="../static/img/rtn-small-logo.png" alt="{{ card.source_name }}">
+                        </figure>
+                      </div>
+                      <div class="media-content">
+  <!--                        {% if card.source_name %}-->
+  <!--                        <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">{{ card.source_name }}</a></p>-->
+  <!--                        {% else %}-->
+  <!--                        <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">Неизвестная газета</a></p>-->
+  <!--                        {% endif %}-->
+                        <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">Неизвестная газета</a></p>
+                      </div>
+                    </div>
+                  </div>
+<!--                subnuws   -->
+                  <hr>
+                  <div class="content mb-3">
+                    <div class="media-content">
+                      <p class="title is-6 no-padding mb-3"><a href="/news/{{ card.id }}">Очень интересная новость о
+                          том и сем</a></p>
+                    </div>
+                    <div class="media">
+                      <div class="media-left">
+                        <figure class="image is-16x16 m-0">
+  <!--                          {% if card.logo_url %}-->
+  <!--                          <img src="{{ card.logo_url }}" alt="{{ card.source_name }}">-->
+  <!--                          {% else %}-->
+  <!--                          <img src="{{ url_for('static', path='/img/rtn-small-logo.png') }}" alt="{{ card.source_name }}">-->
+  <!--                          {% endif %}-->
+                          <img src="../static/img/rtn-small-logo.png" alt="{{ card.source_name }}">
+                        </figure>
+                      </div>
+                      <div class="media-content">
+  <!--                        {% if card.source_name %}-->
+  <!--                        <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">{{ card.source_name }}</a></p>-->
+  <!--                        {% else %}-->
+  <!--                        <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">Неизвестная газета</a></p>-->
+  <!--                        {% endif %}-->
+                        <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">Неизвестная газета</a></p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <a class="button is-fullwidth mt-5">Подробнее о новости</a>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- hot news start -->
+            <div class="tile is-5 is-vertical is-parent">
+
+              <!-- telegram start -->
+              <div class="tile is-child box">
+                <p class="title">СМИ в telegram</p>
+
+                <!--                subnuws   -->
+                  <div class="content mb-3">
+                    <div class="media-content">
+                      <p class="title is-6 no-padding"><a href="/news/{{ card.id }}">Очень интересная новость о
+                          том и сем</a></p>
+                    </div>
+<!--                {% if card.time %}-->
+<!--                    <time datetime="{{ card.date }}">{{ card.time }}</time>-->
+<!--                    {% else %}-->
+                    <span>Сегодня</span>
+<!--                    {% endif %}-->
+                  </div>
+
+
+                <a class="button is-fullwidth mt-5">Смотреть всю ленту</a>
+
+              </div>
+              <!-- telegram end -->
+
+              <!-- vk start -->
+              <div class="tile is-child box">
+                <p class="title">СМИ в vk</p>
+
+                <!--                subnuws   -->
+                  <div class="content mb-3">
+                    <div class="media-content">
+                      <p class="title is-6 no-padding"><a href="/news/{{ card.id }}">Очень интересная новость о
+                          том и сем</a></p>
+                    </div>
+<!--                {% if card.time %}-->
+<!--                    <time datetime="{{ card.date }}">{{ card.time }}</time>-->
+<!--                    {% else %}-->
+                    <span>Сегодня</span>
+<!--                    {% endif %}-->
+                  </div>
+
+
+                <a class="button is-fullwidth mt-5">Смотреть всю ленту</a>
+
+              </div>
+              <!-- vk end -->
+            </div>
+            <!-- hot news end -->
+
+          </div>
+        </div>
+
         <!-- Start news -->
         <div id="news" class="row columns is-multiline">
 
         <!-- News cards -->
-        {% if news %}
-        {% for card in news %}
+<!--        {% if news %}-->
+<!--        {% for card in news %}-->
 
-          {% if card.title %}
+<!--          {% if card.title %}-->
           <div class="column is-4">
             <div class="card large">
 
               <div class="card-content">
                 <div class="media mb-3">
                   <div class="media-content">
-                    <p class="title is-5 no-padding"><a href="/news/{{ card.id }}">{{ card.title | safe }}</a></p>
+<!--                      <p class="title is-5 no-padding"><a href="/news/{{ card.id }}">{{ card.title | safe }}</a></p>-->
+                    <p class="title is-5 no-padding"><a href="/news/{{ card.id }}">Очень интересная новость о
+                      том да о сем</a></p>
                   </div>
                 </div>
                 <div class="media-content mb-3">
-                  {% if card.topic %}
-                  <span class="tag is-primary">{{ card.topic }}</span>
-                  {% else %}
+<!--                    {% if card.topic %}-->
+<!--                    <span class="tag is-primary">{{ card.topic }}</span>-->
+<!--                    {% else %}-->
                   <span class="tag is-primary">Общее</span>
-                  {% endif %}
-                  {% if card.tags %}
-                  <span class="tag">{{ card.tags }}</span>
-                  {% endif %}
+<!--                    {% endif %}-->
+<!--                    {% if card.tags %}-->
+<!--                    <span class="tag">{{ card.tags }}</span>-->
+                  <span class="tag">главное</span>
+                  <span class="tag">о важном</span>
+                  <span class="tag">в жизне</span>
+<!--                    {% endif %}-->
                 </div>
                 <div class="card-image">
-                <figure class="image is-16by9">
-                  {% if card.image_url %}
-                  <a href="/news/{{ card.id }}"><img src="{{ card.image_url }}" alt="{{ card.title }}"></a>
-                  {% else %}
-                  <a href="/news/{{ card.id }}"><img src="{{ url_for('static', path='/img/news-placeholder.jpg') }}" alt="{{ card.title }}"></a>
-                  {% endif %}
-                </figure>
-              </div>
+                  <figure class="image is-16by9">
+                    <a href="/news/{{ card.id }}"><img src="../static/img/news-placeholder.jpg" alt="...."></a>
+<!--                    {% if card.image_url %}-->
+<!--                    <a href="/news/{{ card.id }}"><img src="{{ card.image_url }}" alt="{{ card.title }}"></a>-->
+<!--                    {% else %}-->
+<!--                    <a href="/news/{{ card.id }}"><img src="{{ url_for('static', path='/img/news-placeholder.jpg') }}" alt="{{ card.title }}"></a>-->
+<!--                    {% endif %}-->
+                  </figure>
+                </div>
                 <div class="content">
-                  {% if card.time %}
-                  <time datetime="{{ card.date }}">{{ card.time }}</time>
-                  {% else %}
+<!--                    {% if card.time %}-->
+<!--                    <time datetime="{{ card.date }}">{{ card.time }}</time>-->
+<!--                    {% else %}-->
                   <span>Сегодня</span>
-                  {% endif %}
+<!--                    {% endif %}-->
                   <div class="media">
                     <div class="media-left">
                       <figure class="image is-16x16 m-0">
-                        {% if card.logo_url %}
-                        <img src="{{ card.logo_url }}" alt="{{ card.source_name }}">
-                        {% else %}
-                        <img src="{{ url_for('static', path='/img/rtn-small-logo.png') }}" alt="{{ card.source_name }}">
-                        {% endif %}
+<!--                          {% if card.logo_url %}-->
+<!--                          <img src="{{ card.logo_url }}" alt="{{ card.source_name }}">-->
+<!--                          {% else %}-->
+<!--                          <img src="{{ url_for('static', path='/img/rtn-small-logo.png') }}" alt="{{ card.source_name }}">-->
+<!--                          {% endif %}-->
+                        <img src="../static/img/rtn-small-logo.png" alt="{{ card.source_name }}">
                       </figure>
                     </div>
                     <div class="media-content">
-                      {% if card.source_name %}
-                      <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">{{ card.source_name }}</a></p>
-                      {% else %}
+<!--                        {% if card.source_name %}-->
+<!--                        <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">{{ card.source_name }}</a></p>-->
+<!--                        {% else %}-->
+<!--                        <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">Неизвестная газета</a></p>-->
+<!--                        {% endif %}-->
                       <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">Неизвестная газета</a></p>
-                      {% endif %}
                     </div>
                   </div>
                 </div>
+<!--                subnuws   -->
+                <hr>
+                <div class="content mb-3">
+                  <div class="media-content">
+                    <p class="title is-6 no-padding mb-3"><a href="/news/{{ card.id }}">Очень интересная новость о
+                        том и сем</a></p>
+                  </div>
+                  <div class="media">
+                    <div class="media-left">
+                      <figure class="image is-16x16 m-0">
+<!--                          {% if card.logo_url %}-->
+<!--                          <img src="{{ card.logo_url }}" alt="{{ card.source_name }}">-->
+<!--                          {% else %}-->
+<!--                          <img src="{{ url_for('static', path='/img/rtn-small-logo.png') }}" alt="{{ card.source_name }}">-->
+<!--                          {% endif %}-->
+                        <img src="../static/img/rtn-small-logo.png" alt="{{ card.source_name }}">
+                      </figure>
+                    </div>
+                    <div class="media-content">
+<!--                        {% if card.source_name %}-->
+<!--                        <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">{{ card.source_name }}</a></p>-->
+<!--                        {% else %}-->
+<!--                        <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">Неизвестная газета</a></p>-->
+<!--                        {% endif %}-->
+                      <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">Неизвестная газета</a></p>
+                    </div>
+                  </div>
+                </div>
+<!--                subnuws   -->
+                <hr>
+                <div class="content mb-3">
+                  <div class="media-content">
+                    <p class="title is-6 no-padding mb-3"><a href="/news/{{ card.id }}">Очень интересная новость о
+                        том и сем</a></p>
+                  </div>
+                  <div class="media">
+                    <div class="media-left">
+                      <figure class="image is-16x16 m-0">
+<!--                          {% if card.logo_url %}-->
+<!--                          <img src="{{ card.logo_url }}" alt="{{ card.source_name }}">-->
+<!--                          {% else %}-->
+<!--                          <img src="{{ url_for('static', path='/img/rtn-small-logo.png') }}" alt="{{ card.source_name }}">-->
+<!--                          {% endif %}-->
+                        <img src="../static/img/rtn-small-logo.png" alt="{{ card.source_name }}">
+                      </figure>
+                    </div>
+                    <div class="media-content">
+<!--                        {% if card.source_name %}-->
+<!--                        <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">{{ card.source_name }}</a></p>-->
+<!--                        {% else %}-->
+<!--                        <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">Неизвестная газета</a></p>-->
+<!--                        {% endif %}-->
+                      <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">Неизвестная газета</a></p>
+                    </div>
+                  </div>
+                </div>
+
+                <a class="button is-fullwidth mt-5">Подробнее о новости</a>
+
               </div>
+
             </div>
           </div>
-          {% endif %}
 
-        {% endfor %}
-        {% endif %}
+          <div class="column is-4">
+            <div class="card large">
+
+              <div class="card-content">
+                <div class="media mb-3">
+                  <div class="media-content">
+<!--                      <p class="title is-5 no-padding"><a href="/news/{{ card.id }}">{{ card.title | safe }}</a></p>-->
+                    <p class="title is-5 no-padding"><a href="/news/{{ card.id }}">Очень интересная новость о
+                      том да о сем</a></p>
+                  </div>
+                </div>
+                <div class="media-content mb-3">
+<!--                    {% if card.topic %}-->
+<!--                    <span class="tag is-primary">{{ card.topic }}</span>-->
+<!--                    {% else %}-->
+                  <span class="tag is-primary">Общее</span>
+<!--                    {% endif %}-->
+<!--                    {% if card.tags %}-->
+<!--                    <span class="tag">{{ card.tags }}</span>-->
+                  <span class="tag">главное</span>
+                  <span class="tag">о важном</span>
+                  <span class="tag">в жизне</span>
+<!--                    {% endif %}-->
+                </div>
+                <div class="card-image">
+                  <figure class="image is-16by9">
+                    <a href="/news/{{ card.id }}"><img src="../static/img/news-placeholder.jpg" alt="...."></a>
+<!--                    {% if card.image_url %}-->
+<!--                    <a href="/news/{{ card.id }}"><img src="{{ card.image_url }}" alt="{{ card.title }}"></a>-->
+<!--                    {% else %}-->
+<!--                    <a href="/news/{{ card.id }}"><img src="{{ url_for('static', path='/img/news-placeholder.jpg') }}" alt="{{ card.title }}"></a>-->
+<!--                    {% endif %}-->
+                  </figure>
+                </div>
+                <div class="content">
+<!--                    {% if card.time %}-->
+<!--                    <time datetime="{{ card.date }}">{{ card.time }}</time>-->
+<!--                    {% else %}-->
+                  <span>Сегодня</span>
+<!--                    {% endif %}-->
+                  <div class="media">
+                    <div class="media-left">
+                      <figure class="image is-16x16 m-0">
+<!--                          {% if card.logo_url %}-->
+<!--                          <img src="{{ card.logo_url }}" alt="{{ card.source_name }}">-->
+<!--                          {% else %}-->
+<!--                          <img src="{{ url_for('static', path='/img/rtn-small-logo.png') }}" alt="{{ card.source_name }}">-->
+<!--                          {% endif %}-->
+                        <img src="../static/img/rtn-small-logo.png" alt="{{ card.source_name }}">
+                      </figure>
+                    </div>
+                    <div class="media-content">
+<!--                        {% if card.source_name %}-->
+<!--                        <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">{{ card.source_name }}</a></p>-->
+<!--                        {% else %}-->
+<!--                        <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">Неизвестная газета</a></p>-->
+<!--                        {% endif %}-->
+                      <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">Неизвестная газета</a></p>
+                    </div>
+                  </div>
+                </div>
+<!--                subnuws   -->
+                <hr>
+                <div class="content mb-3">
+                  <div class="media-content">
+                    <p class="title is-6 no-padding mb-3"><a href="/news/{{ card.id }}">Очень интересная новость о
+                        том и сем</a></p>
+                  </div>
+                  <div class="media">
+                    <div class="media-left">
+                      <figure class="image is-16x16 m-0">
+<!--                          {% if card.logo_url %}-->
+<!--                          <img src="{{ card.logo_url }}" alt="{{ card.source_name }}">-->
+<!--                          {% else %}-->
+<!--                          <img src="{{ url_for('static', path='/img/rtn-small-logo.png') }}" alt="{{ card.source_name }}">-->
+<!--                          {% endif %}-->
+                        <img src="../static/img/rtn-small-logo.png" alt="{{ card.source_name }}">
+                      </figure>
+                    </div>
+                    <div class="media-content">
+<!--                        {% if card.source_name %}-->
+<!--                        <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">{{ card.source_name }}</a></p>-->
+<!--                        {% else %}-->
+<!--                        <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">Неизвестная газета</a></p>-->
+<!--                        {% endif %}-->
+                      <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">Неизвестная газета</a></p>
+                    </div>
+                  </div>
+                </div>
+<!--                subnuws   -->
+                <hr>
+                <div class="content mb-3">
+                  <div class="media-content">
+                    <p class="title is-6 no-padding mb-3"><a href="/news/{{ card.id }}">Очень интересная новость о
+                        том и сем</a></p>
+                  </div>
+                  <div class="media">
+                    <div class="media-left">
+                      <figure class="image is-16x16 m-0">
+<!--                          {% if card.logo_url %}-->
+<!--                          <img src="{{ card.logo_url }}" alt="{{ card.source_name }}">-->
+<!--                          {% else %}-->
+<!--                          <img src="{{ url_for('static', path='/img/rtn-small-logo.png') }}" alt="{{ card.source_name }}">-->
+<!--                          {% endif %}-->
+                        <img src="../static/img/rtn-small-logo.png" alt="{{ card.source_name }}">
+                      </figure>
+                    </div>
+                    <div class="media-content">
+<!--                        {% if card.source_name %}-->
+<!--                        <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">{{ card.source_name }}</a></p>-->
+<!--                        {% else %}-->
+<!--                        <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">Неизвестная газета</a></p>-->
+<!--                        {% endif %}-->
+                      <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">Неизвестная газета</a></p>
+                    </div>
+                  </div>
+                </div>
+
+                <a class="button is-fullwidth mt-5">Подробнее о новости</a>
+
+              </div>
+
+            </div>
+          </div>
+
+          <div class="column is-4">
+            <div class="card large">
+
+              <div class="card-content">
+                <div class="media mb-3">
+                  <div class="media-content">
+<!--                      <p class="title is-5 no-padding"><a href="/news/{{ card.id }}">{{ card.title | safe }}</a></p>-->
+                    <p class="title is-5 no-padding"><a href="/news/{{ card.id }}">Очень интересная новость о
+                      том да о сем</a></p>
+                  </div>
+                </div>
+                <div class="media-content mb-3">
+<!--                    {% if card.topic %}-->
+<!--                    <span class="tag is-primary">{{ card.topic }}</span>-->
+<!--                    {% else %}-->
+                  <span class="tag is-primary">Общее</span>
+<!--                    {% endif %}-->
+<!--                    {% if card.tags %}-->
+<!--                    <span class="tag">{{ card.tags }}</span>-->
+                  <span class="tag">главное</span>
+                  <span class="tag">о важном</span>
+                  <span class="tag">в жизне</span>
+<!--                    {% endif %}-->
+                </div>
+                <div class="card-image">
+                  <figure class="image is-16by9">
+                    <a href="/news/{{ card.id }}"><img src="../static/img/news-placeholder.jpg" alt="...."></a>
+<!--                    {% if card.image_url %}-->
+<!--                    <a href="/news/{{ card.id }}"><img src="{{ card.image_url }}" alt="{{ card.title }}"></a>-->
+<!--                    {% else %}-->
+<!--                    <a href="/news/{{ card.id }}"><img src="{{ url_for('static', path='/img/news-placeholder.jpg') }}" alt="{{ card.title }}"></a>-->
+<!--                    {% endif %}-->
+                  </figure>
+                </div>
+                <div class="content">
+<!--                    {% if card.time %}-->
+<!--                    <time datetime="{{ card.date }}">{{ card.time }}</time>-->
+<!--                    {% else %}-->
+                  <span>Сегодня</span>
+<!--                    {% endif %}-->
+                  <div class="media">
+                    <div class="media-left">
+                      <figure class="image is-16x16 m-0">
+<!--                          {% if card.logo_url %}-->
+<!--                          <img src="{{ card.logo_url }}" alt="{{ card.source_name }}">-->
+<!--                          {% else %}-->
+<!--                          <img src="{{ url_for('static', path='/img/rtn-small-logo.png') }}" alt="{{ card.source_name }}">-->
+<!--                          {% endif %}-->
+                        <img src="../static/img/rtn-small-logo.png" alt="{{ card.source_name }}">
+                      </figure>
+                    </div>
+                    <div class="media-content">
+<!--                        {% if card.source_name %}-->
+<!--                        <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">{{ card.source_name }}</a></p>-->
+<!--                        {% else %}-->
+<!--                        <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">Неизвестная газета</a></p>-->
+<!--                        {% endif %}-->
+                      <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">Неизвестная газета</a></p>
+                    </div>
+                  </div>
+                </div>
+<!--                subnuws   -->
+                <hr>
+                <div class="content mb-3">
+                  <div class="media-content">
+                    <p class="title is-6 no-padding mb-3"><a href="/news/{{ card.id }}">Очень интересная новость о
+                        том и сем</a></p>
+                  </div>
+                  <div class="media">
+                    <div class="media-left">
+                      <figure class="image is-16x16 m-0">
+<!--                          {% if card.logo_url %}-->
+<!--                          <img src="{{ card.logo_url }}" alt="{{ card.source_name }}">-->
+<!--                          {% else %}-->
+<!--                          <img src="{{ url_for('static', path='/img/rtn-small-logo.png') }}" alt="{{ card.source_name }}">-->
+<!--                          {% endif %}-->
+                        <img src="../static/img/rtn-small-logo.png" alt="{{ card.source_name }}">
+                      </figure>
+                    </div>
+                    <div class="media-content">
+<!--                        {% if card.source_name %}-->
+<!--                        <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">{{ card.source_name }}</a></p>-->
+<!--                        {% else %}-->
+<!--                        <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">Неизвестная газета</a></p>-->
+<!--                        {% endif %}-->
+                      <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">Неизвестная газета</a></p>
+                    </div>
+                  </div>
+                </div>
+<!--                subnuws   -->
+                <hr>
+                <div class="content mb-3">
+                  <div class="media-content">
+                    <p class="title is-6 no-padding mb-3"><a href="/news/{{ card.id }}">Очень интересная новость о
+                        том и сем</a></p>
+                  </div>
+                  <div class="media">
+                    <div class="media-left">
+                      <figure class="image is-16x16 m-0">
+<!--                          {% if card.logo_url %}-->
+<!--                          <img src="{{ card.logo_url }}" alt="{{ card.source_name }}">-->
+<!--                          {% else %}-->
+<!--                          <img src="{{ url_for('static', path='/img/rtn-small-logo.png') }}" alt="{{ card.source_name }}">-->
+<!--                          {% endif %}-->
+                        <img src="../static/img/rtn-small-logo.png" alt="{{ card.source_name }}">
+                      </figure>
+                    </div>
+                    <div class="media-content">
+<!--                        {% if card.source_name %}-->
+<!--                        <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">{{ card.source_name }}</a></p>-->
+<!--                        {% else %}-->
+<!--                        <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">Неизвестная газета</a></p>-->
+<!--                        {% endif %}-->
+                      <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">Неизвестная газета</a></p>
+                    </div>
+                  </div>
+                </div>
+
+                <a class="button is-fullwidth mt-5">Подробнее о новости</a>
+
+              </div>
+
+            </div>
+          </div>
+<!--          {% endif %}-->
+
+<!--        {% endfor %}-->
+<!--        {% endif %}-->
         </div>
         <!-- End news -->
 

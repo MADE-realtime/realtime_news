@@ -191,6 +191,14 @@ class DBNewsExtractor(BaseNewsExtractor):
             ]}
         )
 
+    def show_clusters_by_filters(self,
+                                 db: Session,
+                                 topic: str,
+                                 end_date: str,
+                                 start_date: str = '1991-05-12',
+                                 num_news: int = 10, ) -> Dict:
+        pass
+
     def show_news_by_filters(
             self,
             db: Session,
@@ -231,7 +239,8 @@ class DBNewsExtractor(BaseNewsExtractor):
         word_re = rf'\b{word}\b'
         if mode == 'full':
             selected_news = [
-                one_news for one_news in news_list if re.search(word_re, _one_news_to_string(one_news), flags=re.IGNORECASE)
+                one_news for one_news in news_list if
+                re.search(word_re, _one_news_to_string(one_news), flags=re.IGNORECASE)
             ]
         else:
             news_list = clean_nones_from_content(news_list)
