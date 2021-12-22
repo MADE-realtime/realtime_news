@@ -36,6 +36,11 @@ def get_news_by_filters(db: Session,
             .offset(skip).limit(limit).all()
 
 
+def get_news_in_clusters(db: Session,
+                         clusters: List[int]) -> List[News]:
+    return db.query(News).filter(News.cluster_num.in_(clusters))
+
+
 def get_single_news(db: Session,
                     news_id: int) -> News:
     return db.query(News).get(news_id)

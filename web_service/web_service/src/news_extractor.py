@@ -196,8 +196,19 @@ class DBNewsExtractor(BaseNewsExtractor):
                                  topic: str,
                                  end_date: str,
                                  start_date: str = '1991-05-12',
-                                 num_news: int = 10, ) -> Dict:
-        pass
+                                 num_news: int = 10) -> Dict:
+        news_list = crud.get_news_by_filters(db,
+                                             topic=topic,
+                                             start_date=convert_str_to_date(start_date),
+                                             end_date=convert_str_to_date(end_date),
+                                             limit=num_news)
+        clusters = [n.cluster_num for n in news_list]
+        news_list = crud.get_news_in_clusters(db, clusters)
+
+
+
+
+
 
     def show_news_by_filters(
             self,
