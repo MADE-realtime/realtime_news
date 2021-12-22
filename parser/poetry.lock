@@ -250,7 +250,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "db-lib"
-version = "0.1.1"
+version = "0.2.0"
 description = "Realtime project"
 category = "main"
 optional = false
@@ -1771,7 +1771,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "1d7cdf78041457b40e2cee1251a171a27f2e170cc7980336fd92e8ab6fb4c6d3"
+content-hash = "e450b2ba4690829156f516f09552fe56245f35821592f3e51c8fc6d0a2babb56"
 
 [metadata.files]
 alembic = [
@@ -1936,8 +1936,8 @@ cssselect = [
     {file = "cssselect-1.1.0.tar.gz", hash = "sha256:f95f8dedd925fd8f54edb3d2dfb44c190d9d18512377d3c1e2388d16126879bc"},
 ]
 db-lib = [
-    {file = "db_lib-0.1.1-py3-none-any.whl", hash = "sha256:790a8382995464f83375544127461a2be44881149656d78b40a72d7f912c6f84"},
-    {file = "db_lib-0.1.1.tar.gz", hash = "sha256:ed121ee30f2f1673c3868ce40bd4338c29cca58d2fd9815a98e5acbc66679b49"},
+    {file = "db_lib-0.2.0-py3-none-any.whl", hash = "sha256:cfe96bb68c420e2d46e22c596627b85655040f340dfef58c2b7d2cd90dbf4f3d"},
+    {file = "db_lib-0.2.0.tar.gz", hash = "sha256:1e00a31edcc548008b2b2ffbb1363bdf3fe10e9dee31368683d9cc5605bc43a3"},
 ]
 debugpy = [
     {file = "debugpy-1.5.1-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:70b422c63a833630c33e3f9cdbd9b6971f8c5afd452697e464339a21bbe862ba"},
