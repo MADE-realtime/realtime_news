@@ -25,14 +25,14 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 
 # copy code
-COPY tag/ tag/
+COPY clusterisation/ clusterisation/
 # copy libs
 COPY db_lib/ db_lib/
 # copy env
 COPY .env .env
 
 
-WORKDIR /code/tag/
+WORKDIR /code/clusterisation/
 
 # install dependencies
 RUN make venv
