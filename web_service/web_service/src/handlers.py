@@ -1,6 +1,6 @@
 from typing import Optional
 
-from config import FAVICON_PATH, TEMPLATE_NAME, SEARCH_TEMPLATE_NAME, SINGLE_TEMPLATE_NAME, SINGLE_POST_TEMPLATE_NAME
+from config import FAVICON_PATH, TEMPLATE_NAME, SEARCH_TEMPLATE_NAME, SINGLE_TEMPLATE_NAME, POSTS_TEMPLATE_NAME, SINGLE_POST_TEMPLATE_NAME
 from datetime import datetime
 from fastapi import Depends, FastAPI, Request, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse
@@ -114,72 +114,27 @@ async def single_news_handler(
 
 
 @app.get(
-    '/get_random_news/{num_random_news}',
+    '/vk_tg',
     response_class=HTMLResponse,
-    response_model=ListNews,
 )
 @session_log
-def get_all_handler(
-        request: Request, num_random_news: int, db: Session = Depends(get_db)
-):
+async def all_posts_handler(request: Request,
+                            number: Optional[int] = 100,
+                            db: Session = Depends(get_db)
+                            ):
     """
-    Get random number news from all the time
+    Get last 100 social network posts
     :return:
     """
-    news_list = NEWS_EXTRACTOR.show_random_news(db, num_random_news)
+    posts_list = NEWS_EXTRACTOR.show_last_posts(db, number)['news_list']
     return templates.TemplateResponse(
-        TEMPLATE_NAME, {"request": request, 'news': news_list.news_list, 'stats': news_list.statistics}
-    )
-
-
-@app.get(
-    '/get_date/{start_date}/{end_date}',
-    response_class=HTMLResponse,
-    response_model=ListNews,
-)
-@session_log
-def get_date_handler(
-        request: Request, start_date: str, end_date: str, db: Session = Depends(get_db)
-):
-    """
-    Get news by day
-    :param date:
-    :return:
-    """
-    news_list = NEWS_EXTRACTOR.show_news_by_days(db, start_date, end_date)
-    return templates.TemplateResponse(
-        TEMPLATE_NAME, {"request": request, 'news': news_list.news_list, 'stats': news_list.statistics}
-    )
-
-
-@app.get(
-    '/get_topic/{topic}/{start_date}/{end_date}',
-    response_class=HTMLResponse,
-    response_model=ListNews,
-)
-@session_log
-def get_topic_handler(
-        request: Request,
-        topic: str,
-        start_date: str,
-        end_date: str,
-        db: Session = Depends(get_db),
-):
-    """
-    Get news by day and topic
-    :param topic:
-    :return:
-    """
-    news_list = NEWS_EXTRACTOR.show_news_by_topic(db, topic, start_date, end_date)
-    return templates.TemplateResponse(
-        TEMPLATE_NAME, {"request": request, 'news': news_list.news_list, 'stats': news_list.statistics}
+        POSTS_TEMPLATE_NAME, {"request": request, 'news': posts_list}
     )
 
 
 @app.get(
     '/vk_tg/{news_id}',
     response_class=HTMLResponse,
-    # response_model=ListNews,
 )
 @session_log
 async def single_vk_tg_handler(
@@ -198,7 +153,7 @@ async def single_vk_tg_handler(
         return templates.TemplateResponse(
             SINGLE_POST_TEMPLATE_NAME, {
                 "request": request,
-                'single_news':  news,
+                'single_news': news,
                 'comments_plot': news_stat['comments'],
                 'likes_plot': news_stat['likes'],
                 'views_plot': news_stat['views'],

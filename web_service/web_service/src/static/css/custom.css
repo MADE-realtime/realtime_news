@@ -35,6 +35,10 @@ body {
     color: #ffcc1f;
 }
 
+.navbar-item .fa-share-alt {
+    color: #339af0;
+}
+
 hr {
     margin: 0.5rem 0;
 }

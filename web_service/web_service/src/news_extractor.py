@@ -66,9 +66,18 @@ class BaseNewsExtractor(ABC):
         """
         pass
 
+    @abstractmethod
+    def show_last_posts(self, db: Session, num: int):
+        """
+        Метод для вывода последних постов
+        """
+        pass
+
+    @abstractmethod
     def show_vk_tg_news(self, db, news_id):
         pass
 
+    @abstractmethod
     def show_vk_tg_stat(self, db, post_id, social_network):
         pass
 
@@ -249,6 +258,12 @@ class DBNewsExtractor(BaseNewsExtractor):
             'single_news': single_news,
         }
 
+    def show_last_posts(self, db: Session, num: int) -> Dict:
+        vk_tg_news_list = crud.get_social_network_news_list(db, num)
+        return {
+            'news_list': vk_tg_news_list,
+        }
+
     def show_vk_tg_news(self, db: Session, news_id: int) -> Dict:
         vk_tg_news = crud.get_social_network_news(db, news_id)
         return {
@@ -258,7 +273,6 @@ class DBNewsExtractor(BaseNewsExtractor):
     def show_vk_tg_stat(self, db: Session, post_id: int, social_network: str):
         vk_tg_stat = crud.get_social_network_stats(db, post_id, social_network)  # List[SocialNetworkStats]
         return vk_tg_stat
-
 
 
 def _to_str(text):

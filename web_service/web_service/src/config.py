@@ -10,6 +10,7 @@ LIMIT_NEWS = 10_000
 TEMPLATE_NAME = 'index.html'
 SEARCH_TEMPLATE_NAME = 'search.html'
 SINGLE_TEMPLATE_NAME = 'single.html'
+POSTS_TEMPLATE_NAME = 'posts.html'
 SINGLE_POST_TEMPLATE_NAME = 'single_post.html'
 FAVICON_PATH = Path('web_service/src/static/img/favicon.ico')
 PATH_TO_SAVE_IMAGE = Path('web_service/src/static/wordcloud_images')

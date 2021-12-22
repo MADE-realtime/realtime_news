@@ -103,6 +103,14 @@ def save_all_news(db: Session, news_list: List[News]) -> List[News]:
     return news_list
 
 
+def get_social_network_news_list(db: Session,
+                                 limit: int = 100,
+                                 skip: int = 0) -> List[SocialNetworkNews]:
+    return db.query(SocialNetworkNews) \
+        .order_by(SocialNetworkNews.time.desc()) \
+        .offset(skip).limit(limit).all()
+
+
 def get_social_network_news(db: Session,
                             news_id: int) -> SocialNetworkNews:
     return db.query(SocialNetworkNews) \
