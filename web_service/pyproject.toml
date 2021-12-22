@@ -20,7 +20,7 @@ Jinja2 = "^3.0.2"
 alembic = "^1.7.4"
 fastapi-sqlalchemy = "^0.2.1"
 psycopg2-binary = "2.9.1"
-db-lib = {path = "../db_lib"}
+db-lib = "0.2.0"
 python-dotenv = "^0.19.2"
 stop-words = "^2018.7.23"
 PyYAML = "^6.0"
