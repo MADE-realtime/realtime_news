@@ -11,9 +11,9 @@ venv:
 	python3.8 -m venv $(VENV)
 	$(VENV)/bin/python -m pip install --upgrade pip
 	$(VENV)/bin/python -m pip install --no-compile poetry
+	$(VENV)/bin/python -m pip install natasha
 	$(VENV)/bin/poetry config virtualenvs.create false
 	$(VENV)/bin/poetry install --no-dev --no-interaction --no-ansi
-	$(VENV)/bin/poetry add natasha
 
 lint:
 	$(VENV)/bin/flake8 --jobs 4 --statistics --show-source $(CODE)
