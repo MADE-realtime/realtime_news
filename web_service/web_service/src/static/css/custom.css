@@ -34,3 +34,18 @@ body {
 .navbar-item .fa-star {
     color: #ffcc1f;
 }
+
+.navbar-item .fa-share-alt {
+    color: #339af0;
+}
+
+hr {
+    margin: 0.5rem 0;
+}
+
+@media only screen and (max-width: 600px) {
+  .column {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}

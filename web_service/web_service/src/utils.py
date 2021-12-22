@@ -40,3 +40,17 @@ def draw_by_day_plot(list_tuples, file_name) -> None:
     fig.write_image(file=file_path,
                     width=600,
                     height=300)
+
+
+def get_vk_tg_stat_plot(news_stat):
+    plots = defaultdict(lambda: defaultdict(list))
+    plots_x = [i for i, _ in enumerate(news_stat)]
+    plots['comments']['y'] = [stat.comments for stat in news_stat]
+    plots['likes']['y'] = [stat.likes for stat in news_stat]
+    plots['views']['y'] = [stat.views for stat in news_stat]
+    plots['reposts']['y'] = [stat.reposts for stat in news_stat]
+    plots['comments']['x'] = plots_x
+    plots['likes']['x'] = plots_x
+    plots['views']['x'] = plots_x
+    plots['reposts']['x'] = plots_x
+    return plots
