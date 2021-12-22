@@ -107,28 +107,43 @@ class ByDayCounter(Statistics):
         return StatisticsModels(type=self.name, stats=news_counter_list)
 
 
+class CategoriesStatistics(Statistics):
+    """Класс для подсчёта количества категорий в выборке"""
+    def __init__(self):
+        self.name = 'categories_stats'
+
+    def predict(self, news: List[News], *args, **kwargs) -> StatisticsModels:
+        news_counter = defaultdict(int)
+        for one_news in news:
+            news_counter[one_news.category] += 1
+        news_counter_list = [(category, count) for category, count in news_counter.items()]
+
+        return StatisticsModels(type=self.name, stats=news_counter_list)
+
+
 class CategoriesClassificator(Statistics):
-        def __init__(self, path_to_classifier: Path = PATH_TO_CATEGORIES_CLASSIFICATOR):
-            with open(path_to_classifier, 'rb') as file:
-                self.builder = pickle.load(file)
-            self.name = 'news_categories'
-            self.class_news = CLASS_OF_NEWS
+    """DEPRECATED"""
+    def __init__(self, path_to_classifier: Path = PATH_TO_CATEGORIES_CLASSIFICATOR):
+        with open(path_to_classifier, 'rb') as file:
+            self.builder = pickle.load(file)
+        self.name = 'news_categories'
+        self.class_news = CLASS_OF_NEWS
 
-        def predict(self, news: List[News], *args, **kwargs) -> StatisticsModels:
-            news_texts = [one_news.content for one_news in news if one_news.content]
-            news_texts = self._preprocessing(news_texts)
-            if not news_texts:
-                return StatisticsModels(type=self.name, stats='')
-            ans_list = self.builder.predict(news_texts)
-            ans_list = [
-                (
-                    self.class_news[np.where(ans == 1)[0][0]], i
-                ) for i, ans in enumerate(ans_list)
-            ]
+    def predict(self, news: List[News], *args, **kwargs) -> StatisticsModels:
+        news_texts = [one_news.content for one_news in news if one_news.content]
+        news_texts = self._preprocessing(news_texts)
+        if not news_texts:
+            return StatisticsModels(type=self.name, stats='')
+        ans_list = self.builder.predict(news_texts)
+        ans_list = [
+            (
+                self.class_news[np.where(ans == 1)[0][0]], i
+            ) for i, ans in enumerate(ans_list)
+        ]
 
-            return StatisticsModels(type=self.name, stats=ans_list)
-    
-        @staticmethod
-        def _preprocessing(news_texts: List[str]) -> List[str]:
-            news_texts = [text.replace('[^\\w\\s]', '').lower() for text in news_texts]
-            return news_texts
+        return StatisticsModels(type=self.name, stats=ans_list)
+
+    @staticmethod
+    def _preprocessing(news_texts: List[str]) -> List[str]:
+        news_texts = [text.replace('[^\\w\\s]', '').lower() for text in news_texts]
+        return news_texts
