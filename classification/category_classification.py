@@ -8,8 +8,9 @@ from db_lib.models import News
 from db_lib.database import SessionLocal
 from sqlalchemy.orm import Session
 import click
+import numpy as np
 
-from classification.config import PATH_TO_CATEGORIES_CLASSIFICATOR
+from classification.config import PATH_TO_CATEGORIES_CLASSIFICATOR, CLASS_OF_NEWS
 
 
 def download_model(model_path: Path = PATH_TO_CATEGORIES_CLASSIFICATOR) -> Any:
@@ -27,8 +28,9 @@ def _preprocess_messages(news_list: List[News]) -> List[str]:
 def classify_news_content(news_list: List[News], path: Path = PATH_TO_CATEGORIES_CLASSIFICATOR) -> List[str]:
     model = download_model(path)
     news_texts = _preprocess_messages(news_list)
+    class_main = CLASS_OF_NEWS
     classes = model.predict(news_texts)
-    return classes
+    return [class_main[np.where(ans == 1)[0][0]] for ans in classes]
 
 
 @click.command()
