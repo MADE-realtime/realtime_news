@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+  <head>
+    {% include 'header.html' %}
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <title>{{ single_news.source_name }} - {{ single_news.time }} / Пост {{ single_news.social_network}} / RTN</title>
+  </head>
+
+  <body>
+
+    <!-- START NAV -->
+    {% include 'main-nav.html' %}
+    <!-- END NAV -->
+
+    <div class="container">
+
+      <div class="section">
+
+        <div class="columns mb-6">
+          <div class="column is-2">
+            <a href="/" class="button is-medium">
+              <span class="icon is-medium">
+                <i class="fas fa-arrow-left"></i>
+              </span>
+              <span>Главная</span>
+            </a>
+          </div>
+          <div class="column is-8 has-text-centered">
+            <h1 class="title is-1" style="color: ghostwhite;">{{ single_news.source_name|capitalize }} - {{ single_news.time }}</h1>
+          </div>
+        </div>
+
+        <!-- Start news -->
+        <div id="news" class="row columns mb-6">
+          <div class="column is-8 is-offset-2 box p-6">
+            <div class="content">
+              {% if single_news.text %}
+              <div class="mb-4">
+                <p class="title is-5">
+                  <span class="icon-text has-text-info">
+                    <span class="icon">
+                      {% if single_news.social_network == "vk" %}
+                      <i class="fab fa-vk"></i>
+                      {% else %}
+                      <i class="fab fa-telegram-plane"></i>
+                      {% endif %}
+                    </span>
+                    <span>Пост {{ single_news.social_network }}</span>
+                  </span>
+                </p>
+                <p>
+                  {{ single_news.text | safe }}
+                </p>
+              </div>
+              {% else %}
+              <div class="mb-4">
+                <p>Это странный пост - в нем нет содержимого :(</p>
+              </div>
+              {% endif %}
+
+              {% if single_news.views %}
+              <span class="icon-text has-text-info">
+                <span class="icon">
+                  <i class="fas fa-eye"></i>
+                </span>
+                <span>{{ single_news.views }}</span>
+              </span>
+              {% endif %}
+              {% if single_news.likes %}
+              <span class="icon-text has-text-danger">
+                <span class="icon">
+                  <i class="fas fa-heart"></i>
+                </span>
+                <span>{{ single_news.likes }}</span>
+              </span>
+              {% endif %}
+              {% if single_news.comments %}
+              <span class="icon-text has-text-warning">
+                <span class="icon">
+                  <i class="fas fa-comments"></i>
+                </span>
+                <span>{{ single_news.comments }}</span>
+              </span>
+              {% endif %}
+              {% if single_news.reposts %}
+              <span class="icon-text has-text-primary">
+                <span class="icon">
+                  <i class="fas fa-retweet"></i>
+                </span>
+                <span>{{ single_news.reposts }}</span>
+              </span>
+              {% endif %}
+
+              {% if views_plot %}
+              <p class="title is-5">Динамика просмотров</p>
+              <div id="views-plot" style="max-width: 100%; margin: auto"></div>
+              {% endif %}
+              {% if likes_plot %}
+              <p class="title is-5">Динамика лайков</p>
+              <div id="likes-plot" style="max-width: 100%; margin: auto"></div>
+              {% endif %}
+              {% if comments_plot %}
+              <p class="title is-5">Динамика комментариев</p>
+              <div id="comments-plot" style="max-width: 100%; margin: auto"></div>
+              {% endif %}
+              {% if reposts_plot %}
+              <p class="title is-5">Динамика репостов</p>
+              <div id="reposts-plot" style="max-width: 100%; margin: auto"></div>
+              {% endif %}
+            </div>
+            <div class="content">
+              {% if single_news.time %}
+              <time datetime="{{ single_news.date }}">{{ single_news.time }}</time>
+              {% else %}
+              <span>Сегодня</span>
+              {% endif %}
+              <div class="media">
+                <div class="media-left">
+                  <figure class="image is-16x16 m-0">
+                    {% if single_news.logo_url %}
+                    <img src="{{ single_news.logo_url }}" alt="{{ single_news.source_name }}">
+                    {% else %}
+                    <img src="{{ url_for('static', path='/img/rtn-small-logo.png') }}" alt="{{ single_news.source_name }}">
+                    {% endif %}
+                  </figure>
+                </div>
+                <div class="content">
+                  {% if single_news.source_name %}
+                  <p class="subtitle is-6">{{ single_news.source_name }}</p>
+                  {% else %}
+                  <p>Неизвестная газета</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    {% include 'footer.html' %}
+    <!-- End Footer -->
+
+    {% block javascript %}
+
+    {% if comments_plot %}
+    <script type="text/javascript">
+      COMMENTS = document.getElementById('comments-plot');
+
+      Plotly.plot( COMMENTS, [{
+          x: {{ comments_plot.x | tojson }},
+          y: {{ comments_plot.y | tojson }}
+        }],
+        {
+          margin: { t: 40 },
+          xaxis: { showline: true, domain: [0, 1], showgrid: true, rangemode: "tozero" },
+          yaxis: { showline: true, rangemode: "tozero" },
+          height: 300,
+        },
+        {
+          title:'Динамика Комментариев'
+        },
+      );
+    </script>
+    {% endif %}
+
+    {% if likes_plot %}
+    <script type="text/javascript">
+      LIKES = document.getElementById('likes-plot');
+
+      Plotly.plot( LIKES, [{
+          x: {{ likes_plot.x | tojson }},
+          y: {{ likes_plot.y | tojson }}
+        }],
+        {
+          margin: { t: 40 },
+          xaxis: { showline: true, domain: [0, 1], showgrid: true, rangemode: "tozero" },
+          yaxis: { showline: true, rangemode: "tozero" },
+          height: 300,
+        },
+        {
+          title:'Динамика лайков'
+        },
+      );
+    </script>
+    {% endif %}
+
+    {% if views_plot %}
+    <script type="text/javascript">
+      VIEWS = document.getElementById('views-plot');
+
+      Plotly.plot( VIEWS, [{
+          x: {{ views_plot.x | tojson }},
+          y: {{ views_plot.y | tojson }}
+        }],
+        {
+          margin: { t: 40 },
+          xaxis: { showline: true, domain: [0, 1], showgrid: true, rangemode: "tozero" },
+          yaxis: { showline: true, rangemode: "tozero" },
+          height: 300,
+        },
+        {
+          title:'Динамика просмотров'
+        },
+      );
+    </script>
+    {% endif %}
+
+    {% if reposts_plot %}
+    <script type="text/javascript">
+      REPOSTS = document.getElementById('reposts-plot');
+
+      Plotly.plot( REPOSTS, [{
+          x: {{ reposts_plot.x | tojson }},
+          y: {{ reposts_plot.y | tojson }}
+        }],
+        {
+          margin: { t: 40 },
+          xaxis: { showline: true, domain: [0, 1], showgrid: true, rangemode: "tozero" },
+          yaxis: { showline: true, rangemode: "tozero" },
+          height: 300,
+        },
+        {
+          title:'Динамика репостов'
+        },
+      );
+    </script>
+    {% endif %}
+
+    {% endblock %}
+
+  </body>
+
+</html>

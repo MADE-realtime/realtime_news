@@ -1,15 +1,19 @@
+import pickle
 import re
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from datetime import datetime
+from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
-import pickle
 from typing import Dict, List
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from stop_words import get_stop_words
-from sklearn import pipeline, preprocessing, multiclass, naive_bayes
-from config import LANGUAGE, MIN_NGRAM_FREQ, CLASS_OF_NEWS
+from wordcloud import WordCloud
+
+from config import LANGUAGE, MIN_NGRAM_FREQ, CLASS_OF_NEWS, \
+    PATH_TO_CATEGORIES_CLASSIFICATOR, WORDCLOUD_IMAGE_NAME, PATH_TO_SAVE_IMAGE
 from models import ListNews, News, StatisticsModels
 
 
@@ -30,11 +34,13 @@ class NgramsBuilder(Statistics):
         )
         self.name = 'Ngrams'
 
-    def predict(self, news: List[News], *args, **kwargs) -> StatisticsModels:
-        news_texts = [one_news.content for one_news in news if one_news.content]
+    def predict(self, news: List[News], cnt: int = 0, *args, **kwargs) -> StatisticsModels:
+        news_texts = [one_news.title + ' ' + one_news.content for one_news in news if one_news.content]
         news_texts = self._cut_non_cyrillic_characters(news_texts)
         if not news_texts:
             return StatisticsModels(type=self.name, stats=[('none', 0)])
+        if cnt:
+            self.build_word_count_image(news_texts, cnt)
         frequencies = np.array(
             np.sum(self.builder.fit_transform(news_texts).todense(), axis=0)
         )[0]
@@ -57,6 +63,18 @@ class NgramsBuilder(Statistics):
     @staticmethod
     def _has_cyrillic(text):
         return bool(re.search('[а-яА-Я]', text))
+
+    @staticmethod
+    def build_word_count_image(news_texts: List[str], cnt: int = 2) -> None:
+        wordcloud = WordCloud(
+            stopwords=get_stop_words(LANGUAGE)
+        ).generate(text=''.join(news_texts))
+        plt.figure()
+        plt.imshow(wordcloud, interpolation="bilinear")
+        plt.axis("off")
+        Path(PATH_TO_SAVE_IMAGE).mkdir(parents=True, exist_ok=True)
+        plt.savefig(PATH_TO_SAVE_IMAGE / Path(f'{WORDCLOUD_IMAGE_NAME}{cnt}.png'), pad_inches=0)
+        return None
 
 
 class StatisticsByResource(Statistics):
@@ -89,10 +107,11 @@ class ByDayCounter(Statistics):
         return StatisticsModels(type=self.name, stats=news_counter_list)
 
 
-class Classificator(Statistics):
-        def __init__(self):
-            self.builder = pickle.load(open('model.save', 'rb'))
-            self.name = 'Get_class_of_news'
+class CategoriesClassificator(Statistics):
+        def __init__(self, path_to_classifier: Path = PATH_TO_CATEGORIES_CLASSIFICATOR):
+            with open(path_to_classifier, 'rb') as file:
+                self.builder = pickle.load(file)
+            self.name = 'news_categories'
             self.class_news = CLASS_OF_NEWS
 
         def predict(self, news: List[News], *args, **kwargs) -> StatisticsModels:
@@ -101,7 +120,11 @@ class Classificator(Statistics):
             if not news_texts:
                 return StatisticsModels(type=self.name, stats='')
             ans_list = self.builder.predict(news_texts)
-            ans_list = [self.class_news[np.where(ans == 1)[0][0]] for ans in ans_list]
+            ans_list = [
+                (
+                    self.class_news[np.where(ans == 1)[0][0]], i
+                ) for i, ans in enumerate(ans_list)
+            ]
 
             return StatisticsModels(type=self.name, stats=ans_list)
     

@@ -13,7 +13,7 @@ from utils import convert_str_to_date
 from config import LIMIT_NEWS
 from db_lib import crud
 from db_lib.database import SessionLocal
-from statistics import NgramsBuilder, StatisticsByResource, ByDayCounter
+from statistics import NgramsBuilder, StatisticsByResource, ByDayCounter, CategoriesClassificator
 
 
 class BaseNewsExtractor(ABC):
@@ -53,7 +53,7 @@ class BaseNewsExtractor(ABC):
         pass
 
     @abstractmethod
-    def show_news_by_regex(self, db: Session, word: str):
+    def show_news_by_regex(self, db: Session, word: str, mode: str, cnt: int):
         """
         Метод для поиска новостей по регулярному выражению
         """
@@ -64,6 +64,21 @@ class BaseNewsExtractor(ABC):
         """
         Метод для показа новости по id
         """
+        pass
+
+    @abstractmethod
+    def show_last_posts(self, db: Session, num: int):
+        """
+        Метод для вывода последних постов
+        """
+        pass
+
+    @abstractmethod
+    def show_vk_tg_news(self, db, news_id):
+        pass
+
+    @abstractmethod
+    def show_vk_tg_stat(self, db, post_id, social_network):
         pass
 
 
@@ -195,14 +210,19 @@ class DBNewsExtractor(BaseNewsExtractor):
         # news_list = random.choices(news_list, k=num_random_news)
         news_list = _clean_img_urls(news_list)
 
+        # Не менять порядок в statistics
         return ListNews.parse_obj(
             {
                 'news_list': news_list,
-                'statistics': [NgramsBuilder().predict(news_list)]
+                'statistics': [
+                    NgramsBuilder().predict(news_list),
+                    StatisticsByResource().predict(news_list),
+                    ByDayCounter().predict(news_list),
+                ]
             }
         )
 
-    def show_news_by_regex(self, db: Session, word: str, mode: str = 'full') -> ListNews:
+    def show_news_by_regex(self, db: Session, word: str, mode: str = 'full', cnt: int = 2) -> ListNews:
         if word:
             news_list = crud.get_n_last_news(db, limit=LIMIT_NEWS)
         else:
@@ -224,7 +244,7 @@ class DBNewsExtractor(BaseNewsExtractor):
             {
                 'news_list': selected_news,
                 'statistics': [
-                    NgramsBuilder().predict(selected_news),
+                    NgramsBuilder().predict(selected_news, cnt),
                     StatisticsByResource().predict(selected_news),
                     ByDayCounter().predict(selected_news),
                 ]
@@ -237,6 +257,22 @@ class DBNewsExtractor(BaseNewsExtractor):
         return {
             'single_news': single_news,
         }
+
+    def show_last_posts(self, db: Session, num: int) -> Dict:
+        vk_tg_news_list = crud.get_social_network_news_list(db, num)
+        return {
+            'news_list': vk_tg_news_list,
+        }
+
+    def show_vk_tg_news(self, db: Session, news_id: int) -> Dict:
+        vk_tg_news = crud.get_social_network_news(db, news_id)
+        return {
+            'single_news': vk_tg_news,
+        }
+
+    def show_vk_tg_stat(self, db: Session, post_id: int, social_network: str):
+        vk_tg_stat = crud.get_social_network_stats(db, post_id, social_network)  # List[SocialNetworkStats]
+        return vk_tg_stat
 
 
 def _to_str(text):

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+  <head>
+    {% include 'header.html' %}
+    <title>Посты СМИ в vk и телеграм / RTN</title>
+  </head>
+
+  <body>
+
+    <!-- START NAV -->
+    {% include 'main-nav.html' %}
+    <!-- END NAV -->
+
+    <div class="container">
+
+      <div class="section">
+
+        <div class="columns mb-6">
+          <div class="column is-2">
+            <a href="/" class="button is-medium">
+              <span class="icon is-medium">
+                <i class="fas fa-arrow-left"></i>
+              </span>
+              <span>Главная</span>
+            </a>
+          </div>
+          <div class="column is-8 has-text-centered">
+            <h1 class="title is-1" style="color: ghostwhite;">Последние посты СМИ в cоцсетях</h1>
+          </div>
+        </div>
+
+        <!-- Start news -->
+        <div id="news" class="row columns mb-6">
+          <div class="column is-8 is-offset-2">
+
+            {% for single_news in news %}
+            <div class="box p-6">
+                <div class="content">
+
+                  {% if single_news.text %}
+                  <div class="mb-4">
+                    <div class="content">
+                      {% if single_news.source_name %}
+                      <p class="subtitle is-6">
+                        <a href="/vk_tg/ {{ single_news.id }}">
+                            <span class="icon-text has-text-info">
+                            <span class="icon">
+                              {% if single_news.social_network == "vk" %}
+                              <i class="fab fa-vk"></i>
+                              {% else %}
+                              <i class="fab fa-telegram-plane"></i>
+                              {% endif %}
+                            </span>
+                          </span>
+                          {{ single_news.source_name }}
+                        </a>
+                      </p>
+                      {% else %}
+                      <p>Неизвестная газета</p>
+                      {% endif %}
+                    </div>
+                    <p>
+                      {{ single_news.text | safe }}
+                    </p>
+                    {% if single_news.link %}
+                    <p><a href="{{ single_news.link }}">Читать пост в источнике</a></p>
+                    {% endif %}
+                  </div>
+                  {% else %}
+                  <div class="mb-4">
+                    <p>Это странный пост - в нем нет содержимого :(</p>
+                  </div>
+                  {% endif %}
+
+                  {% if single_news.views %}
+                  <span class="icon-text has-text-info">
+                    <span class="icon">
+                      <i class="fas fa-eye"></i>
+                    </span>
+                    <span>{{ single_news.views }}</span>
+                  </span>
+                  {% endif %}
+                  {% if single_news.likes %}
+                  <span class="icon-text has-text-danger">
+                    <span class="icon">
+                      <i class="fas fa-heart"></i>
+                    </span>
+                    <span>{{ single_news.likes }}</span>
+                  </span>
+                  {% endif %}
+                  {% if single_news.comments %}
+                  <span class="icon-text has-text-warning">
+                    <span class="icon">
+                      <i class="fas fa-comments"></i>
+                    </span>
+                    <span>{{ single_news.comments }}</span>
+                  </span>
+                  {% endif %}
+                  {% if single_news.reposts %}
+                  <span class="icon-text has-text-primary">
+                    <span class="icon">
+                      <i class="fas fa-retweet"></i>
+                    </span>
+                    <span>{{ single_news.reposts }}</span>
+                  </span>
+                  {% endif %}
+                </div>
+                <div class="content">
+                  {% if single_news.time %}
+                  <time datetime="{{ single_news.date }}">{{ single_news.time }}</time>
+                  {% else %}
+                  <span>Сегодня</span>
+                  {% endif %}
+                </div>
+
+            </div>
+            {% endfor %}
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    {% include 'footer.html' %}
+    <!-- End Footer -->
+
+  </body>
+
+</html>
