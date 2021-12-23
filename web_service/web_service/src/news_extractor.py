@@ -201,8 +201,8 @@ class DBNewsExtractor(BaseNewsExtractor):
                 {
                     'cluster_id': key,
                     'news': list(group_news),
-                    'topic': "",
-                    'tags': [],
+                    'topic': [n.category for n in group_news],
+                    'tags': [n.tags for n in group_news],
                     'statistics': []
                 }
             )

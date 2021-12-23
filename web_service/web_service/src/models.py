@@ -36,6 +36,6 @@ class ListNews(BaseModel):
 class Cluster(BaseModel):
     cluster_id: int
     news: List[News]
-    topic: str
+    topic: List[str]
     tags: List[str]
     statistics: List[StatisticsModels]
