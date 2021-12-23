@@ -4,9 +4,10 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List
+from itertools import groupby
 
 import pandas as pd
-from models import ListNews, News
+from models import ListNews, News, Cluster
 from sqlalchemy.orm import Session
 from utils import convert_str_to_date
 
@@ -191,13 +192,44 @@ class DBNewsExtractor(BaseNewsExtractor):
             ]}
         )
 
+
+    def _clusters_from_news(self,
+                            news_list: List[News]
+    ) -> List[Cluster]:
+        return [
+            Cluster.parse_obj(
+                {
+                    'cluster_id': key,
+                    'news': list(group_news),
+                    'topic': [n.category for n in group_news],
+                    'tags': [n.tags for n in group_news],
+                    'statistics': []
+                }
+            )
+            for key, group_news in groupby(news_list, lambda news: news.cluster_num)
+        ]
+
+
     def show_clusters_by_filters(self,
                                  db: Session,
                                  topic: str,
                                  end_date: str,
                                  start_date: str = '1991-05-12',
-                                 num_news: int = 10, ) -> Dict:
-        pass
+                                 num_news: int = 10) -> Dict:
+        news_list = crud.get_news_by_filters(db,
+                                             topic=topic,
+                                             start_date=convert_str_to_date(start_date),
+                                             end_date=convert_str_to_date(end_date),
+                                             limit=num_news)
+        cluster_nums = [n.cluster_num for n in news_list]
+        news_list = crud.get_news_in_clusters(db, cluster_nums)
+        clusters = self._clusters_from_news(news_list)
+        return {
+            'clusters': clusters,
+            'statistics': []
+        }
+
+
 
     def show_news_by_filters(
             self,
