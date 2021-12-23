@@ -32,3 +32,10 @@ class StatisticsModels(BaseModel):
 class ListNews(BaseModel):
     news_list: List[News]
     statistics: List[StatisticsModels]
+
+class Cluster(BaseModel):
+    cluster_id: int
+    news: List[News]
+    topic: str
+    tags: List[str]
+    statistics: List[StatisticsModels]

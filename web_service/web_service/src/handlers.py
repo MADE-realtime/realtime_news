@@ -89,6 +89,16 @@ async def news_handler(request: Request,
         NEWS_TEMPLATE_NAME, {"request": request, 'news': news_list.news_list, 'stats': news_list.statistics[0]}
     )
 
+@app.get(
+    '/clusters',
+    response_class=HTMLResponse,
+)
+def clusters(request: Request, db: Session = Depends(get_db)
+):
+    rs = NEWS_EXTRACTOR.show_clusters_by_filters(db, topic=None, end_date='2021-12-20')
+    print(rs)
+    return rs
+
 
 @app.get(
     '/search',
