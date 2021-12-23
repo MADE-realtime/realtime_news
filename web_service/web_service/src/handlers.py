@@ -2,7 +2,7 @@ from typing import Optional
 
 from config import FAVICON_PATH, TEMPLATE_NAME, SEARCH_TEMPLATE_NAME, \
     SINGLE_TEMPLATE_NAME, POSTS_TEMPLATE_NAME, SINGLE_POST_TEMPLATE_NAME, \
-    NEWS_TEMPLATE_NAME
+    NEWS_TEMPLATE_NAME, CLUSTER_TEMPLATE_NAME, CLASS_OF_NEWS
 from datetime import datetime
 from fastapi import Depends, FastAPI, Request, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse
@@ -13,7 +13,7 @@ from news_extractor import BaseNewsExtractor, DBNewsExtractor
 from sqlalchemy.orm import Session
 
 from db_lib.database import SessionLocal
-from utils import get_vs_plots_data, get_vk_tg_stat_plot
+from utils import get_vs_plots_data, get_vk_tg_stat_plot, get_topics
 from session_logging import session_log
 
 app = FastAPI()
@@ -56,9 +56,35 @@ async def main_handler(request: Request,
     if not end_date:
         end_date = datetime.date(datetime.now())
     news_list = NEWS_EXTRACTOR.show_news_by_filters(db, topic, end_date, start_date, number)
+    topics = get_topics()
     return templates.TemplateResponse(
-        TEMPLATE_NAME, {"request": request, 'news': news_list.news_list, 'stats': news_list.statistics[0]}
+        TEMPLATE_NAME, {"request": request,
+                        'clusters': news_list.news_list,
+                        'stats': news_list.statistics[0],
+                        'topics': CLASS_OF_NEWS}
     )
+
+
+@app.get(
+    '/cluster/{cluster_id}',
+    response_class=HTMLResponse,
+    # response_model=ListNews,
+)
+@session_log
+async def single_cluster_handler(
+        request: Request, news_id: int, db: Session = Depends(get_db)
+):
+    """
+    Get random number news from all the time
+    :return:
+    """
+    news = NEWS_EXTRACTOR.show_single_news(db, news_id)
+    if news:
+        return templates.TemplateResponse(
+            CLUSTER_TEMPLATE_NAME, {"request": request, 'cluster': news['single_news']}
+        )
+    else:
+        raise HTTPException(status_code=404, detail="No news with such id found")
 
 
 @app.get(
@@ -86,7 +112,10 @@ async def news_handler(request: Request,
         end_date = datetime.date(datetime.now())
     news_list = NEWS_EXTRACTOR.show_news_by_filters(db, topic, end_date, start_date, number)
     return templates.TemplateResponse(
-        NEWS_TEMPLATE_NAME, {"request": request, 'news': news_list.news_list, 'stats': news_list.statistics[0]}
+        NEWS_TEMPLATE_NAME, {"request": request,
+                             'news': news_list.news_list,
+                             'stats': news_list.statistics[0],
+                             'topics': CLASS_OF_NEWS}
     )
 
 

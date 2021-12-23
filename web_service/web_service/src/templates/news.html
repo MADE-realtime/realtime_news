@@ -3,7 +3,7 @@
 
   <head>
     {% include 'header.html' %}
-    <title>Новости - в реальном времени и с аналитикой</title>
+    <title>Все новости / RTN </title>
   </head>
 
   <body>
@@ -18,7 +18,7 @@
 
         <div class="columns mb-6">
           <div class="column has-text-centered">
-            <h1 class="title is-1" style="color: ghostwhite;">Новости</h1>
+            <h1 class="title is-1" style="color: ghostwhite;">Все новости</h1>
           </div>
         </div>
 
@@ -31,15 +31,6 @@
                 <div class="field">
                   <p class="control">
                     <input id="news-number" class="input" type="number" min="5" max="200" value="10">
-<!--                    <div class="select">-->
-<!--                      <select id="news-number">-->
-<!--                        <option value="10" selected>10</option>-->
-<!--                        <option value="20">20</option>-->
-<!--                        <option value="30">30</option>-->
-<!--                        <option value="50">50</option>-->
-<!--                        <option value="100">100</option>-->
-<!--                      </select>-->
-<!--                    </div>-->
                   </p>
                   <p class="help has-text-white">новостей</p>
                 </div>
@@ -61,7 +52,7 @@
                       <option value="" disabled selected>Выберите тему</option>
                       {% if topics %}
                       {% for topic in topics %}
-                      <option>{{ topic }}</option>
+                      <option value="{{ topic }}">{{ topic }}</option>
                       {% endfor %}
                       {% endif %}
                     </select>
@@ -114,18 +105,20 @@
                   <span class="tag is-primary">Общее</span>
                   {% endif %}
                   {% if card.tags %}
-                  <span class="tag">{{ card.tags }}</span>
+                  {% for tag in card.tags%}
+                  <span class="tag">{{ tag }}</span>
+                  {% endfor %}
                   {% endif %}
                 </div>
                 <div class="card-image">
-                <figure class="image is-16by9">
-                  {% if card.image_url %}
-                  <a href="/news/{{ card.id }}"><img src="{{ card.image_url }}" alt="{{ card.title }}"></a>
-                  {% else %}
-                  <a href="/news/{{ card.id }}"><img src="{{ url_for('static', path='/img/news-placeholder.jpg') }}" alt="{{ card.title }}"></a>
-                  {% endif %}
-                </figure>
-              </div>
+                  <figure class="image is-16by9">
+                    {% if card.image_url %}
+                    <a href="/news/{{ card.id }}"><img src="{{ card.image_url }}" alt="{{ card.title }}"></a>
+                    {% else %}
+                    <a href="/news/{{ card.id }}"><img src="{{ url_for('static', path='/img/news-placeholder.jpg') }}" alt="{{ card.title }}"></a>
+                    {% endif %}
+                  </figure>
+                </div>
                 <div class="content">
                   {% if card.time %}
                   <time datetime="{{ card.date }}">{{ card.time }}</time>

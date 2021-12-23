@@ -43,9 +43,17 @@ hr {
     margin: 0.5rem 0;
 }
 
+.content p {
+    overflow-wrap: break-word;
+}
+
 @media only screen and (max-width: 600px) {
   .column {
     padding-left: 0;
     padding-right: 0;
+  }
+
+  .box .p-6{
+    padding: 1rem!important;
   }
 }

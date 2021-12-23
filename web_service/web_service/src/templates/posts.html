@@ -42,9 +42,9 @@
                   <div class="mb-4">
                     <div class="content">
                       {% if single_news.source_name %}
-                      <p class="subtitle is-6">
+                      <span class="subtitle is-6">
                         <a href="/vk_tg/ {{ single_news.id }}">
-                            <span class="icon-text has-text-info">
+                          <span class="icon-text has-text-info">
                             <span class="icon">
                               {% if single_news.social_network == "vk" %}
                               <i class="fab fa-vk"></i>
@@ -53,19 +53,21 @@
                               {% endif %}
                             </span>
                           </span>
-                          {{ single_news.source_name }}
+                          <span></span>{{ single_news.source_name }}
                         </a>
-                      </p>
+                      </span>
                       {% else %}
                       <p>Неизвестная газета</p>
+                      {% endif %}
+                      {% if single_news.time %}
+                      <time datetime="{{ single_news.date }}" class="is-pulled-right">{{ single_news.time }}</time>
+                      {% else %}
+                      <span class="is-pulled-right">Сегодня</span>
                       {% endif %}
                     </div>
                     <p>
                       {{ single_news.text | safe }}
                     </p>
-                    {% if single_news.link %}
-                    <p><a href="{{ single_news.link }}">Читать пост в источнике</a></p>
-                    {% endif %}
                   </div>
                   {% else %}
                   <div class="mb-4">
@@ -104,13 +106,6 @@
                     </span>
                     <span>{{ single_news.reposts }}</span>
                   </span>
-                  {% endif %}
-                </div>
-                <div class="content">
-                  {% if single_news.time %}
-                  <time datetime="{{ single_news.date }}">{{ single_news.time }}</time>
-                  {% else %}
-                  <span>Сегодня</span>
                   {% endif %}
                 </div>
 
