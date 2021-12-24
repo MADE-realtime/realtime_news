@@ -93,20 +93,39 @@
               {% endif %}
 
               {% if views_plot %}
-              <p class="title is-5">Динамика просмотров</p>
+              <p class="title is-5 mt-6">Динамика просмотров</p>
+              {% if views_plot.x|tojson|length > 1 %}
               <div id="views-plot" style="max-width: 100%; margin: auto"></div>
+              {% else %}
+              <p>Данные собираются, проверьте через час.</p>
               {% endif %}
+              {% endif %}
+
               {% if likes_plot %}
               <p class="title is-5">Динамика лайков</p>
+              {% if likes_plot.x|tojson|length > 1 %}
               <div id="likes-plot" style="max-width: 100%; margin: auto"></div>
+              {% else %}
+              <p>Данные собираются, проверьте через час.</p>
               {% endif %}
+              {% endif %}
+
               {% if comments_plot %}
               <p class="title is-5">Динамика комментариев</p>
+              {% if comments_plot.x|tojson|length > 1 %}
               <div id="comments-plot" style="max-width: 100%; margin: auto"></div>
+              {% else %}
+              <p>Данные собираются, проверьте через час.</p>
               {% endif %}
+              {% endif %}
+
               {% if reposts_plot %}
               <p class="title is-5">Динамика репостов</p>
+              {% if reposts_plot.x|tojson|length > 1 %}
               <div id="reposts-plot" style="max-width: 100%; margin: auto"></div>
+              {% else %}
+              <p>Данные собираются, проверьте через час.</p>
+              {% endif %}
               {% endif %}
             </div>
             <div class="content">

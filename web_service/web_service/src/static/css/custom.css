@@ -39,12 +39,20 @@ body {
     color: #339af0;
 }
 
+.navbar-item .fa-rss {
+    color: #f29738;
+}
+
 hr {
     margin: 0.5rem 0;
 }
 
 .content p {
     overflow-wrap: break-word;
+}
+
+.card {
+    height: 100%;
 }
 
 @media only screen and (max-width: 600px) {

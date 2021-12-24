@@ -24,7 +24,7 @@ def get_news_by_filters(db: Session,
     if topic:
         return db.query(News) \
             .order_by(News.time.desc()) \
-            .filter(News.topic == topic) \
+            .filter(News.category == topic) \
             .filter(News.date >= start_date) \
             .filter(News.date <= end_date) \
             .offset(skip).limit(limit).all()
@@ -36,9 +36,9 @@ def get_news_by_filters(db: Session,
             .offset(skip).limit(limit).all()
 
 
-def get_news_in_clusters(db: Session,
-                         clusters: List[int]) -> List[News]:
-    return db.query(News).filter(News.cluster_num.in_(clusters))
+# def get_news_in_clusters(db: Session,
+#                          clusters: List[int]) -> List[News]:
+#     return db.query(News).filter(News.cluster_num.in_(clusters))
 
 
 def get_single_news(db: Session,
@@ -68,15 +68,15 @@ def get_news_by_topic_and_date(db: Session,
 
 
 def get_news_by_filters_with_cluster(db: Session,
-                        topic: str,
-                        start_date: date,
-                        end_date: date,
-                        skip: int = 0,
-                        limit: int = 100) -> List[News]:
+                                     topic: str,
+                                     start_date: date,
+                                     end_date: date,
+                                     skip: int = 0,
+                                     limit: int = 100) -> List[News]:
     if topic:
         return db.query(News) \
             .order_by(News.time.desc()) \
-            .filter(News.topic == topic) \
+            .filter(News.category == topic) \
             .filter(News.date >= start_date) \
             .filter(News.date <= end_date) \
             .filter(News.cluster_num.isnot(None)) \
@@ -91,8 +91,15 @@ def get_news_by_filters_with_cluster(db: Session,
 
 
 def get_news_in_clusters(db: Session,
-                         clusters: List[int]) -> List[News]:
-    return db.query(News).filter(News.cluster_num.in_(clusters))
+                         clusters: List[int],
+                         skip: int = 0) -> List[News]:
+    return db.query(News).filter(News.cluster_num.in_(clusters)).order_by(News.time).offset(skip).all()
+
+
+def get_news_by_cluster_id(db: Session,
+                           cluster_id: int,
+                           skip: int = 0) -> List[News]:
+    return db.query(News).filter(News.cluster_num == cluster_id).order_by(News.time).offset(skip).all()
 
 
 def get_news_by_date(db: Session,
@@ -103,8 +110,8 @@ def get_news_by_date(db: Session,
                      limit: int = 100) -> List[News]:
     return db.query(News) \
         .filter(News.topic == topic) \
-        .filter(News.time >= start_date) \
-        .filter(News.time <= end_date) \
+        .filter(News.date >= start_date) \
+        .filter(News.date <= end_date) \
         .offset(skip).limit(limit).all()
 
 
@@ -134,6 +141,18 @@ def save_all_news(db: Session, news_list: List[News]) -> List[News]:
     db.commit()
     db.refresh(news_list)
     return news_list
+
+
+def get_social_network_news_list_by_filters(db: Session,
+                                            start_date: date,
+                                            end_date: date,
+                                            limit: int = 100,
+                                            skip: int = 0) -> List[SocialNetworkNews]:
+    return db.query(SocialNetworkNews) \
+        .filter(SocialNetworkNews.date >= start_date) \
+        .filter(SocialNetworkNews.date <= end_date) \
+        .order_by(SocialNetworkNews.time.desc()) \
+        .offset(skip).limit(limit).all()
 
 
 def get_social_network_news_list(db: Session,
@@ -183,4 +202,3 @@ def get_social_network_stats_by_domain(db: Session,
         SocialNetworkNews.social_network
     ) \
         .all()
-

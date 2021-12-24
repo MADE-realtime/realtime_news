@@ -11,7 +11,7 @@ class News(BaseModel):
     title: str = None
     content: str = None
     topic: str = None
-    tags: str = None
+    tags: Optional[List[str]] = None
     date: Optional[date]
     time: Optional[datetime]
     source_name: str = None
@@ -32,6 +32,7 @@ class StatisticsModels(BaseModel):
 class ListNews(BaseModel):
     news_list: List[News]
     statistics: List[StatisticsModels]
+
 
 class Cluster(BaseModel):
     cluster_id: int

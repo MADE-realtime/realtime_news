@@ -102,18 +102,20 @@
                   </div>
                   {% if clusters[0]['news'][0].content %}
                   <div class="media-content mb-3">
-                    <p>{{ clusters[0]['news'][0].content | safe }}</p>
+                    <p>{{ clusters[0]['news'][0].content[:240] }} ...</p>
                   </div>
                   {% endif %}
                   <div class="media-content mb-3">
-                    {% if clusters[0]['topic'] %}
-                    <span class="tag is-primary">{{ clusters[0]['topic'] }}</span>
+                    {% if clusters[0]['news'][0].category %}
+                    <span class="tag is-primary">{{ clusters[0]['news'][0].category }}</span>
                     {% else %}
                     <span class="tag is-primary">Общее</span>
                     {% endif %}
-                    {% if clusters[0]['tags'] %}
-                    {% for tag in cluster[0]['tags'] %}
+                    {% if clusters[0]['news'][0].tags %}
+                    {% for tag in clusters[0]['news'][0].tags %}
+                    {% if tag %}
                     <span class="tag">{{ tag }}</span>
+                    {% endif %}
                     {% endfor %}
                     {% endif %}
                   </div>
@@ -132,7 +134,7 @@
                   </div>
                   <div class="content">
                     {% if clusters[0]['news'][0].time %}
-                    <time datetime="{{ card.date }}">{{ clusters[0]['news'][0].time }}</time>
+                    <time datetime="{{ clusters[0]['news'][0].date }}">{{ clusters[0]['news'][0].time }}</time>
                     {% else %}
                     <span>Сегодня</span>
                     {% endif %}
@@ -162,7 +164,7 @@
 
                   <!-- subnews -->
                   {% if clusters[0]['news']|length > 1 %}
-                  {% for card in clusters[0]['news'][1:4] %}
+                  {% for card in clusters[0]['news'][1:3] %}
                   <hr>
                   <div class="content mb-3">
                     <div class="media-content">
@@ -191,7 +193,6 @@
                   {% endif %}
 
                   <a href="/cluster/{{ clusters[0]['cluster_id'] }}" class="button is-fullwidth mt-5">Подробнее о новости</a>
-
                 </div>
                 {% else %}
                 <div class="card-content">
@@ -200,6 +201,7 @@
                   </div>
                 </div>
                 {% endif %}
+
               </div>
 
             </div>
@@ -317,7 +319,7 @@
 
                 <!-- subnews   -->
                 {% if cluster['news']|length > 1 %}
-                {% for card in cluster['news'][1:4] %}
+                {% for card in cluster['news'][1:2] %}
                 <hr>
                 <div class="content mb-3">
                   <div class="media-content">

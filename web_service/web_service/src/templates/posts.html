@@ -30,6 +30,46 @@
           </div>
         </div>
 
+        <!-- Filters -->
+        <div id="filters1" class="row columns mb-2">
+
+          <div class="column is-8 is-offset-2">
+            <div class="field is-horizontal">
+              <div class="field-body">
+                <div class="field">
+                  <p class="control">
+                    <input id="date-start" class="input" type="date">
+                  </p>
+                  <p class="help has-text-white">от</p>
+                </div>
+                <div class="field">
+                  <p class="control">
+                    <input id="date-end" class="input" type="date">
+                  </p>
+                  <p class="help has-text-white">до</p>
+                </div>
+                <div class="field">
+                  <div class="control">
+                    <button id="update" class="button is-primary" onclick="updatePostsFilters()">
+                      Поиск
+                    </button>
+                  </div>
+                </div>
+                <div class="field">
+                  <div class="control">
+                    <button id="clear" class="button is-danger is-outlined" onclick="clearPostsFilters()">
+                      <span class="icon">
+                        <i class="fas fa-times"></i>
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End filters -->
+
         <!-- Start news -->
         <div id="news" class="row columns mb-6">
           <div class="column is-8 is-offset-2">

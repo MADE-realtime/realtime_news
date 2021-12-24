@@ -105,8 +105,10 @@
                   <span class="tag is-primary">Общее</span>
                   {% endif %}
                   {% if card.tags %}
-                  {% for tag in card.tags%}
+                  {% for tag in card.tags %}
+                  {% if tag %}
                   <span class="tag">{{ tag }}</span>
+                  {% endif %}
                   {% endfor %}
                   {% endif %}
                 </div>
@@ -148,8 +150,13 @@
             </div>
           </div>
           {% endif %}
-
         {% endfor %}
+        {% else %}
+        <div class="row column">
+          <div class="box content">
+            <p>По заданным фильтрам ничего не найдено, попробуйте изменить параметры поиска.</p>
+          </div>
+        </div>
         {% endif %}
         </div>
         <!-- End news -->

@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List
-from itertools import groupby
+from itertools import groupby, chain
 
 import pandas as pd
 from models import ListNews, News, Cluster
@@ -54,6 +54,20 @@ class BaseNewsExtractor(ABC):
         pass
 
     @abstractmethod
+    def show_clusters_by_filters(self, db: Session, topic: str, end_date: str, start_date: str, num_news: int = 10):
+        """
+        Метод для кластеров новостей по заданным фильтрам
+        """
+        pass
+
+    @abstractmethod
+    def show_cluster_by_id(self, db: Session, cluster_id):
+        """
+        Метод для показа новостей по кластеру
+        """
+        pass
+
+    @abstractmethod
     def show_news_by_regex(self, db: Session, word: str, mode: str, cnt: int):
         """
         Метод для поиска новостей по регулярному выражению
@@ -64,6 +78,13 @@ class BaseNewsExtractor(ABC):
     def show_single_news(self, db: Session, news_id: int):
         """
         Метод для показа новости по id
+        """
+        pass
+
+    @abstractmethod
+    def show_posts_by_filters(self, db: Session, end_date: str, start_date: str, num_news: int):
+        """
+        Метод для вывода последних постов с филтрацией
         """
         pass
 
@@ -192,23 +213,21 @@ class DBNewsExtractor(BaseNewsExtractor):
             ]}
         )
 
-
     def _clusters_from_news(self,
-                            news_list: List[News]
-    ) -> List[Cluster]:
+                            news_list: List[News]) -> List[Cluster]:
+        news_list.sort(key=lambda x: x.cluster_num, reverse=True)
         return [
             Cluster.parse_obj(
                 {
                     'cluster_id': key,
                     'news': list(group_news),
-                    'topic': [n.category for n in group_news],
-                    'tags': [n.tags for n in group_news],
+                    'topic': list(set([n.category for n in list(group_news) if n.category])),
+                    'tags': list(set(chain(*[n.tags for n in list(group_news) if n.tags]))),
                     'statistics': []
                 }
             )
             for key, group_news in groupby(news_list, lambda news: news.cluster_num)
         ]
-
 
     def show_clusters_by_filters(self,
                                  db: Session,
@@ -216,20 +235,35 @@ class DBNewsExtractor(BaseNewsExtractor):
                                  end_date: str,
                                  start_date: str = '1991-05-12',
                                  num_news: int = 10) -> Dict:
-        news_list = crud.get_news_by_filters(db,
-                                             topic=topic,
-                                             start_date=convert_str_to_date(start_date),
-                                             end_date=convert_str_to_date(end_date),
-                                             limit=num_news)
+        news_list = crud.get_news_by_filters_with_cluster(db,
+                                                          topic=topic,
+                                                          start_date=convert_str_to_date(start_date),
+                                                          end_date=convert_str_to_date(end_date),
+                                                          limit=num_news * 20)
         cluster_nums = [n.cluster_num for n in news_list]
         news_list = crud.get_news_in_clusters(db, cluster_nums)
-        clusters = self._clusters_from_news(news_list)
+        news_list = _clean_img_urls(news_list)
+        news_list = _json_tags_to_list(news_list)
+        clusters = self._clusters_from_news(news_list)[:num_news]
         return {
             'clusters': clusters,
             'statistics': []
         }
 
-
+    def show_cluster_by_id(self,
+                           db: Session,
+                           cluster_id) -> Dict:
+        news_list = crud.get_news_by_cluster_id(db, cluster_id)
+        news_list = _clean_img_urls(news_list)
+        news_list = _json_tags_to_list(news_list)
+        cluster = {
+            'cluster_id': cluster_id,
+            'news': news_list,
+            'topic': list(set([n.category for n in news_list if n.category])),
+            'tags': list(set(chain(*[n.tags for n in news_list if n.tags]))),
+            'statistics': [NgramsBuilder().predict(news_list)]
+        }
+        return cluster
 
     def show_news_by_filters(
             self,
@@ -249,6 +283,7 @@ class DBNewsExtractor(BaseNewsExtractor):
         #     num_news = news_list_len
         # news_list = random.choices(news_list, k=num_random_news)
         news_list = _clean_img_urls(news_list)
+        news_list = _json_tags_to_list(news_list)
 
         # Не менять порядок в statistics
         return ListNews.parse_obj(
@@ -256,9 +291,9 @@ class DBNewsExtractor(BaseNewsExtractor):
                 'news_list': news_list,
                 'statistics': [
                     NgramsBuilder().predict(news_list),
-                    StatisticsByResource().predict(news_list),
-                    ByDayCounter().predict(news_list),
-                    CategoriesStatistics().predict(news_list),
+                    # StatisticsByResource().predict(news_list),
+                    # ByDayCounter().predict(news_list),
+                    # CategoriesStatistics().predict(news_list),
                 ]
             }
         )
@@ -280,6 +315,7 @@ class DBNewsExtractor(BaseNewsExtractor):
                 one_news for one_news in news_list if re.search(word_re, str(one_news.content), flags=re.IGNORECASE)
             ]
         selected_news = _clean_img_urls(selected_news)
+        selected_news = _json_tags_to_list(selected_news)
 
         # Не менять порядок в statistics
         return ListNews.parse_obj(
@@ -289,7 +325,7 @@ class DBNewsExtractor(BaseNewsExtractor):
                     NgramsBuilder().predict(selected_news, cnt),
                     StatisticsByResource().predict(selected_news),
                     ByDayCounter().predict(selected_news),
-                    CategoriesStatistics().predict(selected_news),
+                    # CategoriesStatistics().predict(selected_news),
                 ]
             }
         )
@@ -297,8 +333,23 @@ class DBNewsExtractor(BaseNewsExtractor):
     def show_single_news(self, db: Session, news_id: int) -> Dict:
         single_news = crud.get_single_news(db, news_id)
         single_news.image_url = _remove_extra_link(single_news.image_url)
+        if single_news.tags:
+            single_news.tags = single_news.tags.lstrip('{').rstrip('}').replace('"', '').split(',')
         return {
             'single_news': single_news,
+        }
+
+    def show_posts_by_filters(self,
+                              db: Session,
+                              end_date: str,
+                              start_date: str = '1991-05-12',
+                              num: int = 100) -> Dict:
+        vk_tg_news_list = crud.get_social_network_news_list_by_filters(db,
+                                                                       convert_str_to_date(start_date),
+                                                                       convert_str_to_date(end_date),
+                                                                       num)
+        return {
+            'news_list': vk_tg_news_list,
         }
 
     def show_last_posts(self, db: Session, num: int) -> Dict:
@@ -336,6 +387,17 @@ def clean_nones_from_content(news_list: List[News]) -> List[News]:
 def _clean_img_urls(news_list: List[News]) -> List[News]:
     for i, news in enumerate(news_list):
         news_list[i].image_url = _remove_extra_link(news_list[i].image_url)
+    return news_list
+
+
+def _json_tags_to_list(news_list: List[News]) -> List[News]:
+    for i, news in enumerate(news_list):
+        if news_list[i].tags and not isinstance(news_list[i].tags, list):
+            news_list[i].tags = news_list[i].tags \
+                .lstrip('{').rstrip('}') \
+                .replace('"', '').replace('&laquo', '').replace('&raquo', '') \
+                .replace('[', '').replace(']', '').replace("'", "") \
+                .split(',')
     return news_list
 
 

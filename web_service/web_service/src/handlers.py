@@ -13,7 +13,7 @@ from news_extractor import BaseNewsExtractor, DBNewsExtractor
 from sqlalchemy.orm import Session
 
 from db_lib.database import SessionLocal
-from utils import get_vs_plots_data, get_vk_tg_stat_plot, get_topics
+from utils import get_vs_plots_data, get_vk_tg_stat_plot
 from session_logging import session_log
 
 app = FastAPI()
@@ -55,12 +55,14 @@ async def main_handler(request: Request,
         number = 200
     if not end_date:
         end_date = datetime.date(datetime.now())
-    news_list = NEWS_EXTRACTOR.show_news_by_filters(db, topic, end_date, start_date, number)
-    topics = get_topics()
+    clusters = NEWS_EXTRACTOR.show_clusters_by_filters(db, topic, end_date, start_date, number)
+    print(clusters)
+    posts_list = NEWS_EXTRACTOR.show_last_posts(db, 6)['news_list']
     return templates.TemplateResponse(
         TEMPLATE_NAME, {"request": request,
-                        'clusters': news_list.news_list,
-                        'stats': news_list.statistics[0],
+                        'clusters': clusters['clusters'],
+                        'stats': clusters['statistics'],
+                        'posts': posts_list,
                         'topics': CLASS_OF_NEWS}
     )
 
@@ -72,19 +74,20 @@ async def main_handler(request: Request,
 )
 @session_log
 async def single_cluster_handler(
-        request: Request, news_id: int, db: Session = Depends(get_db)
+        request: Request, cluster_id: int, db: Session = Depends(get_db)
 ):
     """
     Get random number news from all the time
     :return:
     """
-    news = NEWS_EXTRACTOR.show_single_news(db, news_id)
-    if news:
+    cluster = NEWS_EXTRACTOR.show_cluster_by_id(db, cluster_id)
+    print(cluster)
+    if cluster:
         return templates.TemplateResponse(
-            CLUSTER_TEMPLATE_NAME, {"request": request, 'cluster': news['single_news']}
+            CLUSTER_TEMPLATE_NAME, {"request": request, 'cluster': cluster}
         )
     else:
-        raise HTTPException(status_code=404, detail="No news with such id found")
+        raise HTTPException(status_code=404, detail="No news cluster with such id found")
 
 
 @app.get(
@@ -117,6 +120,7 @@ async def news_handler(request: Request,
                              'stats': news_list.statistics[0],
                              'topics': CLASS_OF_NEWS}
     )
+
 
 @app.get(
     '/clusters',
@@ -189,6 +193,8 @@ async def single_news_handler(
 )
 @session_log
 async def all_posts_handler(request: Request,
+                            start_date: Optional[str] = '1991-05-12',
+                            end_date: Optional[str] = None,
                             number: Optional[int] = 100,
                             db: Session = Depends(get_db)
                             ):
@@ -196,7 +202,9 @@ async def all_posts_handler(request: Request,
     Get last 100 social network posts
     :return:
     """
-    posts_list = NEWS_EXTRACTOR.show_last_posts(db, number)['news_list']
+    if not end_date:
+        end_date = datetime.date(datetime.now())
+    posts_list = NEWS_EXTRACTOR.show_posts_by_filters(db, end_date, start_date, number)['news_list']
     return templates.TemplateResponse(
         POSTS_TEMPLATE_NAME, {"request": request, 'news': posts_list}
     )
