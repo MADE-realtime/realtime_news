@@ -1,6 +1,8 @@
 from typing import Optional
 
-from config import FAVICON_PATH, TEMPLATE_NAME, SEARCH_TEMPLATE_NAME, SINGLE_TEMPLATE_NAME, POSTS_TEMPLATE_NAME, SINGLE_POST_TEMPLATE_NAME
+from config import FAVICON_PATH, TEMPLATE_NAME, SEARCH_TEMPLATE_NAME, \
+    SINGLE_TEMPLATE_NAME, POSTS_TEMPLATE_NAME, SINGLE_POST_TEMPLATE_NAME, \
+    NEWS_TEMPLATE_NAME, CLUSTER_TEMPLATE_NAME, CLASS_OF_NEWS
 from datetime import datetime
 from fastapi import Depends, FastAPI, Request, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse
@@ -44,7 +46,65 @@ async def main_handler(request: Request,
                        db: Session = Depends(get_db)
                        ):
     """
-    Get random number news by filters
+    Get clusters with news by filters
+    :return:
+    """
+    if number < 5:
+        number = 5
+    elif number > 200:
+        number = 200
+    if not end_date:
+        end_date = datetime.date(datetime.now())
+    clusters = NEWS_EXTRACTOR.show_clusters_by_filters(db, topic, end_date, start_date, number)
+    print(clusters)
+    posts_list = NEWS_EXTRACTOR.show_last_posts(db, 6)['news_list']
+    return templates.TemplateResponse(
+        TEMPLATE_NAME, {"request": request,
+                        'clusters': clusters['clusters'],
+                        'stats': clusters['statistics'],
+                        'posts': posts_list,
+                        'topics': CLASS_OF_NEWS}
+    )
+
+
+@app.get(
+    '/cluster/{cluster_id}',
+    response_class=HTMLResponse,
+    # response_model=ListNews,
+)
+@session_log
+async def single_cluster_handler(
+        request: Request, cluster_id: int, db: Session = Depends(get_db)
+):
+    """
+    Get random number news from all the time
+    :return:
+    """
+    cluster = NEWS_EXTRACTOR.show_cluster_by_id(db, cluster_id)
+    print(cluster)
+    if cluster:
+        return templates.TemplateResponse(
+            CLUSTER_TEMPLATE_NAME, {"request": request, 'cluster': cluster}
+        )
+    else:
+        raise HTTPException(status_code=404, detail="No news cluster with such id found")
+
+
+@app.get(
+    '/news',
+    response_class=HTMLResponse,
+    response_model=ListNews,
+)
+@session_log
+async def news_handler(request: Request,
+                       topic: Optional[str] = None,
+                       start_date: Optional[str] = '1991-05-12',
+                       end_date: Optional[str] = None,
+                       number: Optional[int] = 10,
+                       db: Session = Depends(get_db)
+                       ):
+    """
+    Get news by filters
     :return:
     """
     if number < 5:
@@ -55,8 +115,22 @@ async def main_handler(request: Request,
         end_date = datetime.date(datetime.now())
     news_list = NEWS_EXTRACTOR.show_news_by_filters(db, topic, end_date, start_date, number)
     return templates.TemplateResponse(
-        TEMPLATE_NAME, {"request": request, 'news': news_list.news_list, 'stats': news_list.statistics[0]}
+        NEWS_TEMPLATE_NAME, {"request": request,
+                             'news': news_list.news_list,
+                             'stats': news_list.statistics[0],
+                             'topics': CLASS_OF_NEWS}
     )
+
+
+@app.get(
+    '/clusters',
+    response_class=HTMLResponse,
+)
+def clusters(request: Request, db: Session = Depends(get_db)
+):
+    rs = NEWS_EXTRACTOR.show_clusters_by_filters(db, topic=None, end_date='2021-12-20')
+    print(rs)
+    return rs
 
 
 @app.get(
@@ -119,6 +193,8 @@ async def single_news_handler(
 )
 @session_log
 async def all_posts_handler(request: Request,
+                            start_date: Optional[str] = '1991-05-12',
+                            end_date: Optional[str] = None,
                             number: Optional[int] = 100,
                             db: Session = Depends(get_db)
                             ):
@@ -126,7 +202,9 @@ async def all_posts_handler(request: Request,
     Get last 100 social network posts
     :return:
     """
-    posts_list = NEWS_EXTRACTOR.show_last_posts(db, number)['news_list']
+    if not end_date:
+        end_date = datetime.date(datetime.now())
+    posts_list = NEWS_EXTRACTOR.show_posts_by_filters(db, end_date, start_date, number)['news_list']
     return templates.TemplateResponse(
         POSTS_TEMPLATE_NAME, {"request": request, 'news': posts_list}
     )

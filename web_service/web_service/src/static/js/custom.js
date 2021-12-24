@@ -215,6 +215,26 @@ function clearVsSearchFilters(){
     location.reload();
 }
 
+function clearPostsFilters(){
+    document.getElementById("date-start").value = "";
+    document.getElementById("date-end").value = "";
+    let searchParams = new URLSearchParams(window.location.search);
+    searchParams.delete("start_date");
+    searchParams.delete("end_date");
+    if (window.history.replaceState) {
+        const url = window.location.protocol
+                    + "//" + window.location.host
+                    + window.location.pathname
+                    + "?"
+                    + searchParams.toString();
+
+        window.history.replaceState({
+            path: url
+        }, "", url)
+    }
+    location.reload();
+}
+
 function updateFilters() {
     let searchParams = new URLSearchParams(window.location.search);
     var newsNumber = document.getElementById("news-number").value;
@@ -257,6 +277,30 @@ function updateVsSearchFilters() {
     }
     if (secondVal !== '') {
         searchParams.set("word_2", secondVal);
+    }
+    if (window.history.replaceState) {
+        const url = window.location.protocol
+                    + "//" + window.location.host
+                    + window.location.pathname
+                    + "?"
+                    + searchParams.toString();
+
+        window.history.replaceState({
+            path: url
+        }, "", url)
+    }
+    location.reload();
+}
+
+function updatePostsFilters() {
+    let searchParams = new URLSearchParams(window.location.search);
+    var dateStart = document.getElementById("date-start").value;
+    var dateEnd = document.getElementById("date-end").value;
+    if (dateStart !== '') {
+        searchParams.set("start_date", dateStart);
+    }
+    if (dateEnd !== '') {
+        searchParams.set("end_date", dateEnd);
     }
     if (window.history.replaceState) {
         const url = window.location.protocol

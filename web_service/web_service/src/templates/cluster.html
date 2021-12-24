@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+  <head>
+    {% include 'header.html' %}
+    <title>{{ cluster['news'][0].title }} / RTN</title>
+  </head>
+
+  <body>
+
+    <!-- START NAV -->
+    {% include 'main-nav.html' %}
+    <!-- END NAV -->
+
+    <div class="container">
+
+      <div class="section">
+
+        <!-- Title -->
+        <div class="columns mb-6">
+          <div class="column is-2">
+            <a href="/" class="button is-medium">
+              <span class="icon is-medium">
+                <i class="fas fa-arrow-left"></i>
+              </span>
+              <span>Главная</span>
+            </a>
+          </div>
+          <div class="column is-8 has-text-centered">
+            <h1 class="title is-1" style="color: ghostwhite;">{{ cluster['news'][0].title | safe }}</h1>
+          </div>
+        </div>
+
+        <!-- Start news -->
+        <div id="news" class="row columns mb-6">
+          <div class="column is-8 is-offset-2">
+
+            <!-- First single news -->
+            {% set card1 = cluster['news'][0] %}
+            <div class="box p-6">
+              <div class="content">
+
+                {% if card1.title %}
+                <div class="mb-4">
+                  <div class="content">
+                    <p class="title is-4">
+                      <a href="/news/ {{ card1.id }}">
+                        {{ card1.title | safe }}
+                      </a>
+                    </p>
+                  </div>
+                  <div class="content">
+                      {% if card1.content %}
+                      <div>
+                        {{ card1.content | safe }}
+                      </div>
+                      {% else %}
+                      <div>
+                        <p><a href="{{ card1.source_url }}" target="_blank">Эту новость можно прочитать полностью в
+                          источнике. <span class="icon"><i class="fas fa-external-link-alt"></i></span></a></p>
+                      </div>
+                      {% endif %}
+                    </div>
+                  <div class="media-content mb-3">
+                    {% if card1.category %}
+                    <span class="tag is-primary">{{ card1.category }}</span>
+                    {% else %}
+                    <span class="tag is-primary">Общее</span>
+                    {% endif %}
+                    {% if card1.tags %}
+                    {% for tag in card1.tags %}
+                    <span class="tag">{{ tag }}</span>
+                    {% endfor %}
+                    {% endif %}
+                  </div>
+                  <div class="card-image">
+                    <figure class="image is-16by9">
+                      {% if card1.image_url %}
+                      <a href="/news/{{ card1.id }}">
+                        <img src="{{ card1.image_url }}" alt="{{ card1.title }}">
+                      </a>
+                      {% else %}
+                      <a href="/news/{{ card1.id }}">
+                        <img src="{{ url_for('static', path='/img/news-placeholder.jpg') }}" alt="{{ card1.title }}">
+                      </a>
+                      {% endif %}
+                    </figure>
+                  </div>
+                  <div class="content">
+                    {% if card1.time %}
+                    <time datetime="{{ card1.date }}">{{ card1.time }}</time>
+                    {% else %}
+                    <span>Сегодня</span>
+                    {% endif %}
+                    <div class="media">
+                      <div class="media-left">
+                        <figure class="image is-16x16 m-0">
+                          {% if card1.logo_url %}
+                          <img src="{{ card1.logo_url }}" alt="{{ card1.source_name }}">
+                          {% else %}
+                          <img src="{{ url_for('static', path='/img/rtn-small-logo.png') }}"
+                               alt="{{ card1.source_name }}">
+                          {% endif %}
+                        </figure>
+                      </div>
+                      <div class="media-content">
+                        {% if card1.source_name %}
+                        <p class="subtitle is-6">
+                          <a href="{{ card1.source_url }}" target="_blank">{{ card1.source_name }}</a>
+                        </p>
+                        {% else %}
+                        <p class="subtitle is-6">
+                          <a href="{{ card1.source_url }}" target="_blank">Неизвестная газета</a></p>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endif %}
+
+              </div>
+
+            </div>
+            <!-- End first single news -->
+
+            <!-- Stats -->
+            <div class="box p-6 content">
+              <h2 class="title is-4">Кто первый написал об этой новости</h2>
+              <p>Первым написали: <b>{{ card1.source_name }}</b>, новость опубликована: <b>{{ card1.time }}</b></p>
+              <p>Всего написали об этой новости: <b>{{ cluster['news']|length }}</b> СМИ</p>
+              <h2 class="title is-4">Контекст новости</h2>
+              <div class="tags">
+                {% if cluster['statistics'] and cluster['statistics'][0].stats and (cluster['statistics'][0].type == "Ngrams") %}
+                {% for ngram in cluster['statistics'][0].stats[:30] %}
+                <span class="tag">{{ngram[0]}}: {{ngram[1]}}</span>
+                {% endfor %}
+                {% endif %}
+              </div>
+            </div>
+            <!-- End stats -->
+
+            <!-- Rest of news -->
+            {% for card in cluster['news'][1:51] %}
+            <div class="box p-6">
+              <div class="content">
+
+                {% if card.title %}
+                <div class="mb-4">
+                  <div class="content">
+                    <p class="title is-4">
+                      <a href="/news/ {{ card.id }}">
+                        {{ card.title | safe }}
+                      </a>
+                    </p>
+                  </div>
+                  <div class="media-content mb-3">
+                    {% if card.category %}
+                    <span class="tag is-primary">{{ card.category }}</span>
+                    {% else %}
+                    <span class="tag is-primary">Общее</span>
+                    {% endif %}
+                    {% if card.tags %}
+                    {% for tag in card.tags %}
+                    <span class="tag">{{ tag }}</span>
+                    {% endfor %}
+                    {% endif %}
+                  </div>
+                  <div class="content">
+                    {% if card.time %}
+                    <time datetime="{{ card.date }}">{{ card.time }}</time>
+                    {% else %}
+                    <span>Сегодня</span>
+                    {% endif %}
+                    <div class="media">
+                      <div class="media-left">
+                        <figure class="image is-16x16 m-0">
+                          {% if card.logo_url %}
+                          <img src="{{ card.logo_url }}" alt="{{ card.source_name }}">
+                          {% else %}
+                          <img src="{{ url_for('static', path='/img/rtn-small-logo.png') }}" alt="{{ card.source_name }}">
+                          {% endif %}
+                        </figure>
+                      </div>
+                      <div class="media-content">
+                        {% if card.source_name %}
+                        <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">{{ card.source_name }}</a></p>
+                        {% else %}
+                        <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">Неизвестная газета</a></p>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endif %}
+
+              </div>
+
+            </div>
+            {% endfor %}
+            <!-- End of rest of news -->
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    {% include 'footer.html' %}
+    <!-- End Footer -->
+
+  </body>
+
+</html>

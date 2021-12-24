@@ -46,13 +46,17 @@
               {% endif %}
             </div>
             <div class="content">
-              {% if single_news.topic %}
-              <span class="tag is-primary">{{ single_news.topic }}</span>
+              {% if single_news.category %}
+              <span class="tag is-primary">{{ single_news.category }}</span>
               {% else %}
               <span class="tag is-primary">Общее</span>
               {% endif %}
               {% if single_news.tags %}
-              <span class="tag">{{ single_news.tags }}</span>
+              {% for tag in single_news.tags %}
+              {% if tag %}
+              <span class="tag">{{ tag }}</span>
+              {% endif %}
+              {% endfor %}
               {% endif %}
             </div>
             <div>

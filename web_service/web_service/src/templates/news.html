@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+  <head>
+    {% include 'header.html' %}
+    <title>Все новости / RTN </title>
+  </head>
+
+  <body>
+
+    <!-- START NAV -->
+    {% include 'main-nav.html' %}
+    <!-- END NAV -->
+
+    <div class="container">
+
+      <div class="section">
+
+        <div class="columns mb-6">
+          <div class="column has-text-centered">
+            <h1 class="title is-1" style="color: ghostwhite;">Все новости</h1>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div id="filters1" class="row columns is-multiline">
+
+          <div class="column">
+            <div class="field is-horizontal">
+              <div class="field-body">
+                <div class="field">
+                  <p class="control">
+                    <input id="news-number" class="input" type="number" min="5" max="200" value="10">
+                  </p>
+                  <p class="help has-text-white">новостей</p>
+                </div>
+                <div class="field">
+                  <p class="control">
+                    <input id="date-start" class="input" type="date">
+                  </p>
+                  <p class="help has-text-white">от</p>
+                </div>
+                <div class="field">
+                  <p class="control">
+                    <input id="date-end" class="input" type="date">
+                  </p>
+                  <p class="help has-text-white">до</p>
+                </div>
+                <div class="field">
+                  <div class="select">
+                    <select id="news-topic">
+                      <option value="" disabled selected>Выберите тему</option>
+                      {% if topics %}
+                      {% for topic in topics %}
+                      <option value="{{ topic }}">{{ topic }}</option>
+                      {% endfor %}
+                      {% endif %}
+                    </select>
+                  </div>
+                  <p class="help has-text-white">тема</p>
+                </div>
+                <div class="field">
+                  <div class="control">
+                    <button id="update" class="button is-primary" onclick="updateFilters()">
+                      Поиск
+                    </button>
+                  </div>
+                </div>
+                <div class="field">
+                  <div class="control">
+                    <button id="clear" class="button is-danger is-outlined is-pulled-right" onclick="clearFilters()">
+                      <span class="icon">
+                        <i class="fas fa-times"></i>
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End filters -->
+
+        <!-- Start news -->
+        <div id="news" class="row columns is-multiline">
+
+        <!-- News cards -->
+        {% if news %}
+        {% for card in news %}
+
+          {% if card.title %}
+          <div class="column is-4">
+            <div class="card card-h100 large">
+
+              <div class="card-content">
+                <div class="media mb-3">
+                  <div class="media-content">
+                    <p class="title is-5 no-padding"><a href="/news/{{ card.id }}">{{ card.title | safe }}</a></p>
+                  </div>
+                </div>
+                <div class="media-content mb-3">
+                  {% if card.category %}
+                  <span class="tag is-primary">{{ card.category }}</span>
+                  {% else %}
+                  <span class="tag is-primary">Общее</span>
+                  {% endif %}
+                  {% if card.tags %}
+                  {% for tag in card.tags %}
+                  {% if tag %}
+                  <span class="tag">{{ tag }}</span>
+                  {% endif %}
+                  {% endfor %}
+                  {% endif %}
+                </div>
+                <div class="card-image">
+                  <figure class="image is-16by9">
+                    {% if card.image_url %}
+                    <a href="/news/{{ card.id }}"><img src="{{ card.image_url }}" alt="{{ card.title }}"></a>
+                    {% else %}
+                    <a href="/news/{{ card.id }}"><img src="{{ url_for('static', path='/img/news-placeholder.jpg') }}" alt="{{ card.title }}"></a>
+                    {% endif %}
+                  </figure>
+                </div>
+                <div class="content">
+                  {% if card.time %}
+                  <time datetime="{{ card.date }}">{{ card.time }}</time>
+                  {% else %}
+                  <span>Сегодня</span>
+                  {% endif %}
+                  <div class="media">
+                    <div class="media-left">
+                      <figure class="image is-16x16 m-0">
+                        {% if card.logo_url %}
+                        <img src="{{ card.logo_url }}" alt="{{ card.source_name }}">
+                        {% else %}
+                        <img src="{{ url_for('static', path='/img/rtn-small-logo.png') }}" alt="{{ card.source_name }}">
+                        {% endif %}
+                      </figure>
+                    </div>
+                    <div class="media-content">
+                      {% if card.source_name %}
+                      <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">{{ card.source_name }}</a></p>
+                      {% else %}
+                      <p class="subtitle is-6"><a href="{{ card.source_url }}" target="_blank">Неизвестная газета</a></p>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        {% endfor %}
+        {% else %}
+        <div class="row column">
+          <div class="box content">
+            <p>По заданным фильтрам ничего не найдено, попробуйте изменить параметры поиска.</p>
+          </div>
+        </div>
+        {% endif %}
+        </div>
+        <!-- End news -->
+
+        <!-- Start stats -->
+        <div class="row">
+          <div class="box">
+            <h2 class="title is-3">Контекст показанных новостей</h2>
+            <div class="tags">
+              {% if stats and stats.stats and (stats.type == "Ngrams") %}
+              {% for ngram in stats.stats[:30] %}
+              <span class="tag">{{ngram[0]}}: {{ngram[1]}}</span>
+              {% endfor %}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <!-- End stats -->
+
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    {% include 'footer.html' %}
+
+  </body>
+
+</html>

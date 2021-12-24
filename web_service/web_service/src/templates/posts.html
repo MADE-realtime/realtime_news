@@ -30,6 +30,46 @@
           </div>
         </div>
 
+        <!-- Filters -->
+        <div id="filters1" class="row columns mb-2">
+
+          <div class="column is-8 is-offset-2">
+            <div class="field is-horizontal">
+              <div class="field-body">
+                <div class="field">
+                  <p class="control">
+                    <input id="date-start" class="input" type="date">
+                  </p>
+                  <p class="help has-text-white">от</p>
+                </div>
+                <div class="field">
+                  <p class="control">
+                    <input id="date-end" class="input" type="date">
+                  </p>
+                  <p class="help has-text-white">до</p>
+                </div>
+                <div class="field">
+                  <div class="control">
+                    <button id="update" class="button is-primary" onclick="updatePostsFilters()">
+                      Поиск
+                    </button>
+                  </div>
+                </div>
+                <div class="field">
+                  <div class="control">
+                    <button id="clear" class="button is-danger is-outlined" onclick="clearPostsFilters()">
+                      <span class="icon">
+                        <i class="fas fa-times"></i>
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End filters -->
+
         <!-- Start news -->
         <div id="news" class="row columns mb-6">
           <div class="column is-8 is-offset-2">
@@ -42,9 +82,9 @@
                   <div class="mb-4">
                     <div class="content">
                       {% if single_news.source_name %}
-                      <p class="subtitle is-6">
+                      <span class="subtitle is-6">
                         <a href="/vk_tg/ {{ single_news.id }}">
-                            <span class="icon-text has-text-info">
+                          <span class="icon-text has-text-info">
                             <span class="icon">
                               {% if single_news.social_network == "vk" %}
                               <i class="fab fa-vk"></i>
@@ -53,19 +93,21 @@
                               {% endif %}
                             </span>
                           </span>
-                          {{ single_news.source_name }}
+                          <span></span>{{ single_news.source_name }}
                         </a>
-                      </p>
+                      </span>
                       {% else %}
                       <p>Неизвестная газета</p>
+                      {% endif %}
+                      {% if single_news.time %}
+                      <time datetime="{{ single_news.date }}" class="is-pulled-right">{{ single_news.time }}</time>
+                      {% else %}
+                      <span class="is-pulled-right">Сегодня</span>
                       {% endif %}
                     </div>
                     <p>
                       {{ single_news.text | safe }}
                     </p>
-                    {% if single_news.link %}
-                    <p><a href="{{ single_news.link }}">Читать пост в источнике</a></p>
-                    {% endif %}
                   </div>
                   {% else %}
                   <div class="mb-4">
@@ -104,13 +146,6 @@
                     </span>
                     <span>{{ single_news.reposts }}</span>
                   </span>
-                  {% endif %}
-                </div>
-                <div class="content">
-                  {% if single_news.time %}
-                  <time datetime="{{ single_news.date }}">{{ single_news.time }}</time>
-                  {% else %}
-                  <span>Сегодня</span>
                   {% endif %}
                 </div>
 
